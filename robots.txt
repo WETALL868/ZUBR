@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://lancor.ru/sitemap.xml

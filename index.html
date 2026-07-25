@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Настройка локальной сети и интернета для офиса — монтаж, подключение, обслуживание | LANCOR</title>
+<meta name="description" content="Настройка локальной сети и интернета для офиса «под ключ»: монтаж LAN, подключение рабочих мест, Wi-Fi, VPN, серверы и сетевое оборудование. Выезд инженера, настройка за 1 день, гарантия и поддержка. Работаем с организациями любого масштаба.">
+<meta name="keywords" content="настройка локальной сети, настройка локальной сети офиса, организация локальной сети, монтаж локальной сети, подключение интернета в офис, настройка компьютерной сети, настройка сети предприятия, IT обслуживание организаций, настройка Wi-Fi в офисе, подключение рабочих мест, настройка сетевого оборудования, системный администратор для офиса, обслуживание локальной сети, организация офисной сети, настройка корпоративной сети">
+<meta name="robots" content="index, follow">
+<meta name="author" content="LANCOR">
+<link rel="canonical" href="https://lancor.ru/">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:title" content="Настройка локальной сети и интернета для офиса | LANCOR">
+<meta property="og:description" content="Проектируем, монтируем и настраиваем компьютерные сети для организаций любой сложности. Выезд инженера, настройка за один день, гарантия на работы.">
+<meta property="og:url" content="https://lancor.ru/">
+<meta property="og:site_name" content="LANCOR">
+<meta property="og:image" content="https://lancor.ru/assets/img/og-cover.jpg">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Настройка локальной сети и интернета для офиса | LANCOR">
+<meta name="twitter:description" content="Проектируем, монтируем и настраиваем компьютерные сети для организаций любой сложности.">
+
+<meta name="theme-color" content="#0a1f44">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/style.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "LANCOR",
+  "url": "https://lancor.ru/",
+  "logo": "https://lancor.ru/assets/img/favicon.svg",
+  "description": "Настройка локальной сети и интернета для офиса: проектирование, монтаж, подключение и обслуживание компьютерных сетей для организаций.",
+  "telephone": "+7-495-000-00-00",
+  "areaServed": "RU",
+  "address": {
+    "@type": "PostalAddress",
+    "addressCountry": "RU"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "serviceType": "Настройка локальной сети и интернета для офиса",
+  "provider": { "@type": "Organization", "name": "LANCOR" },
+  "areaServed": "RU",
+  "audience": { "@type": "Audience", "audienceType": "Организации, офисы, магазины, склады, производства" },
+  "description": "Проектирование, монтаж и настройка локальных сетей, подключение интернета, Wi-Fi, VPN и сетевого оборудования для офисов и предприятий."
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type":"Question","name":"Сколько стоит настройка локальной сети?","acceptedAnswer":{"@type":"Answer","text":"Стоимость зависит от количества рабочих мест, площади офиса, наличия кабельных трасс и требуемого оборудования. После заявки инженер оценивает объект и предоставляет точный расчёт бесплатно."}},
+    {"@type":"Question","name":"Сколько времени занимает настройка?","acceptedAnswer":{"@type":"Answer","text":"Типовой офис на 10–20 рабочих мест подключается за один рабочий день. Крупные объекты со сложным монтажом кабельных трасс могут занимать несколько дней — сроки согласуются заранее."}},
+    {"@type":"Question","name":"Работаете ли с юридическими лицами?","acceptedAnswer":{"@type":"Answer","text":"Да, мы работаем по договору с организациями любой формы собственности, предоставляем закрывающие документы и акты выполненных работ."}},
+    {"@type":"Question","name":"Можно ли настроить удалённый доступ?","acceptedAnswer":{"@type":"Answer","text":"Да, настраиваем защищённый удалённый доступ к рабочим местам и внутренним ресурсам компании через VPN с шифрованием трафика."}},
+    {"@type":"Question","name":"Можно ли модернизировать существующую сеть?","acceptedAnswer":{"@type":"Answer","text":"Да, проводим аудит текущей инфраструктуры и модернизируем сеть без длительного простоя офиса: замену оборудования, перепрокладку кабеля, повышение отказоустойчивости."}},
+    {"@type":"Question","name":"Какие роутеры используете?","acceptedAnswer":{"@type":"Answer","text":"Подбираем оборудование под задачи и бюджет заказчика: MikroTik, TP-Link Omada, Keenetic, Ubiquiti, Cisco и другие профессиональные решения."}},
+    {"@type":"Question","name":"Настраиваете ли MikroTik?","acceptedAnswer":{"@type":"Answer","text":"Да, выполняем настройку маршрутизаторов MikroTik: RouterOS, VPN, firewall, VLAN, балансировку каналов и резервирование интернета."}},
+    {"@type":"Question","name":"Работаете ли с TP-Link Omada?","acceptedAnswer":{"@type":"Answer","text":"Да, проектируем и настраиваем сети на базе экосистемы TP-Link Omada, включая централизованное управление точками доступа и коммутаторами."}},
+    {"@type":"Question","name":"Настраиваете ли Ubiquiti?","acceptedAnswer":{"@type":"Answer","text":"Да, работаем с оборудованием Ubiquiti UniFi: точки доступа, коммутаторы, шлюзы и единая панель управления сетью."}}
+  ]
+}
+</script>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Перейти к содержимому</a>
+
+<!-- ============ HEADER ============ -->
+<header class="site-header" id="top">
+  <div class="container header__inner">
+    <a href="#top" class="logo" aria-label="LANCOR — на главную">
+      <svg class="logo__mark" viewBox="0 0 40 40" aria-hidden="true">
+        <circle cx="20" cy="10" r="3.4" fill="currentColor"/>
+        <circle cx="8" cy="30" r="3.4" fill="currentColor"/>
+        <circle cx="32" cy="30" r="3.4" fill="currentColor"/>
+        <path d="M20 13.4 L8 26.6 M20 13.4 L32 26.6 M8 30 H32" stroke="currentColor" stroke-width="1.6" fill="none"/>
+      </svg>
+      <span class="logo__text">LANCOR<span class="logo__sub">сети для бизнеса</span></span>
+    </a>
+
+    <nav class="nav" id="nav" aria-label="Основная навигация">
+      <ul class="nav__list">
+        <li><a href="#services">Услуги</a></li>
+        <li><a href="#for-whom">Кому подходит</a></li>
+        <li><a href="#process">Как работаем</a></li>
+        <li><a href="#why-us">Почему мы</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#contact">Контакты</a></li>
+      </ul>
+    </nav>
+
+    <div class="header__actions">
+      <a class="header__phone" href="tel:+74950000000">
+        <svg class="icon" aria-hidden="true"><use href="#i-phone"></use></svg>
+        <span>+7 (495) 000-00-00</span>
+      </a>
+      <a href="#contact" class="btn btn--primary btn--sm" data-intent="Заказать настройку">Заказать настройку</a>
+      <button class="burger" id="burger" aria-label="Открыть меню" aria-expanded="false" aria-controls="mobile-nav">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav" id="mobile-nav">
+  <ul>
+    <li><a href="#services">Услуги</a></li>
+    <li><a href="#for-whom">Кому подходит</a></li>
+    <li><a href="#process">Как работаем</a></li>
+    <li><a href="#why-us">Почему мы</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#contact">Контакты</a></li>
+  </ul>
+  <a class="header__phone" href="tel:+74950000000">
+    <svg class="icon" aria-hidden="true"><use href="#i-phone"></use></svg>
+    <span>+7 (495) 000-00-00</span>
+  </a>
+  <a href="#contact" class="btn btn--primary btn--block" data-intent="Заказать настройку">Заказать настройку</a>
+</div>
+
+<main id="main">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="hero__bg" aria-hidden="true"></div>
+    <div class="container hero__inner">
+      <div class="hero__content reveal">
+        <p class="eyebrow">Инженерная IT-компания · сети для организаций</p>
+        <h1 class="hero__title">Настройка локальной сети и&nbsp;интернета для&nbsp;офиса</h1>
+        <p class="hero__subtitle">Проектируем, подключаем и настраиваем компьютерные сети любой сложности для организаций: от одного кабинета до сети филиалов.</p>
+        <div class="hero__actions">
+          <a href="#contact" class="btn btn--primary btn--lg" data-intent="Получить консультацию">
+            Получить консультацию
+            <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+          </a>
+          <a href="#contact" class="btn btn--outline btn--lg" data-intent="Заказать настройку">Заказать настройку</a>
+        </div>
+        <ul class="hero__trust" aria-label="Ключевые преимущества">
+          <li><svg class="icon" aria-hidden="true"><use href="#i-check-circle"></use></svg>Выезд инженера в день заявки</li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-check-circle"></use></svg>Гарантия на все работы</li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-check-circle"></use></svg>Работаем с юрлицами по договору</li>
+        </ul>
+      </div>
+
+      <div class="hero__visual reveal" aria-hidden="true">
+        <svg class="network-illustration" viewBox="0 0 560 480" role="img" aria-label="Схема офисной компьютерной сети: интернет, роутер, коммутатор, рабочие места, Wi-Fi и сервер">
+          <defs>
+            <linearGradient id="panelGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#123163"/>
+              <stop offset="1" stop-color="#0a1f44"/>
+            </linearGradient>
+            <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+              <stop offset="0" stop-color="#3aa7ff" stop-opacity="0.35"/>
+              <stop offset="1" stop-color="#3aa7ff" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+
+          <rect x="0" y="0" width="560" height="480" rx="28" fill="url(#panelGrad)"/>
+          <circle cx="280" cy="240" r="230" fill="url(#glow)"/>
+
+          <g stroke="#5aa8f0" stroke-width="1" opacity="0.18">
+            <line x1="40" y1="40" x2="40" y2="440"/><line x1="120" y1="40" x2="120" y2="440"/>
+            <line x1="200" y1="40" x2="200" y2="440"/><line x1="280" y1="40" x2="280" y2="440"/>
+            <line x1="360" y1="40" x2="360" y2="440"/><line x1="440" y1="40" x2="440" y2="440"/>
+            <line x1="520" y1="40" x2="520" y2="440"/>
+            <line x1="20" y1="60" x2="540" y2="60"/><line x1="20" y1="140" x2="540" y2="140"/>
+            <line x1="20" y1="220" x2="540" y2="220"/><line x1="20" y1="300" x2="540" y2="300"/>
+            <line x1="20" y1="380" x2="540" y2="380"/>
+          </g>
+
+          <!-- cloud / internet -->
+          <g transform="translate(280,70)">
+            <path d="M-46 10 a22 22 0 0 1 5 -43 a30 30 0 0 1 57 -6 a24 24 0 0 1 20 40 a1 1 0 0 1 -1 9 h-80 a1 1 0 0 1 -1 -9z" fill="#0f2a55" stroke="#7fd0ff" stroke-width="1.5"/>
+            <text x="0" y="6" text-anchor="middle" font-size="11" fill="#dff1ff" font-family="inherit">Интернет</text>
+          </g>
+
+          <!-- link cloud -> router -->
+          <path class="flow-line" d="M280 112 L280 158" stroke="#7fd0ff" stroke-width="2" stroke-dasharray="6 6" fill="none"/>
+
+          <!-- router -->
+          <g transform="translate(280,190)">
+            <rect x="-46" y="-24" width="92" height="48" rx="10" fill="#0f2a55" stroke="#7fd0ff" stroke-width="1.5"/>
+            <path d="M-18 -24 v-14 M18 -24 v-14" stroke="#7fd0ff" stroke-width="1.5"/>
+            <circle cx="-24" cy="0" r="3" fill="#3aa7ff" class="pulse-dot"/>
+            <circle cx="0" cy="0" r="3" fill="#3aa7ff" class="pulse-dot" style="animation-delay:.3s"/>
+            <circle cx="24" cy="0" r="3" fill="#3aa7ff" class="pulse-dot" style="animation-delay:.6s"/>
+            <text x="0" y="34" text-anchor="middle" font-size="11" fill="#c9e4ff" font-family="inherit">Роутер / Firewall</text>
+          </g>
+
+          <!-- link router -> switch -->
+          <path class="flow-line" d="M280 214 L280 258" stroke="#7fd0ff" stroke-width="2" stroke-dasharray="6 6" fill="none"/>
+
+          <!-- switch -->
+          <g transform="translate(280,286)">
+            <rect x="-70" y="-18" width="140" height="36" rx="8" fill="#0f2a55" stroke="#7fd0ff" stroke-width="1.5"/>
+            <circle cx="-45" cy="0" r="2.6" fill="#3aa7ff"/><circle cx="-22" cy="0" r="2.6" fill="#3aa7ff"/>
+            <circle cx="0" cy="0" r="2.6" fill="#3aa7ff"/><circle cx="22" cy="0" r="2.6" fill="#3aa7ff"/>
+            <circle cx="45" cy="0" r="2.6" fill="#3aa7ff"/>
+            <text x="0" y="30" text-anchor="middle" font-size="11" fill="#c9e4ff" font-family="inherit">Коммутатор</text>
+          </g>
+
+          <!-- links switch -> devices -->
+          <path class="flow-line" d="M215 300 L110 360" stroke="#7fd0ff" stroke-width="1.6" stroke-dasharray="5 6" fill="none"/>
+          <path class="flow-line" d="M255 304 L200 380" stroke="#7fd0ff" stroke-width="1.6" stroke-dasharray="5 6" fill="none"/>
+          <path class="flow-line" d="M305 304 L360 380" stroke="#7fd0ff" stroke-width="1.6" stroke-dasharray="5 6" fill="none"/>
+          <path class="flow-line" d="M345 300 L450 360" stroke="#7fd0ff" stroke-width="1.6" stroke-dasharray="5 6" fill="none"/>
+
+          <!-- laptop 1 -->
+          <g transform="translate(95,392)">
+            <rect x="-22" y="-15" width="44" height="26" rx="3" fill="#0f2a55" stroke="#7fd0ff" stroke-width="1.4"/>
+            <path d="M-26 13 h52 l-6 8 h-40z" fill="#123163" stroke="#7fd0ff" stroke-width="1.2"/>
+          </g>
+          <!-- desktop / NAS -->
+          <g transform="translate(195,398)">
+            <rect x="-16" y="-20" width="32" height="40" rx="4" fill="#0f2a55" stroke="#7fd0ff" stroke-width="1.4"/>
+            <line x1="-10" y1="-10" x2="10" y2="-10" stroke="#3aa7ff" stroke-width="1.4"/>
+            <line x1="-10" y1="0" x2="10" y2="0" stroke="#3aa7ff" stroke-width="1.4"/>
+            <line x1="-10" y1="10" x2="10" y2="10" stroke="#3aa7ff" stroke-width="1.4"/>
+          </g>
+          <!-- printer -->
+          <g transform="translate(365,398)">
+            <rect x="-20" y="-8" width="40" height="20" rx="3" fill="#0f2a55" stroke="#7fd0ff" stroke-width="1.4"/>
+            <rect x="-12" y="-20" width="24" height="12" rx="2" fill="#0f2a55" stroke="#7fd0ff" stroke-width="1.2"/>
+            <rect x="-10" y="12" width="20" height="10" fill="#123163" stroke="#7fd0ff" stroke-width="1.2"/>
+          </g>
+          <!-- wifi access point -->
+          <g transform="translate(460,392)">
+            <rect x="-20" y="-6" width="40" height="12" rx="6" fill="#0f2a55" stroke="#7fd0ff" stroke-width="1.4"/>
+            <path d="M-10 -10 a14 14 0 0 1 20 0" stroke="#3aa7ff" stroke-width="1.6" fill="none" class="pulse-arc"/>
+            <path d="M-16 -16 a22 22 0 0 1 32 0" stroke="#3aa7ff" stroke-width="1.4" fill="none" opacity="0.6" class="pulse-arc" style="animation-delay:.4s"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <div class="hero__stats container">
+      <div class="stat"><span class="stat__num">12+</span><span class="stat__label">лет на рынке B2B‑сетей</span></div>
+      <div class="stat"><span class="stat__num">640+</span><span class="stat__label">подключённых офисов</span></div>
+      <div class="stat"><span class="stat__num">1&nbsp;день</span><span class="stat__label">типовой монтаж под ключ</span></div>
+      <div class="stat"><span class="stat__num">24/7</span><span class="stat__label">поддержка после сдачи работ</span></div>
+    </div>
+  </section>
+
+  <!-- ============ ADVANTAGES ============ -->
+  <section class="section" aria-labelledby="adv-title">
+    <div class="container">
+      <header class="section__header reveal">
+        <p class="eyebrow">Формат работы</p>
+        <h2 class="section__title" id="adv-title">Настройка сети без хлопот для вашей команды</h2>
+        <p class="section__subtitle">Берём на себя весь цикл — от выезда инженера до запуска сети и поддержки.</p>
+      </header>
+      <div class="cards-grid cards-grid--6">
+        <div class="card reveal">
+          <span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-van"></use></svg></span>
+          <h3 class="card__title">Выезд специалиста</h3>
+          <p class="card__text">Инженер приезжает на объект для осмотра и монтажа — без удалённых догадок.</p>
+        </div>
+        <div class="card reveal">
+          <span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-building"></use></svg></span>
+          <h3 class="card__title">Работаем с организациями</h3>
+          <p class="card__text">Договор, счета, закрывающие документы — комфортно для бухгалтерии и юротдела.</p>
+        </div>
+        <div class="card reveal">
+          <span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg></span>
+          <h3 class="card__title">Настройка за один день</h3>
+          <p class="card__text">Типовой офис подключаем и настраиваем в течение одного рабочего дня.</p>
+        </div>
+        <div class="card reveal">
+          <span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg></span>
+          <h3 class="card__title">Безопасная сеть</h3>
+          <p class="card__text">Сегментация, firewall и защищённый доступ снижают риски утечек и атак.</p>
+        </div>
+        <div class="card reveal">
+          <span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-medal"></use></svg></span>
+          <h3 class="card__title">Гарантия на работы</h3>
+          <p class="card__text">Официальная гарантия на монтаж, настройку и поставленное оборудование.</p>
+        </div>
+        <div class="card reveal">
+          <span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-headset"></use></svg></span>
+          <h3 class="card__title">Поддержка после настройки</h3>
+          <p class="card__text">Остаёмся на связи: консультации, донастройка и плановое обслуживание.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SERVICES ============ -->
+  <section class="section section--tint" id="services" aria-labelledby="services-title">
+    <div class="container">
+      <header class="section__header reveal">
+        <p class="eyebrow">Услуги</p>
+        <h2 class="section__title" id="services-title">Какие услуги оказываем</h2>
+        <p class="section__subtitle">Полный цикл работ по настройке компьютерной сети предприятия — от проекта до сдачи в эксплуатацию.</p>
+      </header>
+
+      <div class="cards-grid cards-grid--services">
+        <div class="card card--service reveal">
+          <span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-lan"></use></svg></span>
+          <h3 class="card__title">Настройка локальной сети (LAN)</h3>
+          <p class="card__text">Проектирование и настройка локальной сети офиса с учётом нагрузки и роста компании.</p>
+        </div>
+        <div class="card card--service reveal">
+          <span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-globe"></use></svg></span>
+          <h3 class="card__title">Подключение интернета в офис</h3>
+          <p class="card__text">Организация основного и резервного канала интернета с балансировкой нагрузки.</p>
+        </div>
+        <div class="card card--service reveal">
+          <span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-wifi"></use></svg></span>
+          <h3 class="card__title">Настройка Wi-Fi</h3>
+          <p class="card__text">Стабильное покрытие Wi-Fi в офисе на одном или нескольких этажах без «слепых зон».</p>
+        </div>
+        <div class="card card--service reveal">
+          <span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-route"></use></svg></span>
+          <h3 class="card__title">Монтаж локальной сети</h3>
+          <p class="card__text">Прокладка и разводка кабельных трасс, монтаж в короба и стойки по стандартам.</p>
+        </div>
+        <div class="card card--service reveal">
+          <span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-desktop"></use></svg></span>
+          <h3 class="card__title">Подключение рабочих компьютеров</h3>
+          <p class="card__text">Настройка сетевых параметров и подключение рабочих мест сотрудников к сети.</p>
+        </div>
+        <div class="card card--service reveal">
+          <span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-router"></use></svg></span>
+          <h3 class="card__title">Настройка маршрутизаторов</h3>
+          <p class="card__text">Настройка роутеров MikroTik, Keenetic, TP-Link, Ubiquiti под задачи бизнеса.</p>
+        </div>
+        <div class="card card--service reveal">
+          <span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-switch"></use></svg></span>
+          <h3 class="card__title">Настройка коммутаторов</h3>
+          <p class="card__text">VLAN, агрегация портов и приоритизация трафика для управляемых коммутаторов.</p>
+        </div>
+        <div class="card card--service reveal">
+          <span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-rack"></use></svg></span>
+          <h3 class="card__title">Настройка сетевого оборудования</h3>
+          <p class="card__text">Ввод в эксплуатацию точек доступа, шлюзов, ИБП и прочего сетевого оборудования.</p>
+        </div>
+        <div class="card card--service reveal">
+          <span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-folder"></use></svg></span>
+          <h3 class="card__title">Настройка общих папок</h3>
+          <p class="card__text">Общий доступ к файлам с разграничением прав между отделами и сотрудниками.</p>
+        </div>
+        <div class="card card--service reveal">
+          <span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-printer"></use></svg></span>
+          <h3 class="card__title">Настройка сетевых принтеров</h3>
+          <p class="card__text">Общий доступ к печати для всех сотрудников офиса с одного или нескольких МФУ.</p>
+        </div>
+        <div class="card card--service reveal">
+          <span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-nas"></use></svg></span>
+          <h3 class="card__title">Настройка NAS</h3>
+          <p class="card__text">Сетевые хранилища для резервного копирования и общего доступа к данным.</p>
+        </div>
+        <div class="card card--service reveal">
+          <span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-vpn"></use></svg></span>
+          <h3 class="card__title">Настройка VPN</h3>
+          <p class="card__text">Защищённое соединение между офисами и удалёнными сотрудниками.</p>
+        </div>
+        <div class="card card--service reveal">
+          <span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-remote"></use></svg></span>
+          <h3 class="card__title">Настройка удалённого доступа</h3>
+          <p class="card__text">Безопасный доступ к рабочим столам и внутренним сервисам из любой точки.</p>
+        </div>
+        <div class="card card--service reveal">
+          <span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-lock"></use></svg></span>
+          <h3 class="card__title">Организация защищённой сети</h3>
+          <p class="card__text">Сегментация сети, firewall-политики и защита от внешних угроз.</p>
+        </div>
+        <div class="card card--service reveal">
+          <span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-tag"></use></svg></span>
+          <h3 class="card__title">Настройка IP-адресации</h3>
+          <p class="card__text">Продуманная схема IP-адресов, DHCP и статических адресов без конфликтов.</p>
+        </div>
+        <div class="card card--service reveal">
+          <span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg></span>
+          <h3 class="card__title">Диагностика сети</h3>
+          <p class="card__text">Поиск причин нестабильной работы сети: обрывы, перегрузки, помехи.</p>
+        </div>
+        <div class="card card--service reveal">
+          <span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-wrench"></use></svg></span>
+          <h3 class="card__title">Устранение неисправностей</h3>
+          <p class="card__text">Оперативный ремонт сети: от повреждённого кабеля до сбоя оборудования.</p>
+        </div>
+        <div class="card card--service reveal">
+          <span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-refresh"></use></svg></span>
+          <h3 class="card__title">Модернизация существующей сети</h3>
+          <p class="card__text">Обновление устаревшей инфраструктуры без длительного простоя офиса.</p>
+        </div>
+        <div class="card card--service reveal">
+          <span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-cable"></use></svg></span>
+          <h3 class="card__title">Прокладка кабеля</h3>
+          <p class="card__text">Витая пара и оптика: скрытая или открытая прокладка по помещению.</p>
+        </div>
+        <div class="card card--service reveal">
+          <span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-server"></use></svg></span>
+          <h3 class="card__title">Настройка серверов при необходимости</h3>
+          <p class="card__text">Развёртывание файловых, почтовых и терминальных серверов под задачи офиса.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOR WHOM ============ -->
+  <section class="section" id="for-whom" aria-labelledby="whom-title">
+    <div class="container">
+      <header class="section__header reveal">
+        <p class="eyebrow">Кому подходит</p>
+        <h2 class="section__title" id="whom-title">Настраиваем сети для любых предприятий</h2>
+        <p class="section__subtitle">Учитываем специфику объекта: планировку, нагрузку, требования к отказоустойчивости.</p>
+      </header>
+      <div class="cards-grid cards-grid--whom">
+        <div class="card card--whom reveal"><span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-building"></use></svg></span><h3 class="card__title">Офисы</h3></div>
+        <div class="card card--whom reveal"><span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-shop"></use></svg></span><h3 class="card__title">Магазины</h3></div>
+        <div class="card card--whom reveal"><span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-warehouse"></use></svg></span><h3 class="card__title">Склады</h3></div>
+        <div class="card card--whom reveal"><span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-factory"></use></svg></span><h3 class="card__title">Производства</h3></div>
+        <div class="card card--whom reveal"><span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-cup"></use></svg></span><h3 class="card__title">Кафе</h3></div>
+        <div class="card card--whom reveal"><span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-restaurant"></use></svg></span><h3 class="card__title">Рестораны</h3></div>
+        <div class="card card--whom reveal"><span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-cross"></use></svg></span><h3 class="card__title">Медицинские центры</h3></div>
+        <div class="card card--whom reveal"><span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-cap"></use></svg></span><h3 class="card__title">Учебные организации</h3></div>
+        <div class="card card--whom reveal"><span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-briefcase"></use></svg></span><h3 class="card__title">Любые предприятия</h3></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PROCESS ============ -->
+  <section class="section section--dark" id="process" aria-labelledby="process-title">
+    <div class="container">
+      <header class="section__header reveal">
+        <p class="eyebrow eyebrow--light">Как проходит работа</p>
+        <h2 class="section__title section__title--light" id="process-title">Восемь шагов от заявки до сдачи сети</h2>
+        <p class="section__subtitle section__subtitle--light">Прозрачный процесс на каждом этапе — вы знаете, что происходит с вашей сетью.</p>
+      </header>
+
+      <ol class="timeline">
+        <li class="timeline__item reveal">
+          <span class="timeline__num">01</span>
+          <span class="timeline__icon"><svg class="icon" aria-hidden="true"><use href="#i-doc"></use></svg></span>
+          <h3 class="timeline__title">Заявка</h3>
+          <p class="timeline__text">Оставляете заявку на сайте или по телефону — уточняем задачу.</p>
+        </li>
+        <li class="timeline__item reveal">
+          <span class="timeline__num">02</span>
+          <span class="timeline__icon"><svg class="icon" aria-hidden="true"><use href="#i-van"></use></svg></span>
+          <h3 class="timeline__title">Выезд специалиста</h3>
+          <p class="timeline__text">Инженер выезжает на объект в удобное для вас время.</p>
+        </li>
+        <li class="timeline__item reveal">
+          <span class="timeline__num">03</span>
+          <span class="timeline__icon"><svg class="icon" aria-hidden="true"><use href="#i-search-building"></use></svg></span>
+          <h3 class="timeline__title">Осмотр объекта</h3>
+          <p class="timeline__text">Оцениваем планировку, текущую инфраструктуру и требования.</p>
+        </li>
+        <li class="timeline__item reveal">
+          <span class="timeline__num">04</span>
+          <span class="timeline__icon"><svg class="icon" aria-hidden="true"><use href="#i-gear-box"></use></svg></span>
+          <h3 class="timeline__title">Подбор оборудования</h3>
+          <p class="timeline__text">Рекомендуем оптимальное оборудование под задачи и бюджет.</p>
+        </li>
+        <li class="timeline__item reveal">
+          <span class="timeline__num">05</span>
+          <span class="timeline__icon"><svg class="icon" aria-hidden="true"><use href="#i-toolbox"></use></svg></span>
+          <h3 class="timeline__title">Монтаж</h3>
+          <p class="timeline__text">Прокладываем кабель, устанавливаем оборудование и рабочие места.</p>
+        </li>
+        <li class="timeline__item reveal">
+          <span class="timeline__num">06</span>
+          <span class="timeline__icon"><svg class="icon" aria-hidden="true"><use href="#i-sliders"></use></svg></span>
+          <h3 class="timeline__title">Настройка</h3>
+          <p class="timeline__text">Настраиваем сеть, безопасность, доступы и сервисы.</p>
+        </li>
+        <li class="timeline__item reveal">
+          <span class="timeline__num">07</span>
+          <span class="timeline__icon"><svg class="icon" aria-hidden="true"><use href="#i-clipboard"></use></svg></span>
+          <h3 class="timeline__title">Проверка</h3>
+          <p class="timeline__text">Тестируем сеть под нагрузкой и устраняем замечания.</p>
+        </li>
+        <li class="timeline__item reveal">
+          <span class="timeline__num">08</span>
+          <span class="timeline__icon"><svg class="icon" aria-hidden="true"><use href="#i-handshake"></use></svg></span>
+          <h3 class="timeline__title">Сдача работ</h3>
+          <p class="timeline__text">Передаём документацию по сети и подписываем акт.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ WHY US ============ -->
+  <section class="section" id="why-us" aria-labelledby="why-title">
+    <div class="container">
+      <header class="section__header reveal">
+        <p class="eyebrow">Почему выбирают нас</p>
+        <h2 class="section__title" id="why-title">Инженерный подход к сетям предприятия</h2>
+      </header>
+      <div class="cards-grid cards-grid--7">
+        <div class="card reveal"><span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-medal"></use></svg></span><h3 class="card__title">Опыт настройки офисных сетей</h3></div>
+        <div class="card reveal"><span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-router"></use></svg></span><h3 class="card__title">Современное оборудование</h3></div>
+        <div class="card reveal"><span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg></span><h3 class="card__title">Безопасность</h3></div>
+        <div class="card reveal"><span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-doc"></use></svg></span><h3 class="card__title">Документирование сети</h3></div>
+        <div class="card reveal"><span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg></span><h3 class="card__title">Минимальный простой офиса</h3></div>
+        <div class="card reveal"><span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-checkmark-circle"></use></svg></span><h3 class="card__title">Гарантия</h3></div>
+        <div class="card reveal"><span class="card__icon"><svg class="icon" aria-hidden="true"><use href="#i-headset"></use></svg></span><h3 class="card__title">Поддержка</h3></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ COMMON TASKS ============ -->
+  <section class="section section--tint" aria-labelledby="tasks-title">
+    <div class="container">
+      <header class="section__header reveal">
+        <p class="eyebrow">Частые задачи</p>
+        <h2 class="section__title" id="tasks-title">С какими запросами к нам обращаются чаще всего</h2>
+      </header>
+      <ul class="tasks-grid">
+        <li class="task-card reveal"><svg class="icon" aria-hidden="true"><use href="#i-globe"></use></svg>Настроить интернет в офисе</li>
+        <li class="task-card reveal"><svg class="icon" aria-hidden="true"><use href="#i-desktop"></use></svg>Подключить 20 рабочих мест</li>
+        <li class="task-card reveal"><svg class="icon" aria-hidden="true"><use href="#i-wifi"></use></svg>Настроить Wi-Fi на нескольких этажах</li>
+        <li class="task-card reveal"><svg class="icon" aria-hidden="true"><use href="#i-folder"></use></svg>Организовать общие папки</li>
+        <li class="task-card reveal"><svg class="icon" aria-hidden="true"><use href="#i-printer"></use></svg>Подключить сетевой принтер</li>
+        <li class="task-card reveal"><svg class="icon" aria-hidden="true"><use href="#i-vpn"></use></svg>Настроить VPN</li>
+        <li class="task-card reveal"><svg class="icon" aria-hidden="true"><use href="#i-van"></use></svg>Перенести офис</li>
+        <li class="task-card reveal"><svg class="icon" aria-hidden="true"><use href="#i-lan"></use></svg>Объединить филиалы</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section class="section" id="faq" aria-labelledby="faq-title">
+    <div class="container container--narrow">
+      <header class="section__header reveal">
+        <p class="eyebrow">Вопросы и ответы</p>
+        <h2 class="section__title" id="faq-title">Частые вопросы о настройке локальной сети</h2>
+      </header>
+
+      <div class="faq-list reveal">
+        <details class="faq-item" name="faq">
+          <summary>Сколько стоит настройка локальной сети?<svg class="icon faq-chevron" aria-hidden="true"><use href="#i-chevron-down"></use></svg></summary>
+          <div class="faq-answer"><p>Стоимость зависит от количества рабочих мест, площади офиса, наличия готовых кабельных трасс и требуемого оборудования. После заявки инженер оценивает объект и предоставляет точный расчёт бесплатно.</p></div>
+        </details>
+        <details class="faq-item" name="faq">
+          <summary>Сколько времени занимает настройка?<svg class="icon faq-chevron" aria-hidden="true"><use href="#i-chevron-down"></use></svg></summary>
+          <div class="faq-answer"><p>Типовой офис на 10–20 рабочих мест подключается за один рабочий день. Крупные объекты со сложным монтажом кабельных трасс могут занимать несколько дней — сроки согласуются заранее.</p></div>
+        </details>
+        <details class="faq-item" name="faq">
+          <summary>Работаете ли с юридическими лицами?<svg class="icon faq-chevron" aria-hidden="true"><use href="#i-chevron-down"></use></svg></summary>
+          <div class="faq-answer"><p>Да, мы работаем по договору с организациями любой формы собственности, предоставляем закрывающие документы и акты выполненных работ.</p></div>
+        </details>
+        <details class="faq-item" name="faq">
+          <summary>Можно ли настроить удалённый доступ?<svg class="icon faq-chevron" aria-hidden="true"><use href="#i-chevron-down"></use></svg></summary>
+          <div class="faq-answer"><p>Да, настраиваем защищённый удалённый доступ к рабочим местам и внутренним ресурсам компании через VPN с шифрованием трафика.</p></div>
+        </details>
+        <details class="faq-item" name="faq">
+          <summary>Можно ли модернизировать существующую сеть?<svg class="icon faq-chevron" aria-hidden="true"><use href="#i-chevron-down"></use></svg></summary>
+          <div class="faq-answer"><p>Да, проводим аудит текущей инфраструктуры и модернизируем сеть без длительного простоя офиса: замену оборудования, перепрокладку кабеля, повышение отказоустойчивости.</p></div>
+        </details>
+        <details class="faq-item" name="faq">
+          <summary>Какие роутеры используете?<svg class="icon faq-chevron" aria-hidden="true"><use href="#i-chevron-down"></use></svg></summary>
+          <div class="faq-answer"><p>Подбираем оборудование под задачи и бюджет заказчика: MikroTik, TP-Link Omada, Keenetic, Ubiquiti, Cisco и другие профессиональные решения.</p></div>
+        </details>
+        <details class="faq-item" name="faq">
+          <summary>Настраиваете ли MikroTik?<svg class="icon faq-chevron" aria-hidden="true"><use href="#i-chevron-down"></use></svg></summary>
+          <div class="faq-answer"><p>Да, выполняем настройку маршрутизаторов MikroTik: RouterOS, VPN, firewall, VLAN, балансировку каналов и резервирование интернета.</p></div>
+        </details>
+        <details class="faq-item" name="faq">
+          <summary>Работаете ли с TP-Link Omada?<svg class="icon faq-chevron" aria-hidden="true"><use href="#i-chevron-down"></use></svg></summary>
+          <div class="faq-answer"><p>Да, проектируем и настраиваем сети на базе экосистемы TP-Link Omada, включая централизованное управление точками доступа и коммутаторами.</p></div>
+        </details>
+        <details class="faq-item" name="faq">
+          <summary>Настраиваете ли Ubiquiti?<svg class="icon faq-chevron" aria-hidden="true"><use href="#i-chevron-down"></use></svg></summary>
+          <div class="faq-answer"><p>Да, работаем с оборудованием Ubiquiti UniFi: точки доступа, коммутаторы, шлюзы и единая панель управления сетью.</p></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONTACT ============ -->
+  <section class="section section--contact" id="contact" aria-labelledby="contact-title">
+    <div class="container">
+      <div class="contact-grid">
+        <div class="contact-info reveal">
+          <p class="eyebrow eyebrow--light">Оставить заявку</p>
+          <h2 class="section__title section__title--light" id="contact-title">Получите расчёт настройки сети для вашего офиса</h2>
+          <p class="section__subtitle section__subtitle--light">Ответим в течение рабочего дня, уточним детали и предложим оптимальное решение по срокам и оборудованию.</p>
+
+          <ul class="contact-details">
+            <li><svg class="icon" aria-hidden="true"><use href="#i-phone"></use></svg><a href="tel:+74950000000">+7 (495) 000-00-00</a></li>
+            <li><svg class="icon" aria-hidden="true"><use href="#i-mail"></use></svg><a href="mailto:info@lancor.ru">info@lancor.ru</a></li>
+            <li><svg class="icon" aria-hidden="true"><use href="#i-pin"></use></svg><span>Москва и Московская область, выезд по РФ</span></li>
+          </ul>
+        </div>
+
+        <form class="contact-form reveal" id="lead-form" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="f-name">Имя</label>
+              <input id="f-name" name="name" type="text" autocomplete="name" required placeholder="Как к вам обращаться">
+            </div>
+            <div class="form-group">
+              <label for="f-phone">Телефон</label>
+              <input id="f-phone" name="phone" type="tel" autocomplete="tel" required placeholder="+7 (___) ___-__-__">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="f-seats">Количество рабочих мест</label>
+            <input id="f-seats" name="seats" type="number" min="1" step="1" placeholder="Например, 15">
+          </div>
+          <div class="form-group">
+            <label for="f-task">Опишите задачу</label>
+            <textarea id="f-task" name="task" rows="4" placeholder="Например: настроить Wi-Fi и подключить 15 рабочих мест на новом этаже"></textarea>
+          </div>
+
+          <input type="hidden" name="intent" id="f-intent" value="Получить консультацию">
+          <input type="text" name="company" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+          <label class="form-consent">
+            <input type="checkbox" name="consent" required>
+            <span>Согласен на обработку персональных данных в соответствии с 152-ФЗ</span>
+          </label>
+
+          <button type="submit" class="btn btn--primary btn--lg btn--block">
+            Получить расчёт
+            <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+          </button>
+
+          <p class="form-success" id="form-success" role="status" aria-live="polite">
+            <svg class="icon" aria-hidden="true"><use href="#i-check-circle"></use></svg>
+            Заявка отправлена! Мы свяжемся с вами в ближайшее рабочее время.
+          </p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="site-footer">
+  <div class="container footer__inner">
+    <div class="footer__brand">
+      <a href="#top" class="logo logo--footer">
+        <svg class="logo__mark" viewBox="0 0 40 40" aria-hidden="true">
+          <circle cx="20" cy="10" r="3.4" fill="currentColor"/>
+          <circle cx="8" cy="30" r="3.4" fill="currentColor"/>
+          <circle cx="32" cy="30" r="3.4" fill="currentColor"/>
+          <path d="M20 13.4 L8 26.6 M20 13.4 L32 26.6 M8 30 H32" stroke="currentColor" stroke-width="1.6" fill="none"/>
+        </svg>
+        <span class="logo__text">LANCOR</span>
+      </a>
+      <p>Настройка локальной сети, подключение интернета и обслуживание корпоративных сетей для организаций.</p>
+    </div>
+
+    <nav class="footer__col" aria-label="Разделы сайта">
+      <h4>Разделы</h4>
+      <ul>
+        <li><a href="#services">Услуги</a></li>
+        <li><a href="#for-whom">Кому подходит</a></li>
+        <li><a href="#process">Как работаем</a></li>
+        <li><a href="#why-us">Почему мы</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+    </nav>
+
+    <div class="footer__col">
+      <h4>Услуги</h4>
+      <ul>
+        <li>Настройка локальной сети офиса</li>
+        <li>Монтаж локальной сети</li>
+        <li>Настройка Wi-Fi в офисе</li>
+        <li>Настройка сетевого оборудования</li>
+        <li>Обслуживание локальной сети</li>
+      </ul>
+    </div>
+
+    <div class="footer__col">
+      <h4>Контакты</h4>
+      <address>
+        <a href="tel:+74950000000">+7 (495) 000-00-00</a><br>
+        <a href="mailto:info@lancor.ru">info@lancor.ru</a><br>
+        Москва и Московская область
+      </address>
+    </div>
+  </div>
+  <div class="container footer__bottom">
+    <p>© <span id="year"></span> LANCOR. Настройка компьютерной сети предприятия и IT-обслуживание организаций.</p>
+  </div>
+</footer>
+
+<!-- Sticky mobile CTA -->
+<div class="mobile-cta" id="mobile-cta">
+  <a href="tel:+74950000000" class="mobile-cta__btn mobile-cta__btn--ghost" aria-label="Позвонить">
+    <svg class="icon" aria-hidden="true"><use href="#i-phone"></use></svg>
+  </a>
+  <a href="#contact" class="mobile-cta__btn mobile-cta__btn--primary" data-intent="Заказать настройку">Оставить заявку</a>
+</div>
+
+<!-- ============ ICON SPRITE ============ -->
+<svg xmlns="http://www.w3.org/2000/svg" class="icon-sprite" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+<defs>
+<g id="icon-base" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></g>
+
+<symbol id="i-phone" viewBox="0 0 24 24"><path d="M6.6 3h2.4l1.5 4-2 1.4a12 12 0 0 0 6.1 6.1l1.4-2 4 1.5v2.4a2 2 0 0 1-2.2 2A17.5 17.5 0 0 1 4.6 5.2 2 2 0 0 1 6.6 3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 6.5 12 13l8.5-6.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6.1 7-11.5A7 7 0 0 0 5 9.5C5 14.9 12 21 12 21z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="9.5" r="2.4" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+<symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M4 12h16M14 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="M5 9l7 7 7-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 12.5l2.6 2.6L16.5 9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-checkmark-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 12.5l2.6 2.6L16.5 9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+
+<symbol id="i-van" viewBox="0 0 24 24"><path d="M3 16V8a1 1 0 0 1 1-1h9v9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M13 10h4l3 3v3h-2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="7.5" cy="17" r="1.6" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="16.5" cy="17" r="1.6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M3 13h10" stroke="currentColor" stroke-width="1.4"/></symbol>
+<symbol id="i-building" viewBox="0 0 24 24"><rect x="4" y="3" width="12" height="18" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M16 9h4v12h-4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7 7h2M11 7h2M7 11h2M11 11h2M7 15h2M11 15h2" stroke="currentColor" stroke-width="1.4"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3.5 2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-medal" viewBox="0 0 24 24"><circle cx="12" cy="9" r="5.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9 13.5L7.5 21 12 18.5 16.5 21 15 13.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9.5 9l1.7 1.7L14.5 7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-headset" viewBox="0 0 24 24"><path d="M4 13v-1a8 8 0 0 1 16 0v1" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="3" y="13" width="4" height="6" rx="1.4" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="17" y="13" width="4" height="6" rx="1.4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M19 19v1a3 3 0 0 1-3 3h-2" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+
+<symbol id="i-lan" viewBox="0 0 24 24"><circle cx="12" cy="4.5" r="2" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="5" cy="19" r="2" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="19" cy="19" r="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M12 6.5v6M12 12.5L6.4 17.3M12 12.5l5.6 4.8M5 17v-4.5h14V17" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+<symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+<symbol id="i-wifi" viewBox="0 0 24 24"><path d="M3 9a13 13 0 0 1 18 0M6 12.5a8.5 8.5 0 0 1 12 0M9.5 16a4 4 0 0 1 5 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="19.2" r="1.2" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.2" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="18" cy="18" r="2.2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6 8.2V13a3 3 0 0 0 3 3h6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2.5 3" stroke-linecap="round"/></symbol>
+<symbol id="i-desktop" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9 20h6M12 16v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-router" viewBox="0 0 24 24"><rect x="3" y="10" width="18" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 10V6M16 10V6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.5" cy="14" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="14" r="1" fill="currentColor" stroke="none"/><circle cx="16.5" cy="14" r="1" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-switch" viewBox="0 0 24 24"><rect x="2.5" y="8" width="19" height="8" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6 12h.01M9.5 12h.01M13 12h.01M16.5 12h.01" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+<symbol id="i-rack" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="1.4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7 7h10M7 11h10M7 15h10" stroke="currentColor" stroke-width="1.5"/><circle cx="16.5" cy="7" r=".6" fill="currentColor" stroke="none"/><circle cx="16.5" cy="11" r=".6" fill="currentColor" stroke="none"/><circle cx="16.5" cy="15" r=".6" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5H9l2 2.2h8.5A1.5 1.5 0 0 1 21 8.7v9.8A1.5 1.5 0 0 1 19.5 20h-15A1.5 1.5 0 0 1 3 18.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9.5 15.2a2.5 2.5 0 1 1 4 2M13.5 17.2v-3M12.2 15.6l1.3-1.4 1.3 1.4" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-printer" viewBox="0 0 24 24"><path d="M7 8V4h10v4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><rect x="3" y="8" width="18" height="8" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="7" y="14" width="10" height="6" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="17" cy="11" r=".7" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-nas" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="6" rx="1.3" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="5" y="14" width="14" height="6" rx="1.3" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="16" cy="7" r=".7" fill="currentColor" stroke="none"/><circle cx="16" cy="17" r=".7" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-vpn" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="11" r="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M12 13v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+<symbol id="i-remote" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9 20h6M12 16v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M9 11l2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="15.3" r="1.3" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-tag" viewBox="0 0 24 24"><path d="M11 3h6.5A1.5 1.5 0 0 1 19 4.5V11L11.4 18.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="14.8" cy="8.2" r="1.3" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M20 20l-4.3-4.3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+<symbol id="i-search-building" viewBox="0 0 24 24"><rect x="3" y="4" width="10" height="16" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6 8h4M6 11h4M6 14h4" stroke="currentColor" stroke-width="1.3"/><circle cx="16.5" cy="14.5" r="3.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M19 17l2.5 2.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.5 6.5a3.5 3.5 0 0 0-4.6 4.2L4 16.6V20h3.4l5.9-5.9a3.5 3.5 0 0 0 4.2-4.6l-2.6 2.6-2-2z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 14-5.2M20 12a8 8 0 0 1-14 5.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M18 4v3.3h-3.3M6 20v-3.3h3.3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-cable" viewBox="0 0 24 24"><path d="M7 12a5 5 0 0 1 5-5h1a3 3 0 0 0 3-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M17 12a5 5 0 0 1-5 5H11a3 3 0 0 0-3 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="7" cy="12" r="1.6" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="17" cy="12" r="1.6" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
+<symbol id="i-server" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="7" rx="1.4" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="4" y="14" width="16" height="7" rx="1.4" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="7.3" cy="6.5" r=".7" fill="currentColor" stroke="none"/><circle cx="7.3" cy="17.5" r=".7" fill="currentColor" stroke="none"/><path d="M11 6.5h6M11 17.5h6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></symbol>
+
+<symbol id="i-shop" viewBox="0 0 24 24"><path d="M4 9l1-5h14l1 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M4 9a2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M5 9v10h14V9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9.5 19v-5h5v5" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+<symbol id="i-warehouse" viewBox="0 0 24 24"><path d="M3 21V10l9-5 9 5v11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M3 21h18" stroke="currentColor" stroke-width="1.6"/><rect x="9" y="13" width="6" height="8" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+<symbol id="i-factory" viewBox="0 0 24 24"><path d="M3 21V12l5 3v-3l5 3V9l6-3v15z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M3 21h18M15 6V3.5M18.5 6V3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+<symbol id="i-cup" viewBox="0 0 24 24"><path d="M5 9h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M16 10.5h1.5a2.3 2.3 0 0 1 0 4.6H16" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4c0 1-1.2 1-1.2 2M11.5 4c0 1-1.2 1-1.2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></symbol>
+<symbol id="i-restaurant" viewBox="0 0 24 24"><path d="M7 3v7a2 2 0 0 0 4 0V3M9 10v11M9 3v3M7 3v3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M16 3c-1.4 0-2.5 1.8-2.5 4s1.1 3.6 2.5 3.6V21" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-cross" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-cap" viewBox="0 0 24 24"><path d="M12 5L2 9.5 12 14l10-4.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M6 11.5V16c0 1.7 2.7 3 6 3s6-1.3 6-3v-4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M21 9.5V15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+<symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="11" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 13h18" stroke="currentColor" stroke-width="1.5"/></symbol>
+
+<symbol id="i-doc" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M14 3v4h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9.5 12h6M9.5 15.5h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+<symbol id="i-gear-box" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M12 3v2.2M12 18.8V21M21 12h-2.2M5.2 12H3M18.4 5.6l-1.6 1.6M7.2 16.8l-1.6 1.6M18.4 18.4l-1.6-1.6M7.2 7.2 5.6 5.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+<symbol id="i-toolbox" viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="10" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 9V6.5A1.5 1.5 0 0 1 9.5 5h5A1.5 1.5 0 0 1 16 6.5V9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 13.5h18M10.5 13.5v2M13.5 13.5v2" stroke="currentColor" stroke-width="1.4"/></symbol>
+<symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 6h9M17 6h3M4 12h3M9 12h11M4 18h13M20 18h0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="14.5" cy="6" r="2" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="6.5" cy="12" r="2" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="15.5" cy="18" r="2" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+<symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="9" y="2.5" width="6" height="3" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8.5 12.5l2.2 2.2L15.5 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-handshake" viewBox="0 0 24 24"><path d="M2 11l4-3 4 2 3-2 3 2 4-2 2 3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M6 8v6l4.5 4a1.6 1.6 0 0 0 2.2-2.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M18 8v6l-4.3 3.9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9.7 15.5l1.6 1.5a1.6 1.6 0 0 0 2.2-2.3l-2.4-2.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+</defs>
+</svg>
+
+<script src="assets/js/main.js" defer></script>
+</body>
+</html>
