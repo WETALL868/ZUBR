@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="700" viewBox="0 0 900 700" role="img">
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#F8F6F1"/>
+<stop offset="1" stop-color="#ECE7DC"/>
+</linearGradient>
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#FBF9F4"/>
+<stop offset="1" stop-color="#F1EDE3"/>
+</linearGradient>
+</defs>
+<rect width="900" height="700" fill="url(#bg)"/>
+<rect width="900" height="532" fill="url(#sky)"/><rect x="0" y="532" width="900" height="168" fill="#E4E0D4"/><line x1="0" y1="532" x2="900" y2="532" stroke="#DDD9D1" stroke-width="2"/><rect x="288" y="238" width="324" height="294" fill="#ffffff" stroke="#DDD9D1" stroke-width="2"/><rect x="336.6" y="290.92" width="226.79999999999998" height="8" fill="#B98242"/><rect x="336.6" y="308.92" width="226.79999999999998" height="8" fill="#DDD9D1"/><rect x="336.6" y="326.92" width="226.79999999999998" height="8" fill="#DDD9D1"/><rect x="336.6" y="344.92" width="226.79999999999998" height="8" fill="#DDD9D1"/><rect x="336.6" y="362.92" width="226.79999999999998" height="8" fill="#DDD9D1"/><rect x="336.6" y="380.92" width="226.79999999999998" height="8" fill="#DDD9D1"/><circle cx="540.72" cy="467.32" r="26" fill="#174C48" opacity="0.15"/>
+
+<g opacity="0.85"><rect x="844.4" y="662" width="45.6" height="22" rx="11" fill="#ffffff" opacity="0.6"/><text x="882" y="677" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#B98242" font-weight="600">фото</text></g></svg>

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800" role="img">
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#F8F6F1"/>
+<stop offset="1" stop-color="#ECE7DC"/>
+</linearGradient>
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#FBF9F4"/>
+<stop offset="1" stop-color="#F1EDE3"/>
+</linearGradient>
+</defs>
+<rect width="800" height="800" fill="url(#bg)"/>
+<rect width="800" height="576" fill="url(#sky)"/><rect x="0" y="576" width="800" height="224" fill="#E4E0D4"/><line x1="0" y1="576" x2="800" y2="576" stroke="#DDD9D1" stroke-width="2"/><rect x="0" y="570" width="800" height="6" fill="#B98242" opacity="0.35"/>
+<g>
+  <rect x="126.22222222222226" y="460.44444444444446" width="195.55555555555554" height="115.55555555555554" fill="#ffffff" stroke="#DDD9D1" stroke-width="2"/>
+  <polygon points="112.22222222222226,460.44444444444446 335.7777777777778,460.44444444444446 224.00000000000003,411.55555555555554" fill="#174C48"/>
+  <rect x="149.68888888888893" y="492.8" width="43.02222222222222" height="34.666666666666664" fill="#174C48" opacity="0.15"/>
+  <rect x="255.28888888888892" y="492.8" width="43.02222222222222" height="34.666666666666664" fill="#174C48" opacity="0.15"/>
+  <rect x="208.35555555555558" y="512.4444444444445" width="31.288888888888888" height="63.55555555555556" fill="#103936" opacity="0.4"/>
+</g>
+<g>
+  <rect x="225.59999999999997" y="582" width="604.8000000000001" height="6" rx="3" fill="#B98242" opacity="0.6"/>
+  <rect x="362" y="448" width="29.6" height="128" fill="#174C48" opacity="0.92"/><rect x="395.6" y="448" width="29.6" height="128" fill="#103936" opacity="0.8"/><rect x="429.2" y="448" width="29.6" height="128" fill="#174C48" opacity="0.92"/><rect x="462.8" y="448" width="29.6" height="128" fill="#103936" opacity="0.8"/><rect x="496.4" y="448" width="29.6" height="128" fill="#174C48" opacity="0.92"/><rect x="530" y="448" width="29.6" height="128" fill="#103936" opacity="0.8"/><rect x="563.6" y="448" width="29.6" height="128" fill="#174C48" opacity="0.92"/><rect x="597.2" y="448" width="29.6" height="128" fill="#103936" opacity="0.8"/><rect x="630.8" y="448" width="29.6" height="128" fill="#174C48" opacity="0.92"/><rect x="664.4000000000001" y="448" width="29.6" height="128" fill="#103936" opacity="0.8"/>
+  <rect x="354" y="440" width="348" height="10" fill="#103936"/>
+  <circle cx="370" cy="582" r="7" fill="#103936"/>
+  <circle cx="686" cy="582" r="7" fill="#103936"/>
+</g>
+
+<g opacity="0.85"><rect x="744.4" y="762" width="45.6" height="22" rx="11" fill="#ffffff" opacity="0.6"/><text x="782" y="777" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#B98242" font-weight="600">фото</text></g></svg>

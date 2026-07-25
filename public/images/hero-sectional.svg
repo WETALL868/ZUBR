@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1100" viewBox="0 0 1600 1100" role="img">
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#F8F6F1"/>
+<stop offset="1" stop-color="#ECE7DC"/>
+</linearGradient>
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#FBF9F4"/>
+<stop offset="1" stop-color="#F1EDE3"/>
+</linearGradient>
+</defs>
+<rect width="1600" height="1100" fill="url(#bg)"/>
+<rect width="1600" height="858" fill="url(#sky)"/><rect x="0" y="858" width="1600" height="242" fill="#E4E0D4"/><line x1="0" y1="858" x2="1600" y2="858" stroke="#DDD9D1" stroke-width="2"/>
+<rect x="446" y="378" width="708" height="480" fill="#ffffff" stroke="#DDD9D1" stroke-width="2"/>
+<rect x="464" y="398" width="672" height="88.4" fill="#174C48" opacity="0.9"/><rect x="464" y="490.4" width="672" height="88.4" fill="#103936" opacity="0.9"/><rect x="464" y="582.8" width="672" height="88.4" fill="#174C48" opacity="0.9"/><rect x="464" y="675.2" width="672" height="88.4" fill="#103936" opacity="0.9"/><rect x="464" y="767.6" width="672" height="88.4" fill="#174C48" opacity="0.9"/>
+<rect x="446" y="378" width="708" height="12" fill="#B98242" opacity="0.5"/>
+
+
+<g opacity="0.85"><rect x="1492.6" y="1062" width="97.4" height="22" rx="11" fill="#ffffff" opacity="0.6"/><text x="1582" y="1077" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#B98242" font-weight="600">иллюстрация</text></g></svg>
