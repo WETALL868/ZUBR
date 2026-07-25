@@ -59,11 +59,8 @@
 
   /* ---------- Cookie consent banner ----------
      Consent choice is stored in localStorage and never asked again once set.
-     "Decline" still permits strictly necessary cookies (session/UI state) —
-     it only opts the visitor out of analytics; there is nothing left here to
-     gate until a real analytics snippet (e.g. Yandex.Metrica) is added, at
-     which point that loader should check getCookieConsent() === "accepted"
-     before running. */
+     "Decline" still permits strictly necessary cookies (session/UI state) and
+     only opts the visitor out of analytics — see loadMetrica() below. */
   var COOKIE_CONSENT_KEY = "lancor_cookie_consent";
   var cookieBanner = document.getElementById("cookie-banner");
 
@@ -71,17 +68,50 @@
     try { return localStorage.getItem(COOKIE_CONSENT_KEY); } catch (e) { return null; }
   }
 
+  /* Yandex.Metrica loader. Does nothing until a counter id is provided via
+     window.__ymCounterId (see index.html <head>), and only ever runs after the
+     visitor has accepted cookies. */
+  var metricaLoaded = false;
+  function loadMetrica() {
+    if (metricaLoaded) return;
+    var id = window.__ymCounterId;
+    if (!id) return; // no counter configured yet
+    metricaLoaded = true;
+
+    (function (m, e, t, r, i, k, a) {
+      m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments); };
+      m[i].l = 1 * new Date();
+      for (var j = 0; j < e.scripts.length; j++) { if (e.scripts[j].src === r) return; }
+      k = e.createElement(t); a = e.getElementsByTagName(t)[0];
+      k.async = 1; k.src = r; a.parentNode.insertBefore(k, a);
+    })(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+    window.ym(id, "init", {
+      clickmap: true,
+      trackLinks: true,
+      accurateTrackBounce: true,
+      webvisor: true
+    });
+  }
+
   if (cookieBanner) {
-    if (!getCookieConsent()) {
+    var storedConsent = getCookieConsent();
+
+    if (!storedConsent) {
+      document.body.classList.add("has-cookie-banner");
       // Defer to the next frame so the slide-up transition actually plays.
       requestAnimationFrame(function () {
         requestAnimationFrame(function () { cookieBanner.classList.add("is-visible"); });
       });
+    } else if (storedConsent === "accepted") {
+      loadMetrica();
     }
 
     var dismissCookieBanner = function (value) {
       try { localStorage.setItem(COOKIE_CONSENT_KEY, value); } catch (e) { /* private mode / storage disabled */ }
       cookieBanner.classList.remove("is-visible");
+      document.body.classList.remove("has-cookie-banner");
+      if (value === "accepted") loadMetrica();
     };
 
     var cookieAccept = document.getElementById("cookie-accept");

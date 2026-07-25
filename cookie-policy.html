@@ -20,10 +20,15 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LANCOR — Политика использования файлов Cookie">
 
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://lancor.ru/assets/img/og-cover.png">
 <meta name="theme-color" content="#0a1f44">
 <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 <link rel="stylesheet" href="assets/css/style.css">
+<!-- Яндекс.Метрика: вставьте номер счётчика вместо null.
+     Счётчик загружается из main.js только после согласия на cookie. -->
+<script>window.__ymCounterId = null;</script>
 </head>
 <body>
 
@@ -230,7 +235,7 @@
     </div>
 
     <nav class="footer__col" aria-label="Разделы сайта">
-      <h4>Разделы</h4>
+      <h3>Разделы</h3>
       <ul>
         <li><a href="index.html#services">Услуги</a></li>
         <li><a href="index.html#for-whom">Кому подходит</a></li>
@@ -241,7 +246,7 @@
     </nav>
 
     <div class="footer__col">
-      <h4>Услуги</h4>
+      <h3>Услуги</h3>
       <ul>
         <li>Настройка локальной сети офиса</li>
         <li>Монтаж локальной сети</li>
@@ -252,7 +257,7 @@
     </div>
 
     <div class="footer__col">
-      <h4>Контакты</h4>
+      <h3>Контакты</h3>
       <address>
         <a href="tel:+74950000000">+7 (495) 000-00-00</a><br>
         <a href="mailto:info@lancor.ru">info@lancor.ru</a><br>
@@ -271,7 +276,7 @@
 </footer>
 
 <!-- Cookie consent banner: choice is stored in localStorage (see main.js) -->
-<div class="cookie-banner" id="cookie-banner" role="dialog" aria-live="polite" aria-label="Использование файлов cookie">
+<div class="cookie-banner" id="cookie-banner" role="region" aria-label="Уведомление об использовании файлов cookie">
   <p>Мы используем файлы Cookie для корректной работы сайта, анализа посещаемости и улучшения качества обслуживания. <a href="cookie-policy.html">Подробнее</a></p>
   <div class="cookie-banner__actions">
     <button type="button" class="btn btn--outline btn--sm" id="cookie-decline">Отклонить</button>

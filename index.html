@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <script>document.documentElement.className += " js";</script>
 <title>Настройка локальной сети и интернета для офиса | LANCOR</title>
-<meta name="description" content="Настройка локальной сети и интернета для офиса «под ключ»: монтаж LAN, подключение рабочих мест, Wi-Fi, VPN, серверы и сетевое оборудование. Выезд инженера, настройка за 1 день, гарантия и поддержка. Работаем с организациями любого масштаба.">
+<meta name="description" content="Настройка локальной сети и интернета для офиса под ключ: монтаж LAN, подключение рабочих мест, Wi-Fi, VPN и сетевого оборудования. Выезд инженера, настройка за 1 день, гарантия.">
 <meta name="keywords" content="настройка локальной сети, настройка локальной сети офиса, организация локальной сети, монтаж локальной сети, подключение интернета в офис, настройка компьютерной сети, настройка сети предприятия, IT обслуживание организаций, настройка Wi-Fi в офисе, подключение рабочих мест, настройка сетевого оборудования, системный администратор для офиса, обслуживание локальной сети, организация офисной сети, настройка корпоративной сети">
 <meta name="robots" content="index, follow">
 <meta name="author" content="LANCOR">
@@ -77,6 +77,9 @@
   ]
 }
 </script>
+<!-- Яндекс.Метрика: вставьте номер счётчика вместо null.
+     Счётчик загружается из main.js только после согласия на cookie. -->
+<script>window.__ymCounterId = null;</script>
 </head>
 <body>
 
@@ -674,8 +677,12 @@
             </div>
             <div class="form-group">
               <label for="f-phone">Телефон</label>
+<!-- pattern is compiled with the RegExp `v` flag, where "(" and ")" are
+                   syntax characters even inside a character class; leaving them
+                   unescaped makes the whole pattern a syntax error that browsers
+                   silently drop, disabling phone validation entirely. -->
               <input id="f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required
-                     minlength="10" pattern="[0-9+()\-\s]{10,20}"
+                     minlength="10" maxlength="20" pattern="[0-9+\(\)\-\s]{10,20}"
                      title="Введите номер телефона, например +7 (999) 123-45-67"
                      placeholder="+7 (___) ___-__-__">
             </div>
@@ -736,7 +743,7 @@
     </div>
 
     <nav class="footer__col" aria-label="Разделы сайта">
-      <h4>Разделы</h4>
+      <h3>Разделы</h3>
       <ul>
         <li><a href="#services">Услуги</a></li>
         <li><a href="#for-whom">Кому подходит</a></li>
@@ -747,7 +754,7 @@
     </nav>
 
     <div class="footer__col">
-      <h4>Услуги</h4>
+      <h3>Услуги</h3>
       <ul>
         <li>Настройка локальной сети офиса</li>
         <li>Монтаж локальной сети</li>
@@ -758,7 +765,7 @@
     </div>
 
     <div class="footer__col">
-      <h4>Контакты</h4>
+      <h3>Контакты</h3>
       <address>
         <a href="tel:+74950000000">+7 (495) 000-00-00</a><br>
         <a href="mailto:info@lancor.ru">info@lancor.ru</a><br>
@@ -785,7 +792,7 @@
 </div>
 
 <!-- Cookie consent banner: choice is stored in localStorage (see main.js) -->
-<div class="cookie-banner" id="cookie-banner" role="dialog" aria-live="polite" aria-label="Использование файлов cookie">
+<div class="cookie-banner" id="cookie-banner" role="region" aria-label="Уведомление об использовании файлов cookie">
   <p>Мы используем файлы Cookie для корректной работы сайта, анализа посещаемости и улучшения качества обслуживания. <a href="cookie-policy.html">Подробнее</a></p>
   <div class="cookie-banner__actions">
     <button type="button" class="btn btn--outline btn--sm" id="cookie-decline">Отклонить</button>

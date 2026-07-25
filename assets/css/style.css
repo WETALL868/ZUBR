@@ -193,7 +193,13 @@ h1,h2,h3,h4{line-height:1.15;font-weight:700;letter-spacing:-0.02em;}
   /* Landscape phones are shorter than the menu — keep every link reachable. */
   overflow-y:auto;-webkit-overflow-scrolling:touch;
   padding-bottom:calc(2rem + env(safe-area-inset-bottom));
+  /* Without visibility the closed menu keeps its 8 links in the tab order —
+     invisible focus stops, and aria-hidden over focusable content is a WCAG
+     violation. visibility is delayed so the fade-out still animates. */
+  visibility:hidden;
+  transition:opacity .3s var(--ease), transform .3s var(--ease), visibility 0s linear .3s;
 }
+.mobile-nav.is-open{visibility:visible;transition:opacity .3s var(--ease), transform .3s var(--ease), visibility 0s linear 0s;}
 @media (max-height:520px){
   .mobile-nav{justify-content:flex-start;gap:1rem;padding-top:1.5rem;}
   .mobile-nav a{font-size:1.1rem;}
@@ -441,7 +447,7 @@ h1,h2,h3,h4{line-height:1.15;font-weight:700;letter-spacing:-0.02em;}
 @media (min-width:720px){ .footer__inner{grid-template-columns:1.4fr 1fr 1fr 1fr;} }
 .footer__brand p{margin-top:1rem;font-size:.92rem;color:#9aa3b2;max-width:32ch;}
 .logo--footer{color:#fff;}
-.footer__col h4{font-size:.85rem;text-transform:uppercase;letter-spacing:.06em;color:#fff;margin-bottom:1.1rem;}
+.footer__col h3{font-size:.85rem;text-transform:uppercase;letter-spacing:.06em;color:#fff;margin-bottom:1.1rem;}
 .footer__col ul{display:flex;flex-direction:column;gap:.65rem;font-size:.92rem;}
 .footer__col a:hover{color:var(--blue-300);}
 .footer__col address{font-style:normal;font-size:.92rem;line-height:1.9;}
@@ -460,10 +466,15 @@ h1,h2,h3,h4{line-height:1.15;font-weight:700;letter-spacing:-0.02em;}
   position:fixed;left:0;right:0;bottom:0;z-index:90;display:flex;gap:10px;
   padding:12px 16px calc(12px + env(safe-area-inset-bottom));
   background:rgba(10,31,68,.92);backdrop-filter:blur(10px);
-  transform:translateY(120%);transition:transform .35s var(--ease);
+  transform:translateY(120%);
   border-top:1px solid rgba(255,255,255,.1);
+  visibility:hidden;
+  transition:transform .35s var(--ease), visibility 0s linear .35s;
 }
-.mobile-cta.is-visible{transform:translateY(0);}
+.mobile-cta.is-visible{transform:translateY(0);visibility:visible;transition:transform .35s var(--ease), visibility 0s linear 0s;}
+/* The cookie banner sits at the same screen edge and fully covers this bar,
+   hiding the primary mobile CTA until a consent choice is made. */
+body.has-cookie-banner .mobile-cta{transform:translateY(120%);visibility:hidden;}
 @media (min-width:960px){ .mobile-cta{display:none;} }
 .mobile-cta__btn{
   flex:1;display:flex;align-items:center;justify-content:center;gap:.5rem;
@@ -531,13 +542,17 @@ h1,h2,h3,h4{line-height:1.15;font-weight:700;letter-spacing:-0.02em;}
   border:1px solid rgba(255,255,255,.14);border-radius:var(--radius-lg);
   padding:22px 26px;color:#fff;box-shadow:var(--shadow-lg);
   display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;justify-content:space-between;
-  transform:translateY(140%);opacity:0;transition:transform .4s var(--ease),opacity .4s var(--ease);
+  transform:translateY(140%);opacity:0;visibility:hidden;
+  transition:transform .4s var(--ease),opacity .4s var(--ease),visibility 0s linear .4s;
 }
-.cookie-banner.is-visible{transform:translateY(0);opacity:1;}
+.cookie-banner.is-visible{transform:translateY(0);opacity:1;visibility:visible;
+  transition:transform .4s var(--ease),opacity .4s var(--ease),visibility 0s linear 0s;}
 /* The fullscreen mobile menu (z-index:99) sits below the banner (z-index:130)
    in the stacking order, so an open menu would otherwise be partly covered
    by it. Suppress the banner for as long as the menu is open. */
-#mobile-nav.is-open ~ #cookie-banner.is-visible{opacity:0;transform:translateY(140%);pointer-events:none;}
+#mobile-nav.is-open ~ #cookie-banner.is-visible{
+  opacity:0;transform:translateY(140%);pointer-events:none;visibility:hidden;
+}
 .cookie-banner p{font-size:.9rem;line-height:1.5;color:#dbe6f7;max-width:600px;margin:0;flex:1 1 320px;}
 .cookie-banner a{color:var(--blue-300);text-decoration:underline;}
 .cookie-banner a:hover{color:#fff;}
@@ -546,8 +561,11 @@ h1,h2,h3,h4{line-height:1.15;font-weight:700;letter-spacing:-0.02em;}
 .cookie-banner .btn--outline{color:#fff;box-shadow:inset 0 0 0 1.6px rgba(255,255,255,.35);}
 .cookie-banner .btn--outline:hover{box-shadow:inset 0 0 0 1.6px var(--blue-300);color:var(--blue-300);}
 @media (max-width:640px){
-  .cookie-banner{left:10px;right:10px;bottom:10px;padding:18px 20px;flex-direction:column;align-items:stretch;}
-  .cookie-banner__actions{flex-direction:column;}
-  .cookie-banner__actions .btn{width:100%;}
+  /* Keep the banner short: stacking the two buttons made it ~470px tall,
+     swallowing most of a phone screen. */
+  .cookie-banner{left:10px;right:10px;bottom:10px;padding:16px 18px;flex-direction:column;align-items:stretch;gap:14px;}
+  .cookie-banner p{font-size:.84rem;flex:1 1 auto;}
+  .cookie-banner__actions{flex-direction:row;}
+  .cookie-banner__actions .btn{flex:1 1 0;padding:.7rem .8rem;}
 }
 @media (prefers-reduced-motion:reduce){ .cookie-banner{transition:opacity .2s linear;} }
