@@ -16,6 +16,13 @@ const GRAPHITE = "#174C48";
 const GRAPHITE_DARK = "#103936";
 const BRONZE = "#B98242";
 const LINE = "#DDD9D1";
+const STEEL = "#6E756F";
+const STEEL_DARK = "#4B514C";
+const SOIL = "#7A6449";
+const SOIL_DARK = "#54432E";
+const SKIN = "#C9977A";
+const DUSK_SKY_TOP = "#1B2422";
+const DUSK_SKY_BOTTOM = "#2C3A34";
 
 function svgWrap(w, h, inner, tag) {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img">
@@ -28,6 +35,14 @@ function svgWrap(w, h, inner, tag) {
 <stop offset="0" stop-color="#FBF9F4"/>
 <stop offset="1" stop-color="#F1EDE3"/>
 </linearGradient>
+<linearGradient id="duskSky" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="${DUSK_SKY_TOP}"/>
+<stop offset="1" stop-color="${DUSK_SKY_BOTTOM}"/>
+</linearGradient>
+<radialGradient id="workLight" cx="50%" cy="30%" r="70%">
+<stop offset="0" stop-color="${BRONZE}" stop-opacity="0.35"/>
+<stop offset="1" stop-color="${BRONZE}" stop-opacity="0"/>
+</radialGradient>
 </defs>
 <rect width="${w}" height="${h}" fill="url(#bg)"/>
 ${inner}
@@ -41,8 +56,25 @@ ${
 </svg>`;
 }
 
-function ground(w, h, y) {
-  return `<rect x="0" y="${y}" width="${w}" height="${h - y}" fill="#E4E0D4"/><line x1="0" y1="${y}" x2="${w}" y2="${y}" stroke="${LINE}" stroke-width="2"/>`;
+function ground(w, h, y, { dark = false } = {}) {
+  const base = dark ? "#232B27" : "#E4E0D4";
+  const lineColor = dark ? "rgba(255,255,255,0.12)" : LINE;
+  let texture = "";
+  const speckleCount = Math.round(((w * (h - y)) / 9000) * 3);
+  for (let i = 0; i < speckleCount; i++) {
+    const px = Math.random() * w;
+    const py = y + Math.random() * (h - y);
+    const r = 1.2 + Math.random() * 2.6;
+    const tone = Math.random() > 0.5 ? SOIL : SOIL_DARK;
+    texture += `<ellipse cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" rx="${r.toFixed(1)}" ry="${(r * 0.6).toFixed(1)}" fill="${tone}" opacity="${(dark ? 0.18 : 0.14).toFixed(2)}"/>`;
+  }
+  // Едва заметные следы протектора — жизненная, «рабочая» деталь участка.
+  const trackY = y + (h - y) * 0.55;
+  const track = `<g opacity="${dark ? 0.14 : 0.1}" stroke="${SOIL_DARK}" stroke-width="10" fill="none" stroke-linecap="round">
+    <path d="M ${w * 0.05} ${trackY + 14} Q ${w * 0.5} ${trackY - 10} ${w * 0.95} ${trackY + 18}"/>
+    <path d="M ${w * 0.05} ${trackY + 34} Q ${w * 0.5} ${trackY + 10} ${w * 0.95} ${trackY + 38}"/>
+  </g>`;
+  return `<rect x="0" y="${y}" width="${w}" height="${h - y}" fill="${base}"/>${track}${texture}<line x1="0" y1="${y}" x2="${w}" y2="${y}" stroke="${lineColor}" stroke-width="2"/>`;
 }
 
 function house(cx, baseY, scale = 1) {
@@ -140,6 +172,99 @@ function driveBox(cx, cy, scale = 1) {
   <rect x="-58" y="18" width="70" height="10" rx="5" fill="#ffffff" opacity="0.5"/>
   <line x1="70" y1="10" x2="130" y2="-30" stroke="${GRAPHITE_DARK}" stroke-width="6" stroke-linecap="round"/>
   <line x1="-70" y1="10" x2="-130" y2="40" stroke="${GRAPHITE_DARK}" stroke-width="6" stroke-linecap="round"/>
+</g>`;
+}
+
+/** Простая фигура монтажника — приземистая рабочая поза, инструмент в руке. */
+function worker(cx, baseY, { scale = 1, pose = "crouch", dark = false, mirror = false } = {}) {
+  const s = scale;
+  const bodyColor = GRAPHITE_DARK;
+  const vestColor = BRONZE;
+  const flip = mirror ? -1 : 1;
+  if (pose === "crouch") {
+    return `
+<g transform="translate(${cx} ${baseY}) scale(${flip * s} ${s})">
+  <ellipse cx="0" cy="2" rx="34" ry="7" fill="#000000" opacity="${dark ? 0.35 : 0.14}"/>
+  <path d="M -14 -8 L -22 0 L -10 0 Z" fill="${bodyColor}"/>
+  <path d="M 10 -10 L 20 0 L 6 0 Z" fill="${bodyColor}"/>
+  <path d="M -16 -42 Q -18 -18 -6 -8 L 14 -10 Q 20 -26 12 -46 Q -4 -54 -16 -42 Z" fill="${vestColor}"/>
+  <circle cx="-6" cy="-58" r="11" fill="${SKIN}"/>
+  <path d="M -16 -60 Q -6 -70 4 -60 L 2 -63 Q -6 -68 -14 -63 Z" fill="${bodyColor}"/>
+  <path d="M 12 -44 Q 30 -40 34 -24" stroke="${bodyColor}" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <rect x="30" y="-30" width="6" height="22" rx="2" fill="${STEEL}" transform="rotate(20 33 -19)"/>
+  <path d="M -14 -40 Q -26 -34 -26 -18" stroke="${bodyColor}" stroke-width="7" fill="none" stroke-linecap="round"/>
+</g>`;
+  }
+  return `
+<g transform="translate(${cx} ${baseY}) scale(${flip * s} ${s})">
+  <ellipse cx="0" cy="2" rx="26" ry="6" fill="#000000" opacity="${dark ? 0.35 : 0.14}"/>
+  <rect x="-10" y="-8" width="10" height="10" fill="${bodyColor}"/>
+  <rect x="4" y="-8" width="10" height="10" fill="${bodyColor}"/>
+  <path d="M -14 -70 L 14 -70 L 12 -10 L -12 -10 Z" fill="${vestColor}"/>
+  <circle cx="0" cy="-82" r="11" fill="${SKIN}"/>
+  <path d="M -11 -84 Q 0 -94 11 -84 L 9 -88 Q 0 -95 -9 -88 Z" fill="${bodyColor}"/>
+  <path d="M -14 -64 Q -30 -54 -32 -34" stroke="${bodyColor}" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <path d="M 14 -64 Q 26 -50 24 -30" stroke="${bodyColor}" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <rect x="16" y="-36" width="6" height="26" rx="2" fill="${STEEL}" transform="rotate(-18 19 -23)"/>
+</g>`;
+}
+
+/** Инструмент, разбросанный у места монтажа — гаечный ключ, уровень, рулетка. */
+function toolsScatter(cx, baseY, scale = 1) {
+  const s = scale;
+  return `
+<g transform="translate(${cx} ${baseY}) scale(${s})">
+  <rect x="-46" y="-6" width="70" height="10" rx="3" fill="${BRONZE}" transform="rotate(-8 -11 -1)"/>
+  <rect x="30" y="-16" width="8" height="34" rx="2" fill="${STEEL_DARK}" transform="rotate(24 34 1)"/>
+  <circle cx="52" cy="4" r="10" fill="${STEEL}" opacity="0.9"/>
+  <circle cx="52" cy="4" r="4" fill="${GRAPHITE_DARK}"/>
+</g>`;
+}
+
+/** Траншея под направляющую откатных ворот — с уложенным рельсом и грунтом по краям. */
+function trench(cx, baseY, width = 260) {
+  const depth = 22;
+  return `
+<g>
+  <rect x="${cx - width / 2}" y="${baseY - depth}" width="${width}" height="${depth + 6}" rx="4" fill="${SOIL_DARK}"/>
+  <rect x="${cx - width / 2 - 10}" y="${baseY - depth - 6}" width="${width + 20}" height="8" rx="4" fill="${SOIL}" opacity="0.8"/>
+  <rect x="${cx - width / 2 + 6}" y="${baseY - depth + 4}" width="${width - 12}" height="7" rx="3" fill="${STEEL}"/>
+  ${Array.from({ length: Math.round(width / 30) })
+    .map((_, i) => {
+      const bx = cx - width / 2 + 16 + i * 30;
+      return `<rect x="${bx}" y="${baseY - depth - 2}" width="4" height="12" fill="${STEEL_DARK}"/>`;
+    })
+    .join("")}
+</g>`;
+}
+
+/** Тачка с раствором — деталь подготовки фундамента под направляющую. */
+function wheelbarrow(cx, baseY, scale = 1) {
+  const s = scale;
+  return `
+<g transform="translate(${cx} ${baseY}) scale(${s})">
+  <ellipse cx="0" cy="4" rx="30" ry="6" fill="#000000" opacity="0.12"/>
+  <circle cx="-18" cy="0" r="9" fill="${STEEL_DARK}"/>
+  <path d="M -30 -22 L 26 -26 L 20 -2 L -24 2 Z" fill="${STEEL}"/>
+  <path d="M -26 -20 L 18 -24 L 14 -6 L -20 -2 Z" fill="${SOIL}"/>
+  <line x1="20" y1="-2" x2="40" y2="6" stroke="${STEEL_DARK}" stroke-width="5" stroke-linecap="round"/>
+  <line x1="26" y1="-26" x2="42" y2="2" stroke="${STEEL_DARK}" stroke-width="5" stroke-linecap="round"/>
+</g>`;
+}
+
+/** Рабочий фургон компании — используется в сценах об автопарке и на общем плане объекта. */
+function van(cx, baseY, scale = 1) {
+  const s = scale;
+  const w = 240;
+  const h = 96;
+  return `
+<g transform="translate(${cx - w / 2} ${baseY - h}) scale(${s})">
+  <rect x="0" y="16" width="${w}" height="${h - 16}" rx="10" fill="${GRAPHITE}"/>
+  <rect x="${w - 64}" y="0" width="64" height="${h}" rx="8" fill="${GRAPHITE_DARK}"/>
+  <rect x="${w - 54}" y="14" width="40" height="30" rx="4" fill="#CFE3E0" opacity="0.55"/>
+  <circle cx="40" cy="${h + 4}" r="17" fill="${STEEL_DARK}"/>
+  <circle cx="${w - 46}" cy="${h + 4}" r="17" fill="${STEEL_DARK}"/>
+  <rect x="14" y="${h * 0.42}" width="${w * 0.45}" height="${h * 0.3}" fill="${BRONZE}" opacity="0.4"/>
 </g>`;
 }
 
@@ -308,10 +433,63 @@ function sceneTeam(w, h, variant = "installer") {
     inner += `<circle cx="${x + dw * 0.78}" cy="${baseY - dh * 0.22}" r="26" fill="${GRAPHITE}" opacity="0.15"/>`;
   } else {
     inner += house(w * 0.32, baseY, w / 1000);
-    inner += `<circle cx="${w * 0.68}" cy="${baseY - h * 0.16}" r="34" fill="${GRAPHITE}"/>`;
-    inner += `<rect x="${w * 0.6}" y="${baseY - h * 0.1}" width="${w * 0.16}" height="${h * 0.1}" rx="10" fill="${GRAPHITE_DARK}"/>`;
-    inner += `<rect x="${w * 0.64}" y="${baseY - h * 0.03}" width="${w * 0.09}" height="${h * 0.03}" fill="${BRONZE}"/>`;
+    inner += toolsScatter(w * 0.6, baseY + 8, w / 1400);
+    inner += worker(w * 0.66, baseY, { scale: w / 1050, pose: "stand" });
   }
+  return svgWrap(w, h, inner);
+}
+
+function sceneOtkatnyeInstall(w, h, { stage = "trench" } = {}) {
+  const baseY = h * 0.74;
+  let inner = "";
+  inner += `<rect width="${w}" height="${baseY}" fill="url(#sky)"/>`;
+  inner += ground(w, h, baseY);
+  inner += house(w * 0.22, baseY, w / 1050);
+
+  if (stage === "trench") {
+    inner += trench(w * 0.62, baseY, w * 0.34);
+    inner += slidingGate(w * 0.62, baseY, w * 0.4, h * 0.14, 0.05);
+    inner += wheelbarrow(w * 0.36, baseY + 6, w / 1300);
+    inner += toolsScatter(w * 0.5, baseY + 10, w / 1400);
+    inner += worker(w * 0.68, baseY, { scale: w / 1250, pose: "crouch" });
+  } else if (stage === "mount") {
+    inner += slidingGate(w * 0.68, baseY, w * 0.38, h * 0.15, 0.1);
+    inner += driveBox(w * 0.475, baseY - h * 0.11, Math.min(w, h) / 620);
+    inner += toolsScatter(w * 0.62, baseY + 8, w / 1500);
+    inner += worker(w * 0.54, baseY, { scale: w / 1250, pose: "stand" });
+  } else {
+    inner += slidingGate(w * 0.62, baseY, w * 0.42, h * 0.16, 0);
+  }
+
+  return svgWrap(w, h, inner);
+}
+
+function sceneAutomationMount(w, h) {
+  const baseY = h * 0.72;
+  let inner = "";
+  inner += `<rect width="${w}" height="${baseY}" fill="url(#sky)"/>`;
+  inner += ground(w, h, baseY);
+  inner += slidingGate(w * 0.7, baseY, w * 0.34, h * 0.15, 0.08);
+  inner += driveBox(w * 0.47, baseY - h * 0.13, Math.min(w, h) / 560);
+  inner += toolsScatter(w * 0.58, baseY + 10, w / 1300);
+  inner += worker(w * 0.33, baseY, { scale: w / 1100, pose: "stand" });
+  return svgWrap(w, h, inner);
+}
+
+function sceneJobsiteDusk(w, h) {
+  const baseY = h * 0.7;
+  let inner = "";
+  inner += `<rect width="${w}" height="${baseY}" fill="url(#duskSky)"/>`;
+  inner += `<rect width="${w}" height="${baseY}" fill="url(#workLight)"/>`;
+  inner += ground(w, h, baseY, { dark: true });
+
+  inner += van(w * 0.16, baseY, w / 900);
+  inner += trench(w * 0.48, baseY, w * 0.22);
+  inner += slidingGate(w * 0.78, baseY, w * 0.3, h * 0.22, 0.05);
+  inner += toolsScatter(w * 0.36, baseY + 10, w / 1200);
+  inner += worker(w * 0.46, baseY, { scale: w / 1000, pose: "crouch", dark: true });
+  inner += worker(w * 0.68, baseY, { scale: w / 950, pose: "stand", dark: true, mirror: true });
+
   return svgWrap(w, h, inner);
 }
 
@@ -319,12 +497,13 @@ function sceneTeam(w, h, variant = "installer") {
 
 const files = [];
 
+files.push(["hero-otkatnye-install.svg", sceneOtkatnyeInstall(1600, 1100, { stage: "trench" }), "иллюстрация"]);
 files.push(["hero-sliding-gate.svg", sceneHouseGate(1600, 1100, { open: 0.05 }), "иллюстрация"]);
 files.push(["hero-sectional.svg", sceneSectional(1600, 1100), "иллюстрация"]);
 files.push(["hero-swing.svg", sceneSwing(1600, 1100, 16), "иллюстрация"]);
 files.push(["hero-automation.svg", sceneAutomation(1600, 1100), "иллюстрация"]);
 files.push(["hero-repair.svg", sceneRepair(1600, 1100, "before"), "иллюстрация"]);
-files.push(["hero-ustanovka.svg", sceneHouseGate(1600, 1100, { open: 0.2 }), "иллюстрация"]);
+files.push(["hero-ustanovka.svg", sceneOtkatnyeInstall(1600, 1100, { stage: "mount" }), "иллюстрация"]);
 files.push(["hero-about.svg", sceneTeam(1600, 1100, "installer"), "иллюстрация"]);
 
 files.push(["gate-sliding-card.svg", sceneHouseGate(800, 600, { open: 0 }), "иллюстрация"]);
@@ -334,9 +513,11 @@ files.push(["gate-automation-card.svg", sceneAutomation(800, 600), "иллюст
 files.push(["gate-garage-card.svg", sceneSectional(800, 600), "иллюстрация"]);
 files.push(["gate-industrial-card.svg", sceneIndustrial(800, 600), "иллюстрация"]);
 
-files.push(["otkatnye-gallery-1.svg", sceneHouseGate(900, 700, { open: 0 }), "иллюстрация"]);
-files.push(["otkatnye-gallery-2.svg", sceneHouseGate(900, 700, { open: 0.5 }), "иллюстрация"]);
-files.push(["otkatnye-gallery-3.svg", sceneAutomation(900, 700), "иллюстрация"]);
+files.push(["otkatnye-work-1.svg", sceneOtkatnyeInstall(900, 700, { stage: "trench" }), "иллюстрация"]);
+files.push(["otkatnye-work-2.svg", sceneOtkatnyeInstall(900, 700, { stage: "mount" }), "иллюстрация"]);
+files.push(["otkatnye-work-3.svg", sceneHouseGate(900, 700, { open: 0 }), "иллюстрация"]);
+files.push(["automation-otkatnye.svg", sceneAutomationMount(1000, 760), "иллюстрация"]);
+files.push(["footer-jobsite.svg", sceneJobsiteDusk(1920, 900), ""]);
 
 files.push(["fill-ral.svg", swatchPattern("ral"), ""]);
 files.push(["fill-profnastil.svg", swatchPattern("profnastil"), ""]);
@@ -345,18 +526,15 @@ files.push(["fill-zhalyuzi.svg", swatchPattern("zhalyuzi"), ""]);
 files.push(["fill-sandwich.svg", swatchPattern("sandwich"), ""]);
 files.push(["fill-combo.svg", swatchPattern("combo"), ""]);
 
-files.push(["automation-showcase.svg", sceneAutomation(1000, 760), "иллюстрация"]);
-files.push(["repair-showcase.svg", sceneRepair(1000, 760, "normal"), "иллюстрация"]);
-
 files.push(["trust-installer.svg", sceneTeam(900, 700, "installer"), "фото"]);
 files.push(["trust-van.svg", sceneTeam(900, 700, "van"), "фото"]);
 files.push(["trust-warranty.svg", sceneTeam(900, 700, "warranty"), "фото"]);
 files.push(["trust-object.svg", sceneHouseGate(900, 700, { open: 0 }), "фото"]);
 
 // Портфолио
-files.push(["portfolio-otkatnye-1.svg", sceneHouseGate(800, 800, { open: 0 }), "фото"]);
+files.push(["portfolio-otkatnye-1.svg", sceneOtkatnyeInstall(800, 800, { stage: "trench" }), "фото"]);
 files.push(["portfolio-otkatnye-1b.svg", sceneHouseGate(800, 800, { open: 0.6 }), "фото"]);
-files.push(["portfolio-otkatnye-2.svg", sceneHouseGate(800, 800, { open: 0.3 }), "фото"]);
+files.push(["portfolio-otkatnye-2.svg", sceneOtkatnyeInstall(800, 800, { stage: "mount" }), "фото"]);
 files.push(["portfolio-otkatnye-3.svg", sceneHouseGate(800, 800, { open: 0.1 }), "фото"]);
 files.push(["portfolio-sektsionnye-1.svg", sceneSectional(800, 800), "фото"]);
 files.push(["portfolio-sektsionnye-2.svg", sceneSectional(800, 800), "фото"]);

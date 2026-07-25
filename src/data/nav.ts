@@ -1,6 +1,8 @@
 export interface NavItem {
   label: string;
   href: string;
+  /** Отметить как основное направление (визуальный акцент в выпадающем меню). */
+  primary?: boolean;
 }
 
 /** Компактное меню в шапке сайта. «Установка ворот» открывается отдельным выпадающим списком. */
@@ -12,13 +14,13 @@ export const headerNav: NavItem[] = [
   { label: "Контакты", href: "/kontakty" },
 ];
 
-/** Выпадающее меню пункта «Установка ворот» в шапке. */
+/** Выпадающее меню пункта «Установка ворот» в шапке. Откатные ворота — основное направление, идут первыми. */
 export const installationDropdown: NavItem[] = [
+  { label: "Откатные ворота", href: "/otkatnye-vorota", primary: true },
+  { label: "Автоматика для откатных ворот", href: "/avtomatika", primary: true },
   { label: "Все услуги по установке", href: "/ustanovka-vorot" },
-  { label: "Откатные ворота", href: "/otkatnye-vorota" },
   { label: "Секционные ворота", href: "/sektsionnye-vorota" },
   { label: "Распашные ворота", href: "/raspashnye-vorota" },
-  { label: "Автоматические ворота", href: "/avtomatika" },
 ];
 
 /** Виды ворот — колонка в подвале сайта. */

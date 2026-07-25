@@ -8,9 +8,20 @@
 <stop offset="0" stop-color="#FBF9F4"/>
 <stop offset="1" stop-color="#F1EDE3"/>
 </linearGradient>
+<linearGradient id="duskSky" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#1B2422"/>
+<stop offset="1" stop-color="#2C3A34"/>
+</linearGradient>
+<radialGradient id="workLight" cx="50%" cy="30%" r="70%">
+<stop offset="0" stop-color="#B98242" stop-opacity="0.35"/>
+<stop offset="1" stop-color="#B98242" stop-opacity="0"/>
+</radialGradient>
 </defs>
 <rect width="800" height="600" fill="url(#bg)"/>
-<rect width="800" height="456" fill="url(#sky)"/><rect x="0" y="456" width="800" height="144" fill="#E4E0D4"/><line x1="0" y1="456" x2="800" y2="456" stroke="#DDD9D1" stroke-width="2"/>
+<rect width="800" height="456" fill="url(#sky)"/><rect x="0" y="456" width="800" height="144" fill="#E4E0D4"/><g opacity="0.1" stroke="#54432E" stroke-width="10" fill="none" stroke-linecap="round">
+    <path d="M 40 549.2 Q 400 525.2 760 553.2"/>
+    <path d="M 40 569.2 Q 400 545.2 760 573.2"/>
+  </g><ellipse cx="150.5" cy="506.7" rx="1.5" ry="0.9" fill="#7A6449" opacity="0.14"/><ellipse cx="350.1" cy="467.5" rx="1.7" ry="1.0" fill="#7A6449" opacity="0.14"/><ellipse cx="322.6" cy="470.2" rx="1.4" ry="0.8" fill="#54432E" opacity="0.14"/><ellipse cx="48.2" cy="566.9" rx="2.1" ry="1.3" fill="#7A6449" opacity="0.14"/><ellipse cx="502.6" cy="516.3" rx="3.8" ry="2.3" fill="#54432E" opacity="0.14"/><ellipse cx="429.6" cy="502.5" rx="3.2" ry="1.9" fill="#54432E" opacity="0.14"/><ellipse cx="222.6" cy="461.2" rx="1.9" ry="1.2" fill="#7A6449" opacity="0.14"/><ellipse cx="408.2" cy="580.0" rx="1.8" ry="1.1" fill="#54432E" opacity="0.14"/><ellipse cx="502.9" cy="457.9" rx="1.5" ry="0.9" fill="#54432E" opacity="0.14"/><ellipse cx="601.8" cy="517.8" rx="1.4" ry="0.9" fill="#54432E" opacity="0.14"/><ellipse cx="756.8" cy="570.1" rx="1.6" ry="1.0" fill="#54432E" opacity="0.14"/><ellipse cx="738.6" cy="579.6" rx="2.8" ry="1.7" fill="#7A6449" opacity="0.14"/><ellipse cx="680.6" cy="514.2" rx="1.7" ry="1.0" fill="#54432E" opacity="0.14"/><ellipse cx="465.8" cy="578.4" rx="2.0" ry="1.2" fill="#7A6449" opacity="0.14"/><ellipse cx="306.9" cy="518.6" rx="1.2" ry="0.7" fill="#7A6449" opacity="0.14"/><ellipse cx="4.2" cy="461.6" rx="3.1" ry="1.9" fill="#54432E" opacity="0.14"/><ellipse cx="190.0" cy="464.3" rx="2.7" ry="1.6" fill="#54432E" opacity="0.14"/><ellipse cx="378.6" cy="553.7" rx="3.3" ry="2.0" fill="#7A6449" opacity="0.14"/><ellipse cx="53.8" cy="519.4" rx="2.0" ry="1.2" fill="#7A6449" opacity="0.14"/><ellipse cx="339.4" cy="589.9" rx="1.4" ry="0.9" fill="#7A6449" opacity="0.14"/><ellipse cx="351.7" cy="470.9" rx="2.2" ry="1.3" fill="#54432E" opacity="0.14"/><ellipse cx="167.8" cy="489.2" rx="3.1" ry="1.9" fill="#54432E" opacity="0.14"/><ellipse cx="113.7" cy="525.3" rx="1.9" ry="1.1" fill="#7A6449" opacity="0.14"/><ellipse cx="490.1" cy="595.4" rx="1.5" ry="0.9" fill="#54432E" opacity="0.14"/><ellipse cx="542.6" cy="473.2" rx="3.7" ry="2.2" fill="#54432E" opacity="0.14"/><ellipse cx="526.2" cy="512.9" rx="3.7" ry="2.2" fill="#54432E" opacity="0.14"/><ellipse cx="130.2" cy="519.4" rx="2.8" ry="1.7" fill="#7A6449" opacity="0.14"/><ellipse cx="350.2" cy="581.1" rx="2.1" ry="1.2" fill="#7A6449" opacity="0.14"/><ellipse cx="723.9" cy="463.0" rx="2.3" ry="1.4" fill="#7A6449" opacity="0.14"/><ellipse cx="27.9" cy="572.7" rx="2.6" ry="1.5" fill="#54432E" opacity="0.14"/><ellipse cx="504.8" cy="533.9" rx="2.6" ry="1.6" fill="#54432E" opacity="0.14"/><ellipse cx="35.0" cy="476.8" rx="1.5" ry="0.9" fill="#54432E" opacity="0.14"/><ellipse cx="430.0" cy="598.5" rx="3.5" ry="2.1" fill="#54432E" opacity="0.14"/><ellipse cx="669.6" cy="522.8" rx="1.5" ry="0.9" fill="#54432E" opacity="0.14"/><ellipse cx="287.3" cy="563.3" rx="3.4" ry="2.0" fill="#54432E" opacity="0.14"/><ellipse cx="574.7" cy="521.3" rx="1.7" ry="1.0" fill="#7A6449" opacity="0.14"/><ellipse cx="688.0" cy="522.6" rx="3.1" ry="1.9" fill="#54432E" opacity="0.14"/><ellipse cx="302.2" cy="591.6" rx="1.7" ry="1.0" fill="#54432E" opacity="0.14"/><line x1="0" y1="456" x2="800" y2="456" stroke="#DDD9D1" stroke-width="2"/>
 
 <rect x="174" y="306" width="26" height="150" fill="#103936"/>
 <rect x="600" y="306" width="26" height="150" fill="#103936"/>

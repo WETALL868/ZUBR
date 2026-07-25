@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { siteConfig } from "@/config/site";
 import { footerCompanyNav, gateTypesNav, footerLegalNav } from "@/data/nav";
@@ -10,14 +11,27 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="section-dark border-t border-border bg-bg text-text">
-      <Container className="py-12 sm:py-16">
+    <footer className="section-dark relative overflow-hidden border-t border-border bg-bg text-text">
+      <div className="absolute inset-0" aria-hidden="true">
+        <Image
+          src="/images/footer-jobsite.svg"
+          alt=""
+          fill
+          loading="lazy"
+          sizes="100vw"
+          className="object-cover opacity-60"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-bg/65 via-bg/80 to-bg/95" />
+      </div>
+
+      <Container className="relative py-12 sm:py-16">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <span className="text-xl font-extrabold tracking-tight text-text">{siteConfig.companyShortName}</span>
             <p className="mt-3 max-w-xs text-sm text-text-muted">
-              Установка, изготовление и автоматизация ворот в {siteConfig.cityAndRegion}. Замер, монтаж и
-              гарантийное обслуживание.
+              Замеряем, изготавливаем и монтируем откатные ворота в {siteConfig.cityAndRegion} — сами, на
+              объекте, с гарантией на выполненные работы. Также ставим секционные и распашные ворота и чиним
+              автоматику.
             </p>
             <div className="mt-5 flex gap-3">
               <a

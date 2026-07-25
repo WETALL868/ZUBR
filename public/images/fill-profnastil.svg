@@ -8,6 +8,14 @@
 <stop offset="0" stop-color="#FBF9F4"/>
 <stop offset="1" stop-color="#F1EDE3"/>
 </linearGradient>
+<linearGradient id="duskSky" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#1B2422"/>
+<stop offset="1" stop-color="#2C3A34"/>
+</linearGradient>
+<radialGradient id="workLight" cx="50%" cy="30%" r="70%">
+<stop offset="0" stop-color="#B98242" stop-opacity="0.35"/>
+<stop offset="1" stop-color="#B98242" stop-opacity="0"/>
+</radialGradient>
 </defs>
 <rect width="640" height="480" fill="url(#bg)"/>
 <rect x="0" y="0" width="22" height="480" fill="#103936" opacity="0.85"/><rect x="42" y="0" width="22" height="480" fill="#174C48" opacity="0.85"/><rect x="84" y="0" width="22" height="480" fill="#103936" opacity="0.85"/><rect x="126" y="0" width="22" height="480" fill="#174C48" opacity="0.85"/><rect x="168" y="0" width="22" height="480" fill="#103936" opacity="0.85"/><rect x="210" y="0" width="22" height="480" fill="#174C48" opacity="0.85"/><rect x="252" y="0" width="22" height="480" fill="#103936" opacity="0.85"/><rect x="294" y="0" width="22" height="480" fill="#174C48" opacity="0.85"/><rect x="336" y="0" width="22" height="480" fill="#103936" opacity="0.85"/><rect x="378" y="0" width="22" height="480" fill="#174C48" opacity="0.85"/><rect x="420" y="0" width="22" height="480" fill="#103936" opacity="0.85"/><rect x="462" y="0" width="22" height="480" fill="#174C48" opacity="0.85"/><rect x="504" y="0" width="22" height="480" fill="#103936" opacity="0.85"/><rect x="546" y="0" width="22" height="480" fill="#174C48" opacity="0.85"/><rect x="588" y="0" width="22" height="480" fill="#103936" opacity="0.85"/><rect x="630" y="0" width="22" height="480" fill="#174C48" opacity="0.85"/>

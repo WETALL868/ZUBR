@@ -6,11 +6,11 @@ export function PortfolioPreview() {
     <Section surface="surface" id="portfolio" className="scroll-mt-24">
       <SectionHeading
         eyebrow="Портфолио"
-        title="Готовые объекты"
-        description="Примеры выполненных работ. Районы указаны условно — см. полное портфолио."
+        title="Примеры выполненных откатных ворот"
+        description="Показываем в первую очередь откатные ворота — основное направление работы. Остальные категории доступны через фильтр."
       />
       <div className="mt-8">
-        <PortfolioGallery limit={6} showViewAllLink />
+        <PortfolioGallery limit={6} initialFilter="otkatnye" showViewAllLink />
       </div>
     </Section>
   );

@@ -7,10 +7,20 @@ import { Reveal } from "@/components/ui/Reveal";
 import { CalculatorButton } from "@/components/lead/CalculatorButton";
 import { cn } from "@/lib/utils";
 
-export function GateTypeCards() {
+interface GateTypeCardsProps {
+  eyebrow?: string;
+  title?: string;
+  description?: string;
+}
+
+export function GateTypeCards({
+  eyebrow = "Виды ворот",
+  title = "Подберите конструкцию под ваш объект",
+  description,
+}: GateTypeCardsProps) {
   return (
     <Section surface="surface">
-      <SectionHeading eyebrow="Виды ворот" title="Подберите конструкцию под ваш объект" />
+      <SectionHeading eyebrow={eyebrow} title={title} description={description} />
 
       <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {gateTypes.map((gate, index) => (
@@ -32,7 +42,7 @@ export function GateTypeCards() {
                 />
                 {gate.featured ? (
                   <span className="absolute left-3 top-3 rounded-full bg-brand px-3 py-1 text-xs font-semibold text-white">
-                    Популярное решение
+                    Основное направление
                   </span>
                 ) : null}
               </div>

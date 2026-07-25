@@ -2,10 +2,18 @@ import { stages } from "@/data/stages";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
 
-export function Stages() {
+interface StagesProps {
+  eyebrow?: string;
+  title?: string;
+}
+
+export function Stages({
+  eyebrow = "Как мы работаем",
+  title = "Путь от заявки до сдачи объекта",
+}: StagesProps) {
   return (
     <Section surface="surface">
-      <SectionHeading eyebrow="Как мы работаем" title="Путь от заявки до сдачи объекта" />
+      <SectionHeading eyebrow={eyebrow} title={title} />
       <div className="mt-10 grid grid-cols-1 gap-0 sm:grid-cols-2 lg:grid-cols-5 lg:gap-6">
         {stages.map((stage, index) => (
           <Reveal key={stage.number} delay={index * 60}>

@@ -6,9 +6,9 @@ export const gateTypes: GateType[] = [
     href: "/otkatnye-vorota",
     title: "Откатные ворота",
     shortDescription:
-      "Не занимают место при открывании, легко автоматизируются и подходят для широких проёмов.",
+      "Основное направление компании: замер, изготовление, монтаж и автоматика под ключ.",
     image: "/images/gate-sliding-card.svg",
-    imageAlt: "Откатные ворота у частного дома",
+    imageAlt: "Монтаж откатных ворот на объекте",
     featured: true,
     isLandingPage: true,
   },

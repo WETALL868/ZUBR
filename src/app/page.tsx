@@ -29,15 +29,25 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <>
+      {/* Основное направление: откатные ворота — от первого экрана до автоматики */}
       <Hero />
-      <GateTypeCards />
       <OtkatnyeHighlight />
       <CalculatorSection />
-      <Advantages />
-      <Stages />
+      <Stages
+        eyebrow="Установка откатных ворот"
+        title="Как проходит установка откатных ворот"
+      />
       <PortfolioPreview />
-      <FillOptionsSection />
       <AutomationSection />
+      <FillOptionsSection />
+
+      {/* Второй план: остальные направления и общие преимущества компании */}
+      <Advantages />
+      <GateTypeCards
+        eyebrow="Также устанавливаем"
+        title="Другие виды ворот"
+        description="Основной фокус компании — откатные ворота, но мы выполняем полный цикл работ и для других конструкций."
+      />
       <RepairSection />
       <Testimonials />
       <FaqSection items={faqGeneral} />

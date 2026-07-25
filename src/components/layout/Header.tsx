@@ -88,7 +88,8 @@ function InstallationNavItem({ pathname }: { pathname: string }) {
               role="menuitem"
               href={item.href}
               className={cn(
-                "block px-4 py-2.5 text-[15px] text-text hover:bg-bg hover:text-brand",
+                "block px-4 py-2.5 text-[15px] hover:bg-bg hover:text-brand",
+                item.primary ? "font-bold text-text" : "text-text-muted",
                 pathname === item.href && "text-brand",
               )}
             >
@@ -256,7 +257,8 @@ export function Header() {
                     key={item.href}
                     href={item.href}
                     className={cn(
-                      "rounded-xl px-4 py-3 text-base font-medium text-text-muted hover:bg-bg hover:text-brand",
+                      "rounded-xl px-4 py-3 text-base hover:bg-bg hover:text-brand",
+                      item.primary ? "font-bold text-text" : "font-medium text-text-muted",
                       pathname === item.href && "text-brand",
                     )}
                   >

@@ -5,8 +5,8 @@ import { ButtonLink } from "@/components/ui/Button";
 import { MeasurementButton } from "@/components/lead/MeasurementButton";
 
 const quickPoints = [
-  { title: "Точный замер", description: "Перед изготовлением проверяем размеры на месте" },
-  { title: "Монтаж под ключ", description: "Изготовление, доставка и установка одной командой" },
+  { title: "Выезд на замер", description: "Проверяем проём и грунт на объекте перед изготовлением" },
+  { title: "Монтаж под ключ", description: "Фундамент, направляющая, полотно и автоматика — одной бригадой" },
   { title: "Гарантия на работы", description: `${siteConfig.warrantyYears} года на монтаж и автоматику` },
 ];
 
@@ -15,20 +15,23 @@ export function Hero() {
     <section className="section-dark relative overflow-hidden bg-bg text-text">
       <Container className="grid gap-10 py-12 sm:py-16 lg:grid-cols-2 lg:items-center lg:py-24">
         <div className="animate-fade-up">
+          <span className="mb-3 inline-block text-sm font-semibold uppercase tracking-wide text-accent">
+            Основное направление
+          </span>
           <h1 className="text-4xl font-extrabold tracking-tight text-text sm:text-5xl lg:text-[3.25rem] lg:leading-[1.08]">
-            Установка автоматических ворот под ключ
+            Установка откатных ворот под ключ
           </h1>
           <p className="mt-5 max-w-xl text-lg text-text-muted">
-            Подберём конструкцию, выполним точный замер, изготовим, установим и подключим автоматику в{" "}
-            {siteConfig.cityAndRegion}.
+            Выезжаем на объект, замеряем проём, изготавливаем конструкцию, монтируем и подключаем автоматику —
+            в реальных условиях участка, а не по каталожным чертежам. Работаем в {siteConfig.cityAndRegion}.
           </p>
           <p className="mt-3 max-w-xl text-base text-text-muted">
-            Откатные, секционные и распашные ворота для частных домов, гаражей и коммерческих объектов.
+            Также устанавливаем секционные и распашные ворота, автоматику и выполняем ремонт.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <ButtonLink href="#calculator" size="lg">
-              Рассчитать стоимость
+              Рассчитать откатные ворота
             </ButtonLink>
             <MeasurementButton size="lg">Вызвать замерщика</MeasurementButton>
           </div>
@@ -43,10 +46,10 @@ export function Hero() {
           </dl>
         </div>
 
-        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl shadow-2xl ring-1 ring-white/10 lg:aspect-square">
+        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl shadow-2xl ring-1 ring-white/10 lg:aspect-square">
           <Image
-            src="/images/hero-sliding-gate.svg"
-            alt="Современные откатные ворота у частного дома"
+            src="/images/hero-otkatnye-install.svg"
+            alt="Монтаж откатных ворот на объекте"
             fill
             priority
             sizes="(min-width: 1024px) 50vw, 100vw"
