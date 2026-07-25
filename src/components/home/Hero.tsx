@@ -1,8 +1,8 @@
-import Image from "next/image";
 import { siteConfig } from "@/config/site";
 import { Container } from "@/components/ui/Container";
 import { ButtonLink } from "@/components/ui/Button";
 import { MeasurementButton } from "@/components/lead/MeasurementButton";
+import { HeroVideoBackground } from "./HeroVideoBackground";
 
 const quickPoints = [
   { title: "Выезд на замер", description: "Проверяем проём и грунт на объекте перед изготовлением" },
@@ -12,20 +12,31 @@ const quickPoints = [
 
 export function Hero() {
   return (
-    <section className="section-dark relative overflow-hidden bg-bg text-text">
-      <Container className="grid gap-10 py-12 sm:py-16 lg:grid-cols-2 lg:items-center lg:py-24">
-        <div className="animate-fade-up">
+    <section className="section-dark relative isolate flex min-h-[560px] items-center overflow-hidden text-text sm:min-h-[620px] lg:min-h-[720px]">
+      <HeroVideoBackground
+        posterSrc="/images/hero-otkatnye-install.svg"
+        posterAlt="Монтаж откатных ворот на объекте"
+        webmSrc="/videos/hero-otkatnye.webm"
+        mp4Src="/videos/hero-otkatnye.mp4"
+      />
+      <div
+        className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/55 to-black/25"
+        aria-hidden="true"
+      />
+
+      <Container className="relative z-[2] py-14 sm:py-16 lg:py-20">
+        <div className="max-w-2xl animate-fade-up">
           <span className="mb-3 inline-block text-sm font-semibold uppercase tracking-wide text-accent">
             Основное направление
           </span>
-          <h1 className="text-4xl font-extrabold tracking-tight text-text sm:text-5xl lg:text-[3.25rem] lg:leading-[1.08]">
+          <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-[3.25rem] lg:leading-[1.08]">
             Установка откатных ворот под ключ
           </h1>
-          <p className="mt-5 max-w-xl text-lg text-text-muted">
+          <p className="mt-5 max-w-xl text-lg text-white/85">
             Выезжаем на объект, замеряем проём, изготавливаем конструкцию, монтируем и подключаем автоматику —
             в реальных условиях участка, а не по каталожным чертежам. Работаем в {siteConfig.cityAndRegion}.
           </p>
-          <p className="mt-3 max-w-xl text-base text-text-muted">
+          <p className="mt-3 max-w-xl text-base text-white/75">
             Также устанавливаем секционные и распашные ворота, автоматику и выполняем ремонт.
           </p>
 
@@ -36,25 +47,14 @@ export function Hero() {
             <MeasurementButton size="lg">Вызвать замерщика</MeasurementButton>
           </div>
 
-          <dl className="mt-10 grid grid-cols-1 gap-6 border-t border-border pt-8 sm:grid-cols-3">
+          <dl className="mt-10 grid grid-cols-1 gap-6 border-t border-white/20 pt-8 sm:grid-cols-3">
             {quickPoints.map((point) => (
               <div key={point.title}>
                 <dt className="text-[15px] font-bold text-accent">{point.title}</dt>
-                <dd className="mt-1 text-sm text-text-muted">{point.description}</dd>
+                <dd className="mt-1 text-sm text-white/75">{point.description}</dd>
               </div>
             ))}
           </dl>
-        </div>
-
-        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl shadow-2xl ring-1 ring-white/10 lg:aspect-square">
-          <Image
-            src="/images/hero-otkatnye-install.svg"
-            alt="Монтаж откатных ворот на объекте"
-            fill
-            priority
-            sizes="(min-width: 1024px) 50vw, 100vw"
-            className="object-cover"
-          />
         </div>
       </Container>
     </section>
