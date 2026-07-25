@@ -69,17 +69,28 @@ h1,h2,h3,h4{line-height:1.15;font-weight:700;letter-spacing:-0.02em;}
 .container{max-width:var(--container-w);margin-inline:auto;padding-inline:24px;}
 .container--narrow{max-width:840px;}
 
+@media (max-width:360px){ .container{padding-inline:18px;} }
 @media (min-width:768px){ .container{padding-inline:32px;} }
 
 .icon{width:1.25em;height:1.25em;stroke:currentColor;flex-shrink:0;}
 
-/* ---------- Reveal on scroll ---------- */
-.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s var(--ease),transform .7s var(--ease);}
-.reveal.is-visible{opacity:1;transform:translateY(0);}
+/* ---------- Reveal on scroll ----------
+   Gated behind .js so the page stays fully readable without JavaScript
+   (and for crawlers that do not execute scripts). */
+.js .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s var(--ease),transform .7s var(--ease);}
+.js .reveal.is-visible{opacity:1;transform:translateY(0);}
 @media (prefers-reduced-motion:reduce){
-  .reveal{opacity:1;transform:none;transition:none;}
+  .js .reveal{opacity:1;transform:none;transition:none;}
   *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;scroll-behavior:auto !important;}
 }
+
+/* ---------- Focus visibility (keyboard navigation) ---------- */
+:focus-visible{outline:2px solid var(--blue-400);outline-offset:3px;border-radius:4px;}
+.section--dark :focus-visible,
+.section--contact :focus-visible,
+.hero :focus-visible,
+.site-footer :focus-visible,
+.mobile-nav :focus-visible{outline-color:var(--blue-300);}
 
 /* ---------- Buttons ---------- */
 .btn{
@@ -101,6 +112,14 @@ h1,h2,h3,h4{line-height:1.15;font-weight:700;letter-spacing:-0.02em;}
 .btn--lg{padding:1.05rem 2rem;font-size:1.05rem;}
 .btn--sm{padding:.6rem 1.2rem;font-size:.9rem;}
 .btn--block{width:100%;}
+
+/* Long Russian CTA labels must not force a min-content wider than the
+   viewport on small phones (caused ~60px of horizontal overflow at 320px). */
+@media (max-width:430px){
+  .btn{white-space:normal;text-align:center;}
+  .btn--lg{padding:.95rem 1.4rem;font-size:1rem;}
+  .hero__actions .btn{width:100%;}
+}
 
 /* ---------- Eyebrow / section headers ---------- */
 .eyebrow{
@@ -171,6 +190,13 @@ h1,h2,h3,h4{line-height:1.15;font-weight:700;letter-spacing:-0.02em;}
   padding:2rem;transform:translateY(-12px);opacity:0;pointer-events:none;
   transition:opacity .3s var(--ease), transform .3s var(--ease);
   z-index:99;
+  /* Landscape phones are shorter than the menu — keep every link reachable. */
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding-bottom:calc(2rem + env(safe-area-inset-bottom));
+}
+@media (max-height:520px){
+  .mobile-nav{justify-content:flex-start;gap:1rem;padding-top:1.5rem;}
+  .mobile-nav a{font-size:1.1rem;}
 }
 .mobile-nav.is-open{opacity:1;transform:translateY(0);pointer-events:auto;}
 .mobile-nav ul{display:flex;flex-direction:column;gap:1.4rem;text-align:center;}
@@ -201,6 +227,12 @@ h1,h2,h3,h4{line-height:1.15;font-weight:700;letter-spacing:-0.02em;}
 @media (min-width:960px){
   .hero__inner{grid-template-columns:1.05fr 1fr;gap:40px;}
 }
+/* Above-the-fold: animate with CSS only (never gated behind JS) so the
+   LCP element paints on first frame and survives a JS failure. */
+.hero__content,.hero__visual{min-width:0;animation:heroIn .7s var(--ease) both;}
+.hero__visual{animation-delay:.12s;}
+@keyframes heroIn{ from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
+
 .hero__content{max-width:640px;}
 .hero__title{font-size:clamp(2.1rem,5vw,3.4rem);margin-bottom:1.1rem;}
 .hero__subtitle{font-size:clamp(1.02rem,1.6vw,1.2rem);color:#c9d6ec;max-width:56ch;margin-bottom:2rem;}
@@ -242,6 +274,11 @@ h1,h2,h3,h4{line-height:1.15;font-weight:700;letter-spacing:-0.02em;}
 /* ==========================================================================
    CARDS GRID
    ========================================================================== */
+/* Grid items default to min-width:auto, letting a long unbreakable word or a
+   nowrap button stretch the whole track past the viewport. */
+.cards-grid>*,.timeline>*,.tasks-grid>*,.contact-grid>*,.footer__inner>*,.hero__stats>*{min-width:0;}
+.card__title,.card__text,.timeline__title,.timeline__text,.task-card{overflow-wrap:break-word;}
+
 .cards-grid{display:grid;gap:22px;grid-template-columns:1fr;}
 @media (min-width:640px){ .cards-grid{grid-template-columns:repeat(2,1fr);} }
 @media (min-width:1020px){ .cards-grid--6{grid-template-columns:repeat(3,1fr);} }
@@ -304,7 +341,8 @@ h1,h2,h3,h4{line-height:1.15;font-weight:700;letter-spacing:-0.02em;}
 /* ==========================================================================
    TASKS
    ========================================================================== */
-.tasks-grid{display:grid;gap:14px;grid-template-columns:repeat(2,1fr);}
+.tasks-grid{display:grid;gap:14px;grid-template-columns:1fr;}
+@media (min-width:480px){ .tasks-grid{grid-template-columns:repeat(2,1fr);} }
 @media (min-width:640px){ .tasks-grid{grid-template-columns:repeat(3,1fr);} }
 @media (min-width:1020px){ .tasks-grid{grid-template-columns:repeat(4,1fr);} }
 .task-card{
@@ -360,6 +398,9 @@ h1,h2,h3,h4{line-height:1.15;font-weight:700;letter-spacing:-0.02em;}
 .form-group input,.form-group textarea{
   background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:12px;
   padding:.85rem 1rem;color:#fff;transition:border-color .25s var(--ease), background .25s var(--ease);
+  /* Inputs carry an intrinsic width from the `size` attribute and will not
+     shrink inside a grid track without this. */
+  width:100%;min-width:0;
 }
 .form-group input::placeholder,.form-group textarea::placeholder{color:#8fa0bf;}
 .form-group input:focus,.form-group textarea:focus{
@@ -372,12 +413,22 @@ h1,h2,h3,h4{line-height:1.15;font-weight:700;letter-spacing:-0.02em;}
 .form-consent{display:flex;align-items:flex-start;gap:.6rem;font-size:.86rem;color:#b9c8e2;cursor:pointer;}
 .form-consent input{margin-top:3px;accent-color:var(--blue-400);}
 
-.form-success{
-  display:none;align-items:center;gap:.6rem;font-size:.92rem;color:#a4e9c3;
-  background:rgba(58,204,120,.1);border:1px solid rgba(58,204,120,.35);border-radius:12px;padding:.9rem 1.1rem;
+.form-note{
+  display:none;align-items:center;gap:.6rem;font-size:.92rem;border-radius:12px;padding:.9rem 1.1rem;
 }
-.form-success.is-visible{display:flex;}
-.form-success .icon{color:#4fdc8f;flex-shrink:0;}
+.form-note.is-visible{display:flex;}
+.form-note .icon{flex-shrink:0;}
+.form-success{color:#a4e9c3;background:rgba(58,204,120,.1);border:1px solid rgba(58,204,120,.35);}
+.form-success .icon{color:#4fdc8f;}
+.form-error{color:#ffc4c4;background:rgba(255,86,86,.1);border:1px solid rgba(255,86,86,.4);}
+.form-error .icon{color:#ff8080;}
+.form-error a{text-decoration:underline;white-space:nowrap;}
+
+.contact-form.is-sending{opacity:.75;pointer-events:none;}
+.btn[disabled]{opacity:.6;cursor:not-allowed;transform:none !important;}
+
+.form-consent a{color:var(--blue-300);text-decoration:underline;}
+.form-consent a:hover{color:#fff;}
 
 /* ==========================================================================
    FOOTER
@@ -395,7 +446,12 @@ h1,h2,h3,h4{line-height:1.15;font-weight:700;letter-spacing:-0.02em;}
 .footer__col a:hover{color:var(--blue-300);}
 .footer__col address{font-style:normal;font-size:.92rem;line-height:1.9;}
 .footer__col address a:hover{color:var(--blue-300);}
-.footer__bottom{padding:20px 0 28px;font-size:.82rem;color:#7c8494;}
+.footer__bottom{
+  padding:20px 0 28px;font-size:.82rem;color:#7c8494;
+  display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between;align-items:center;
+}
+.footer__bottom a{text-decoration:underline;}
+.footer__bottom a:hover{color:var(--blue-300);}
 
 /* ==========================================================================
    MOBILE STICKY CTA
@@ -415,3 +471,16 @@ h1,h2,h3,h4{line-height:1.15;font-weight:700;letter-spacing:-0.02em;}
 }
 .mobile-cta__btn--ghost{flex:0 0 52px;background:rgba(255,255,255,.1);color:#fff;}
 .mobile-cta__btn--primary{background:linear-gradient(135deg,var(--blue-500),var(--navy-700));color:#fff;}
+
+/* ==========================================================================
+   LEGAL PAGE (privacy policy)
+   ========================================================================== */
+.legal h1{margin-bottom:.5rem;}
+.legal__meta{color:var(--text-muted);font-size:.9rem;margin-bottom:2.5rem;}
+.legal h2{font-size:1.15rem;color:var(--navy-900);margin:2rem 0 .7rem;}
+.legal p{color:var(--text-muted);margin-bottom:1rem;max-width:72ch;}
+.legal ul{list-style:disc;padding-left:1.3rem;margin-bottom:1.2rem;color:var(--text-muted);}
+.legal li{margin-bottom:.4rem;}
+.legal a{color:var(--blue-500);text-decoration:underline;}
+.legal a.btn{text-decoration:none;color:#fff;}
+.legal__back{margin-top:2.5rem;}
