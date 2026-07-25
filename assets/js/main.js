@@ -57,6 +57,39 @@
 
   setNavState(false);
 
+  /* ---------- Cookie consent banner ----------
+     Consent choice is stored in localStorage and never asked again once set.
+     "Decline" still permits strictly necessary cookies (session/UI state) —
+     it only opts the visitor out of analytics; there is nothing left here to
+     gate until a real analytics snippet (e.g. Yandex.Metrica) is added, at
+     which point that loader should check getCookieConsent() === "accepted"
+     before running. */
+  var COOKIE_CONSENT_KEY = "lancor_cookie_consent";
+  var cookieBanner = document.getElementById("cookie-banner");
+
+  function getCookieConsent() {
+    try { return localStorage.getItem(COOKIE_CONSENT_KEY); } catch (e) { return null; }
+  }
+
+  if (cookieBanner) {
+    if (!getCookieConsent()) {
+      // Defer to the next frame so the slide-up transition actually plays.
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { cookieBanner.classList.add("is-visible"); });
+      });
+    }
+
+    var dismissCookieBanner = function (value) {
+      try { localStorage.setItem(COOKIE_CONSENT_KEY, value); } catch (e) { /* private mode / storage disabled */ }
+      cookieBanner.classList.remove("is-visible");
+    };
+
+    var cookieAccept = document.getElementById("cookie-accept");
+    var cookieDecline = document.getElementById("cookie-decline");
+    if (cookieAccept) cookieAccept.addEventListener("click", function () { dismissCookieBanner("accepted"); });
+    if (cookieDecline) cookieDecline.addEventListener("click", function () { dismissCookieBanner("declined"); });
+  }
+
   /* ---------- CTA intent tracking (which button brought them to the form) ---------- */
   var intentField = document.getElementById("f-intent");
   document.querySelectorAll("[data-intent]").forEach(function (btn) {

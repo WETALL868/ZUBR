@@ -7,9 +7,21 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://lancor.ru/privacy.html</loc>
+    <loc>https://lancor.ru/privacy-policy.html</loc>
     <lastmod>2026-07-25</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.1</priority>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://lancor.ru/cookie-policy.html</loc>
+    <lastmod>2026-07-25</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://lancor.ru/terms.html</loc>
+    <lastmod>2026-07-25</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
   </url>
 </urlset>

@@ -473,14 +473,81 @@ h1,h2,h3,h4{line-height:1.15;font-weight:700;letter-spacing:-0.02em;}
 .mobile-cta__btn--primary{background:linear-gradient(135deg,var(--blue-500),var(--navy-700));color:#fff;}
 
 /* ==========================================================================
-   LEGAL PAGE (privacy policy)
+   LEGAL PAGES (privacy policy, cookie policy, terms)
    ========================================================================== */
+.legal__back-top{margin-bottom:2rem;}
 .legal h1{margin-bottom:.5rem;}
-.legal__meta{color:var(--text-muted);font-size:.9rem;margin-bottom:2.5rem;}
-.legal h2{font-size:1.15rem;color:var(--navy-900);margin:2rem 0 .7rem;}
+.legal__meta{color:var(--text-muted);font-size:.9rem;margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--gray-200);}
+.legal h2{font-size:1.15rem;color:var(--navy-900);margin:2.2rem 0 .7rem;}
+.legal h3{font-size:1rem;color:var(--navy-900);margin:1.4rem 0 .5rem;}
 .legal p{color:var(--text-muted);margin-bottom:1rem;max-width:72ch;}
 .legal ul{list-style:disc;padding-left:1.3rem;margin-bottom:1.2rem;color:var(--text-muted);}
 .legal li{margin-bottom:.4rem;}
 .legal a{color:var(--blue-500);text-decoration:underline;}
-.legal a.btn{text-decoration:none;color:#fff;}
+.legal a.btn{text-decoration:none;}
+.legal a.btn--primary{color:#fff;}
+.legal a.btn--outline{color:var(--navy-800);}
+.legal a.btn--outline:hover{color:var(--blue-500);}
 .legal__back{margin-top:2.5rem;}
+.legal strong{color:var(--navy-900);}
+
+/* Explicit "fill this in before publishing" markers — deliberately not a
+   real phone/e-mail/domain, so nobody mistakes a placeholder for real data. */
+.tbd{
+  display:inline-block;background:rgba(255,176,32,.14);color:#8a5a00;
+  border:1px dashed rgba(191,130,0,.55);border-radius:6px;
+  padding:.05rem .5rem;font-weight:600;font-size:.92em;white-space:nowrap;
+}
+
+.legal table.requisites{width:100%;border-collapse:collapse;margin:1rem 0 1.6rem;font-size:.95rem;}
+.legal table.requisites th,.legal table.requisites td{text-align:left;padding:.6rem .9rem;border-bottom:1px solid var(--gray-200);vertical-align:top;}
+.legal table.requisites th{width:38%;color:var(--text-muted);font-weight:600;}
+.legal table.requisites td{color:var(--navy-900);font-weight:500;}
+@media (max-width:560px){
+  .legal table.requisites,.legal table.requisites tbody,.legal table.requisites tr,.legal table.requisites th,.legal table.requisites td{display:block;width:auto;}
+  .legal table.requisites tr{padding:.5rem 0;border-bottom:1px solid var(--gray-200);}
+  .legal table.requisites th,.legal table.requisites td{border-bottom:0;padding:.15rem 0;}
+  .legal table.requisites th{color:var(--text-muted);font-size:.82rem;text-transform:uppercase;letter-spacing:.03em;}
+}
+
+/* Short consent note placed directly beside the lead form, distinct from the
+   checkbox itself (which sits right above the submit button). */
+.form-legal-note{font-size:.84rem;color:#aebedd;margin-top:1.2rem;max-width:46ch;}
+.form-legal-note a{color:var(--blue-300);text-decoration:underline;}
+.form-legal-note a:hover{color:#fff;}
+
+/* Footer legal links row */
+.footer__legal{display:flex;flex-wrap:wrap;gap:6px 22px;}
+.footer__legal a{text-decoration:underline;}
+.footer__legal a:hover{color:var(--blue-300);}
+
+/* ==========================================================================
+   COOKIE CONSENT BANNER
+   ========================================================================== */
+.cookie-banner{
+  position:fixed;left:16px;right:16px;bottom:16px;z-index:130;
+  max-width:960px;margin-inline:auto;
+  background:rgba(8,18,38,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,.14);border-radius:var(--radius-lg);
+  padding:22px 26px;color:#fff;box-shadow:var(--shadow-lg);
+  display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;justify-content:space-between;
+  transform:translateY(140%);opacity:0;transition:transform .4s var(--ease),opacity .4s var(--ease);
+}
+.cookie-banner.is-visible{transform:translateY(0);opacity:1;}
+/* The fullscreen mobile menu (z-index:99) sits below the banner (z-index:130)
+   in the stacking order, so an open menu would otherwise be partly covered
+   by it. Suppress the banner for as long as the menu is open. */
+#mobile-nav.is-open ~ #cookie-banner.is-visible{opacity:0;transform:translateY(140%);pointer-events:none;}
+.cookie-banner p{font-size:.9rem;line-height:1.5;color:#dbe6f7;max-width:600px;margin:0;flex:1 1 320px;}
+.cookie-banner a{color:var(--blue-300);text-decoration:underline;}
+.cookie-banner a:hover{color:#fff;}
+.cookie-banner__actions{display:flex;gap:10px;flex-wrap:wrap;flex:0 0 auto;}
+.cookie-banner .btn{padding:.65rem 1.3rem;font-size:.9rem;}
+.cookie-banner .btn--outline{color:#fff;box-shadow:inset 0 0 0 1.6px rgba(255,255,255,.35);}
+.cookie-banner .btn--outline:hover{box-shadow:inset 0 0 0 1.6px var(--blue-300);color:var(--blue-300);}
+@media (max-width:640px){
+  .cookie-banner{left:10px;right:10px;bottom:10px;padding:18px 20px;flex-direction:column;align-items:stretch;}
+  .cookie-banner__actions{flex-direction:column;}
+  .cookie-banner__actions .btn{width:100%;}
+}
+@media (prefers-reduced-motion:reduce){ .cookie-banner{transition:opacity .2s linear;} }
