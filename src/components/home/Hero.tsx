@@ -12,7 +12,7 @@ const quickPoints = [
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden bg-bg">
+    <section className="section-dark relative overflow-hidden bg-bg text-text">
       <Container className="grid gap-10 py-12 sm:py-16 lg:grid-cols-2 lg:items-center lg:py-24">
         <div className="animate-fade-up">
           <h1 className="text-4xl font-extrabold tracking-tight text-text sm:text-5xl lg:text-[3.25rem] lg:leading-[1.08]">
@@ -36,14 +36,14 @@ export function Hero() {
           <dl className="mt-10 grid grid-cols-1 gap-6 border-t border-border pt-8 sm:grid-cols-3">
             {quickPoints.map((point) => (
               <div key={point.title}>
-                <dt className="text-[15px] font-bold text-brand">{point.title}</dt>
+                <dt className="text-[15px] font-bold text-accent">{point.title}</dt>
                 <dd className="mt-1 text-sm text-text-muted">{point.description}</dd>
               </div>
             ))}
           </dl>
         </div>
 
-        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl lg:aspect-square">
+        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl shadow-2xl ring-1 ring-white/10 lg:aspect-square">
           <Image
             src="/images/hero-sliding-gate.svg"
             alt="Современные откатные ворота у частного дома"

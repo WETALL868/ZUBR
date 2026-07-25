@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { siteConfig } from "@/config/site";
-import { mainNav, gateTypesNav, footerLegalNav } from "@/data/nav";
+import { footerCompanyNav, gateTypesNav, footerLegalNav } from "@/data/nav";
 import { Container } from "@/components/ui/Container";
 import { trackGoal } from "@/lib/analytics";
 
@@ -10,7 +10,7 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-border bg-surface">
+    <footer className="section-dark border-t border-border bg-bg text-text">
       <Container className="py-12 sm:py-16">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
@@ -25,7 +25,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Telegram"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-text-muted hover:border-brand hover:text-brand"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-text-muted hover:border-accent hover:text-accent"
               >
                 <TelegramIcon />
               </a>
@@ -34,7 +34,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="WhatsApp"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-text-muted hover:border-brand hover:text-brand"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-text-muted hover:border-accent hover:text-accent"
               >
                 <WhatsAppIcon />
               </a>
@@ -43,7 +43,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="ВКонтакте"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-text-muted hover:border-brand hover:text-brand"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-text-muted hover:border-accent hover:text-accent"
               >
                 <VkIcon />
               </a>
@@ -53,9 +53,9 @@ export function Footer() {
           <nav aria-label="Разделы сайта">
             <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-text-muted">Компания</h3>
             <ul className="space-y-2.5 text-sm">
-              {mainNav.map((item) => (
+              {footerCompanyNav.map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href} className="text-text hover:text-brand">
+                  <Link href={item.href} className="text-text hover:text-accent">
                     {item.label}
                   </Link>
                 </li>
@@ -68,13 +68,13 @@ export function Footer() {
             <ul className="space-y-2.5 text-sm">
               {gateTypesNav.map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href} className="text-text hover:text-brand">
+                  <Link href={item.href} className="text-text hover:text-accent">
                     {item.label}
                   </Link>
                 </li>
               ))}
               <li>
-                <Link href="/remont-vorot" className="text-text hover:text-brand">
+                <Link href="/remont-vorot" className="text-text hover:text-accent">
                   Ремонт ворот
                 </Link>
               </li>
@@ -85,12 +85,12 @@ export function Footer() {
             <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-text-muted">Контакты</h3>
             <ul className="space-y-2.5 text-sm text-text">
               <li>
-                <a href={siteConfig.phoneHref} onClick={() => trackGoal("phone_click")} className="hover:text-brand">
+                <a href={siteConfig.phoneHref} onClick={() => trackGoal("phone_click")} className="hover:text-accent">
                   {siteConfig.phone}
                 </a>
               </li>
               <li>
-                <a href={`mailto:${siteConfig.email}`} className="hover:text-brand">
+                <a href={`mailto:${siteConfig.email}`} className="hover:text-accent">
                   {siteConfig.email}
                 </a>
               </li>
@@ -109,7 +109,7 @@ export function Footer() {
             </div>
             <nav aria-label="Правовая информация" className="flex flex-col gap-2 sm:items-end">
               {footerLegalNav.map((item) => (
-                <Link key={item.href} href={item.href} className="hover:text-brand">
+                <Link key={item.href} href={item.href} className="hover:text-accent">
                   {item.label}
                 </Link>
               ))}

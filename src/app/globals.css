@@ -1,14 +1,35 @@
 @import "tailwindcss";
 
 :root {
-  --color-bg: #f5f3ee;
-  --color-surface: #ffffff;
+  /* Тёплый серый — основной фон светлых секций (не белый и не бежевый в лоб) */
+  --color-bg: #e5e0d5;
+  /* Белый используется умеренно — карточки и чередующиеся секции */
+  --color-surface: #faf8f3;
   --color-text: #171a1d;
-  --color-text-muted: #62676c;
+  --color-text-muted: #5b5f5a;
   --color-brand: #174c48;
   --color-brand-hover: #103936;
   --color-accent: #b98242;
-  --color-border: #ddd9d1;
+  --color-border: #d3cbba;
+
+  /* Антрацитовые/графитовые секции для глубины и контраста */
+  --color-dark-bg: #12181a;
+  --color-dark-surface: #1c2426;
+  --color-dark-text: #f4f1ea;
+  --color-dark-text-muted: #aca89e;
+  --color-dark-border: rgba(255, 255, 255, 0.12);
+}
+
+/* Локально переопределяет токены для тёмных секций (Hero, Footer и т.д.) —
+   вложенные компоненты (Card, SectionHeading и др.) используют те же
+   Tailwind-классы (bg-surface, text-text-muted…) и автоматически получают
+   тёмную палитру благодаря каскаду CSS-переменных. */
+.section-dark {
+  --color-bg: var(--color-dark-bg);
+  --color-surface: var(--color-dark-surface);
+  --color-text: var(--color-dark-text);
+  --color-text-muted: var(--color-dark-text-muted);
+  --color-border: var(--color-dark-border);
 }
 
 @theme inline {

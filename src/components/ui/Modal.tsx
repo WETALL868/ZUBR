@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 interface ModalProps {
   isOpen: boolean;
@@ -37,9 +38,14 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
         if (e.target === dialogRef.current) onClose();
       }}
       aria-labelledby="modal-title"
-      className="m-0 w-full max-w-lg rounded-2xl border-0 bg-transparent p-0 backdrop:bg-black/50 open:animate-fade-in max-sm:fixed max-sm:inset-x-0 max-sm:bottom-0 max-sm:top-auto max-sm:max-h-[92vh]"
+      className={cn(
+        "fixed inset-0 m-0 h-full max-h-none w-full max-w-none items-center justify-center overflow-y-auto border-0 bg-transparent p-4 backdrop:bg-black/60 open:animate-fade-in sm:p-6",
+        // Tailwind-утилиты имеют больший вес, чем стандартное `dialog:not([open]){display:none}`
+        // браузера, поэтому видимость управляется явно состоянием React, а не только атрибутом [open].
+        isOpen ? "flex" : "hidden",
+      )}
     >
-      <div className="max-h-[92vh] overflow-y-auto rounded-2xl bg-surface p-6 shadow-2xl sm:p-8">
+      <div className="my-auto max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-surface p-6 shadow-2xl sm:p-8">
         <div className="mb-5 flex items-start justify-between gap-4">
           <h2 id="modal-title" className="text-xl font-bold text-text sm:text-2xl">
             {title}

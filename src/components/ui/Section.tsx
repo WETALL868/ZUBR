@@ -2,10 +2,18 @@ import type { HTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 import { Container } from "./Container";
 
+export type SectionSurface = "bg" | "surface" | "dark";
+
 interface SectionProps extends HTMLAttributes<HTMLElement> {
   containerClassName?: string;
-  surface?: "bg" | "surface";
+  surface?: SectionSurface;
 }
+
+const surfaceClasses: Record<SectionSurface, string | undefined> = {
+  bg: undefined,
+  surface: "bg-surface",
+  dark: "section-dark bg-bg text-text",
+};
 
 export function Section({
   className,
@@ -15,10 +23,7 @@ export function Section({
   ...props
 }: SectionProps) {
   return (
-    <section
-      className={cn("py-14 sm:py-20", surface === "surface" ? "bg-surface" : undefined, className)}
-      {...props}
-    >
+    <section className={cn("py-14 sm:py-20", surfaceClasses[surface], className)} {...props}>
       <Container className={containerClassName}>{children}</Container>
     </section>
   );

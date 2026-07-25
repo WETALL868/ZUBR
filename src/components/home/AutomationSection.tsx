@@ -6,7 +6,7 @@ import { CalculatorButton } from "@/components/lead/CalculatorButton";
 
 export function AutomationSection() {
   return (
-    <Section id="avtomatika" surface="surface" className="scroll-mt-24">
+    <Section id="avtomatika" surface="dark" className="scroll-mt-24">
       <div className="grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-14">
         <Reveal className="relative order-2 aspect-[4/3] w-full overflow-hidden rounded-3xl lg:order-1">
           <Image
