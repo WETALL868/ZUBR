@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Настройки</h1>
+    <div class="sub">Пароли и ключи хранятся только в файле <span class="mono">.env</span> и не сохраняются в базу.</div>
+  </div>
+</div>
+
+<div class="grid-2">
+  <div class="panel">
+    <header>Подключение к почте (из .env)</header>
+    <div class="body">
+      <table class="data">
+        <tbody>
+          <tr><td>IMAP-сервер</td><td class="mono">{{ env.imap_host }}:{{ env.imap_port }}</td></tr>
+          <tr><td>Почтовый адрес</td><td class="mono">{{ env.email }}</td></tr>
+          <tr><td>Пароль приложения</td><td>{{ 'задан' if env.password_set else 'НЕ задан' }}</td></tr>
+          <tr><td>Ключ OpenAI</td><td>{{ 'задан' if env.openai_key_set else 'НЕ задан' }}</td></tr>
+          <tr><td>Модель OpenAI</td><td class="mono">{{ env.openai_model }}</td></tr>
+          <tr><td>Файл базы данных</td><td class="mono small">{{ env.database }}</td></tr>
+          <tr><td>Папка вложений</td><td class="mono small">{{ env.attachments_dir }}</td></tr>
+        </tbody>
+      </table>
+      <div class="toolbar" style="margin-top:12px">
+        <form method="post" action="/actions/test-connection" class="inline-form">
+          <button class="btn" type="submit">Проверить подключение</button>
+        </form>
+        <form method="post" action="/actions/sync" class="inline-form">
+          <input type="hidden" name="days" value="{{ data['sync.default_days'] }}">
+          <input type="hidden" name="run_analysis" value="1">
+          <button class="btn primary" type="submit">Синхронизировать за {{ data['sync.default_days'] }} дн. и проанализировать</button>
+        </form>
+      </div>
+      <div class="hint">
+        Программа подключается по IMAP в режиме только для чтения (EXAMINE + BODY.PEEK):
+        письма не помечаются прочитанными, не перемещаются и не удаляются.
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <header>Расход на AI-анализ</header>
+    <div class="body">
+      <table class="data">
+        <tbody>
+          <tr><td>Обращений к OpenAI</td><td class="right"><strong>{{ ai_calls }}</strong></td></tr>
+          <tr><td>Израсходовано токенов (всего)</td><td class="right"><strong>{{ ai_tokens }}</strong></td></tr>
+        </tbody>
+      </table>
+      <div class="hint">
+        Повторный анализ одной и той же цепочки не выполняется: результат кэшируется
+        по хешу содержимого и обновляется только при появлении нового письма.
+      </div>
+      <div class="toolbar" style="margin-top:12px">
+        <form method="post" action="/actions/analyze" class="inline-form">
+          <input type="hidden" name="days" value="90">
+          <button class="btn" type="submit">Проанализировать новые цепочки</button>
+        </form>
+        <form method="post" action="/actions/analyze" class="inline-form" data-confirm="Повторно проанализировать все цепочки? При включённом AI это приведёт к расходу токенов.">
+          <input type="hidden" name="days" value="365">
+          <input type="hidden" name="force" value="1">
+          <button class="btn" type="submit">Полный повторный анализ</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<form method="post" action="/actions/settings">
+  <div class="panel">
+    <header>Организация: кто сотрудник, а кто клиент</header>
+    <div class="body">
+      <div class="field-row">
+        <div class="field" style="flex:1;min-width:280px">
+          <label>Корпоративные домены (через запятую)</label>
+          <input type="text" name="corporate_domains" value="{{ data['corporate.domains']|join(', ') }}" placeholder="mycompany.ru, mycompany.com">
+        </div>
+        <div class="field" style="flex:1;min-width:280px">
+          <label>Корпоративные адреса (если домен общий)</label>
+          <input type="text" name="corporate_emails" value="{{ data['corporate.emails']|join(', ') }}" placeholder="sales@yandex.ru">
+        </div>
+      </div>
+      <div class="section-title">Менеджеры</div>
+      <table class="data">
+        <thead><tr><th>Email</th><th>Имя</th></tr></thead>
+        <tbody>
+        {% for m in data['corporate.managers'] %}
+          <tr>
+            <td><input type="text" name="manager_email" value="{{ m.email }}"></td>
+            <td><input type="text" name="manager_name" value="{{ m.name }}"></td>
+          </tr>
+        {% endfor %}
+        {% for i in range(3) %}
+          <tr>
+            <td><input type="text" name="manager_email" placeholder="ivanov@company.ru"></td>
+            <td><input type="text" name="manager_name" placeholder="Иванов Сергей"></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      <div class="hint">Пустые строки игнорируются. Чтобы удалить менеджера, очистите поле email.</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <header>Папки почты для анализа</header>
+    <div class="body">
+      {% if folders %}
+        <table class="data">
+          <thead><tr><th>Анализировать</th><th>Папка</th><th>Тип</th><th>Последний UID</th><th>Синхронизация</th></tr></thead>
+          <tbody>
+          {% for f in folders %}
+            <tr>
+              <td><input type="checkbox" name="folder_enabled" value="{{ f.id }}" {{ 'checked' if f.enabled }}></td>
+              <td class="mono small">{{ f.folder_name }}</td>
+              <td class="small">{{ f.folder_type }}</td>
+              <td class="small">{{ f.last_uid }}</td>
+              <td class="small">{{ f.last_sync_at|local_dt }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="empty">Список папок появится после первой синхронизации.</div>
+      {% endif %}
+      <div class="hint">По умолчанию анализируются «Входящие» и «Отправленные». Спам и рассылки не попадают в клиентскую аналитику.</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="panel">
+      <header>Рабочее время</header>
+      <div class="body">
+        <div class="field-row">
+          <div class="field"><label>Начало</label><input type="time" name="work_start" value="{{ data['work.start'] }}"></div>
+          <div class="field"><label>Конец</label><input type="time" name="work_end" value="{{ data['work.end'] }}"></div>
+          <div class="field"><label>Часовой пояс</label><input type="text" name="work_timezone" value="{{ data['work.timezone'] }}"></div>
+        </div>
+        <div class="field" style="margin-top:10px">
+          <label>Рабочие дни</label>
+          <div class="toolbar">
+            {% set day_names = {1:'Пн',2:'Вт',3:'Ср',4:'Чт',5:'Пт',6:'Сб',7:'Вс'} %}
+            {% for n in range(1, 8) %}
+              <label class="checkbox-row">
+                <input type="checkbox" name="work_days" value="{{ n }}" {{ 'checked' if n in data['work.days'] }}> {{ day_names[n] }}
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="field" style="margin-top:10px">
+          <label>Праздничные дни (ГГГГ-ММ-ДД через запятую)</label>
+          <input type="text" name="work_holidays" value="{{ data['work.holidays']|join(', ') }}">
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <header>Сроки реакции (в рабочих часах)</header>
+      <div class="body">
+        <div class="field-row">
+          <div class="field"><label>Предупреждение</label><input type="number" step="0.5" name="sla_warning_hours" value="{{ data['sla.warning_hours'] }}"></div>
+          <div class="field"><label>Критично</label><input type="number" step="0.5" name="sla_critical_hours" value="{{ data['sla.critical_hours'] }}"></div>
+          <div class="field"><label>VIP-клиенты</label><input type="number" step="0.5" name="sla_vip_hours" value="{{ data['sla.vip_hours'] }}"></div>
+          <div class="field"><label>Претензии</label><input type="number" step="0.5" name="sla_claim_hours" value="{{ data['sla.claim_hours'] }}"></div>
+          <div class="field"><label>Запрос счёта</label><input type="number" step="0.5" name="sla_invoice_hours" value="{{ data['sla.invoice_hours'] }}"></div>
+        </div>
+        <div class="field" style="margin-top:10px">
+          <label>VIP-клиенты (email или домен через запятую)</label>
+          <input type="text" name="sla_vip_clients" value="{{ data['sla.vip_clients']|join(', ') }}">
+        </div>
+        <label class="checkbox-row" style="margin-top:10px">
+          <input type="checkbox" name="sla_count_weekends" {{ 'checked' if data['sla.count_weekends'] }}>
+          Учитывать выходные и нерабочее время при расчёте срока
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="panel">
+      <header>Исключения: автоматические письма и рассылки</header>
+      <div class="body">
+        <div class="field"><label>Адреса отправителей</label>
+          <input type="text" name="exclusions_senders" value="{{ data['exclusions.senders']|join(', ') }}"></div>
+        <div class="field" style="margin-top:10px"><label>Домены и части адреса</label>
+          <input type="text" name="exclusions_domains" value="{{ data['exclusions.domains']|join(', ') }}"></div>
+        <div class="field" style="margin-top:10px"><label>Ключевые слова в теме</label>
+          <input type="text" name="exclusions_subjects" value="{{ data['exclusions.subject_keywords']|join(', ') }}"></div>
+        <label class="checkbox-row" style="margin-top:10px">
+          <input type="checkbox" name="exclusions_use_headers" {{ 'checked' if data['exclusions.use_headers'] }}>
+          Использовать заголовки Auto-Submitted, Precedence, List-Unsubscribe
+        </label>
+      </div>
+    </div>
+
+    <div class="panel">
+      <header>AI-анализ и вложения</header>
+      <div class="body">
+        <label class="checkbox-row"><input type="checkbox" name="ai_enabled" {{ 'checked' if data['ai.enabled'] }}> Использовать OpenAI для смыслового анализа</label>
+        <label class="checkbox-row" style="margin-top:6px"><input type="checkbox" name="ai_test_mode" {{ 'checked' if data['ai.test_mode'] }}> Тестовый режим: анализ только правилами, без вызовов API</label>
+        <div class="field-row" style="margin-top:10px">
+          <div class="field"><label>Модель</label><input type="text" name="ai_model" value="{{ data['ai.model'] }}"></div>
+          <div class="field"><label>Максимум цепочек за прогон</label><input type="number" name="ai_max_threads" value="{{ data['ai.max_threads_per_run'] }}"></div>
+        </div>
+        <label class="checkbox-row" style="margin-top:12px">
+          <input type="checkbox" name="attachments_save_local" {{ 'checked' if data['attachments.save_local'] }}>
+          Сохранять вложения локально (по умолчанию сохраняются только метаданные)
+        </label>
+        <div class="field-row" style="margin-top:10px">
+          <div class="field"><label>Период синхронизации по умолчанию, дней</label><input type="number" name="sync_default_days" value="{{ data['sync.default_days'] }}"></div>
+          <div class="field"><label>Максимум писем на папку</label><input type="number" name="sync_max_messages" value="{{ data['sync.max_messages_per_folder'] }}"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toolbar" style="margin-bottom:20px">
+    <button class="btn primary" type="submit">Сохранить настройки</button>
+  </div>
+</form>
+
+<div class="panel">
+  <header>Журнал синхронизаций</header>
+  <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th>Начало</th><th>Статус</th><th>Папок</th><th>Получено</th><th>Новых</th><th>Ошибок</th><th>Сообщение</th></tr></thead>
+      <tbody>
+      {% for r in runs %}
+        <tr>
+          <td class="nowrap small">{{ r.started_at|local_dt }}</td>
+          <td><span class="status {{ 'green' if r.status == 'ok' else ('red' if r.status == 'error' else 'yellow') }}">{{ r.status }}</span></td>
+          <td class="right">{{ r.folders_processed }}</td>
+          <td class="right">{{ r.messages_fetched }}</td>
+          <td class="right">{{ r.messages_new }}</td>
+          <td class="right">{{ r.messages_failed }}</td>
+          <td class="small">{{ r.error|short(90) or '—' }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="7" class="empty">Синхронизаций ещё не было</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

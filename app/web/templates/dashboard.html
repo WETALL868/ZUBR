@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% from "partials/thread_table.html" import thread_table %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Главная панель</h1>
+    <div class="sub">
+      Дата анализа: <strong>{{ target.strftime('%d.%m.%Y') }}</strong> ·
+      Последняя синхронизация: {{ metrics.last_sync_at|local_dt }}
+      {% if metrics.last_sync_status == 'error' %}
+        <span style="color:var(--red)"> · ошибка: {{ metrics.last_sync_error|short(80) }}</span>
+      {% elif metrics.last_sync_status == 'partial' %}
+        <span style="color:var(--orange)"> · синхронизация с замечаниями</span>
+      {% endif %}
+    </div>
+  </div>
+  <div class="toolbar">
+    <a class="btn small" href="/?day={{ prev_day }}">← {{ prev_day.strftime('%d.%m') }}</a>
+    <a class="btn small" href="/?day={{ today }}">Сегодня</a>
+    <a class="btn small" href="/?day={{ next_day }}">{{ next_day.strftime('%d.%m') }} →</a>
+    <form method="post" action="/actions/analyze" class="inline-form">
+      <input type="hidden" name="days" value="30">
+      <button class="btn primary" type="submit">Запустить анализ</button>
+    </form>
+    <a class="btn" href="/report?day={{ target }}">Отчёт за день</a>
+  </div>
+</div>
+
+{% if metrics.critical or metrics.read_unanswered %}
+<div class="priority-note">
+  Требуют немедленного внимания: без ответа — {{ metrics.total_critical_all }},
+  из них прочитано без ответа — {{ metrics.read_unanswered }};
+  ответ отправлен, но запрос клиента не выполнен — {{ metrics.total_incomplete_all }}.
+</div>
+{% endif %}
+
+<div class="metrics">
+  <div class="metric"><div class="label">Входящих писем за день</div><div class="value">{{ metrics.incoming_messages }}</div></div>
+  <div class="metric"><div class="label">Новых обращений за день</div><div class="value">{{ metrics.new_threads }}</div></div>
+  <div class="metric red"><a href="/threads?status=CRITICAL">
+    <div class="label">Критические — без ответа</div><div class="value">{{ metrics.total_critical_all }}</div>
+    <div class="label">за выбранный день: {{ metrics.critical }}</div></a></div>
+  <div class="metric orange"><a href="/threads?status=INCOMPLETE">
+    <div class="label">Запрос не выполнен</div><div class="value">{{ metrics.total_incomplete_all }}</div>
+    <div class="label">за выбранный день: {{ metrics.incomplete }}</div></a></div>
+  <div class="metric red"><a href="/threads?read_unanswered=1">
+    <div class="label">Прочитано без ответа</div><div class="value">{{ metrics.read_unanswered }}</div></a></div>
+  <div class="metric gray"><a href="/threads?is_seen=0">
+    <div class="label">Не прочитано и без ответа</div><div class="value">{{ metrics.unread_unanswered }}</div></a></div>
+  <div class="metric yellow"><a href="/threads?status=WAITING_FOR_CLIENT">
+    <div class="label">Ожидают ответа клиента</div><div class="value">{{ metrics.total_waiting_all }}</div>
+    <div class="label">за выбранный день: {{ metrics.waiting_client }}</div></a></div>
+  <div class="metric purple"><a href="/threads?needs_review=1">
+    <div class="label">Требует ручной проверки</div><div class="value">{{ metrics.total_needs_review_all }}</div></a></div>
+  <div class="metric red"><div class="label">Нарушен срок ответа</div><div class="value">{{ metrics.sla_exceeded }}</div></div>
+  <div class="metric green"><a href="/threads?status=COMPLETED">
+    <div class="label">Выполнено за день</div><div class="value">{{ metrics.completed }}</div></a></div>
+  <div class="metric gray"><div class="label">Не относится к клиентам</div><div class="value">{{ metrics.not_relevant }}</div></div>
+</div>
+<div class="hint" style="margin:-10px 0 18px">
+  Цветные показатели отражают текущее состояние по всем обращениям — именно они требуют действий.
+  Показатели «за день» относятся к выбранной дате и используются в ежедневном отчёте.
+</div>
+
+<div class="panel accent-red">
+  <header>
+    ПРОЧИТАНО, НО НЕ ОТВЕЧЕНО
+    <span class="count">{{ read_unanswered|length }} на экране · <a href="/threads?read_unanswered=1">все</a></span>
+  </header>
+  {{ thread_table(read_unanswered, requests_map, compact=True) }}
+  <div class="body small muted">
+    IMAP не сообщает точное время прочтения письма. Показано только то, что письмо
+    отмечено как прочитанное, и сколько времени прошло с момента получения.
+  </div>
+</div>
+
+<div class="panel accent-orange">
+  <header>
+    ОТВЕТ ОТПРАВЛЕН, НО ЗАПРОС КЛИЕНТА НЕ ВЫПОЛНЕН
+    <span class="count">{{ incomplete|length }} на экране · <a href="/threads?status=INCOMPLETE">все</a></span>
+  </header>
+  {{ thread_table(incomplete, requests_map, compact=True) }}
+</div>
+
+<div class="panel">
+  <header>
+    Обращения без ответа
+    <span class="count">{{ critical|length }} на экране · <a href="/threads?status=CRITICAL">все</a></span>
+  </header>
+  {{ thread_table(critical, requests_map, compact=True) }}
+</div>
+{% endblock %}

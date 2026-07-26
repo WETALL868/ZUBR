@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>{{ title }}</h1>
+    <div class="sub">Код: {{ code }}</div>
+  </div>
+</div>
+<div class="panel">
+  <div class="body">
+    <p>{{ message }}</p>
+    <a class="btn primary" href="/">На главную панель</a>
+  </div>
+</div>
+{% endblock %}

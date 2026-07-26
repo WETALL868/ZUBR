@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>{{ thread.subject or '(без темы)' }}</h1>
+    <div class="sub">
+      Обращение №{{ thread.id }} ·
+      <span class="status {{ thread.current_status|status_color }}">{{ thread.current_status|status_ru }}</span>
+      {% if thread.manual_override %}<span class="chip">статус изменён вручную</span>{% endif %}
+      {% if thread.grouping_confidence < 0.85 %}
+        <span class="chip fail">цепочка собрана с низкой уверенностью</span>
+      {% endif %}
+    </div>
+  </div>
+  <div class="toolbar">
+    <a class="btn small" href="/threads">← К списку</a>
+    <form method="post" action="/threads/{{ thread.id }}/reanalyze" class="inline-form">
+      <button class="btn primary small" type="submit">Проанализировать заново</button>
+    </form>
+  </div>
+</div>
+
+<div class="panel">
+  <header>Обращение</header>
+  <div class="body">
+    <div class="thread-head">
+      <div class="item"><div class="k">Клиент</div><div class="v">{{ thread.client_name or '—' }}</div></div>
+      <div class="item"><div class="k">Email</div><div class="v">{{ thread.client_email or '—' }}</div></div>
+      <div class="item"><div class="k">Компания</div><div class="v">{{ thread.company_name or '—' }}</div></div>
+      <div class="item"><div class="k">Ответственный</div><div class="v">{{ thread.assigned_manager or 'не определён' }}</div></div>
+      <div class="item"><div class="k">Первое письмо</div><div class="v">{{ thread.first_message_at|local_dt }}</div></div>
+      <div class="item"><div class="k">Последнее письмо</div><div class="v">{{ thread.last_message_at|local_dt }}</div></div>
+      <div class="item">
+        <div class="k">Время ожидания</div>
+        <div class="v">
+          {% if thread.waiting_seconds %}
+            {{ thread.waiting_seconds|duration }}
+            <div class="small muted">рабочего времени: {{ thread.waiting_business_seconds|duration }}</div>
+          {% else %}—{% endif %}
+        </div>
+      </div>
+      <div class="item">
+        <div class="k">Первый ответ</div>
+        <div class="v">
+          {% if thread.first_response_seconds is not none %}
+            {{ thread.first_response_seconds|duration }}
+            <div class="small muted">рабочего: {{ thread.first_response_business_seconds|duration }}</div>
+          {% else %}ответа не было{% endif %}
+        </div>
+      </div>
+      <div class="item">
+        <div class="k">Уверенность анализа</div>
+        <div class="v">
+          {% if thread.ai_confidence is not none %}{{ thread.ai_confidence|percent }}{% else %}—{% endif %}
+          <div class="small muted">
+            источник: {% if thread.analysis_source == 'ai' %}OpenAI{% elif thread.analysis_source == 'offline' %}правила (без AI){% elif thread.analysis_source == 'manual' %}ручная правка{% else %}—{% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="item"><div class="k">Писем в цепочке</div><div class="v">{{ thread.message_count }} ({{ thread.incoming_count }} вх. / {{ thread.outgoing_count }} исх.)</div></div>
+    </div>
+
+    {% if thread.is_read_unanswered %}
+      <div class="alert error" style="margin-top:14px">
+        Последнее письмо клиента отмечено как <strong>прочитанное</strong>, но ответа на него нет.
+        Точное время прочтения через IMAP недоступно — известно только время получения письма
+        ({{ thread.last_incoming_at|local_dt }}) и прошедшее с тех пор время ({{ thread.waiting_seconds|duration }}).
+      </div>
+    {% elif thread.has_unread_incoming %}
+      <div class="alert warn" style="margin-top:14px">
+        Последнее письмо клиента <strong>не прочитано</strong> и остаётся без ответа {{ thread.waiting_seconds|duration }}.
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="grid-2">
+  <div class="panel">
+    <header>Запрос клиента <span class="count">{{ requests|length }} задач(и)</span></header>
+    <div class="body">
+      {% if requests %}
+      <ul class="task-list">
+        {% for r in requests %}
+        <li>
+          <div class="mark {{ 'done' if r.fulfilled else 'fail' }}">{{ '✓' if r.fulfilled else '✕' }}</div>
+          <div class="info">
+            <div class="type">
+              {{ r.request_type|request_ru }} — {{ 'выполнено' if r.fulfilled else 'НЕ выполнено' }}
+              {% if r.manual_override %}<span class="chip">вручную</span>{% endif %}
+            </div>
+            <div class="desc">{{ r.description }}</div>
+            {% for e in r.evidence|from_json %}
+              <div class="evidence">Подтверждение [{{ e.message_id }}]: «{{ e.quote }}»</div>
+            {% endfor %}
+            {% if r.missing_information %}
+              <div class="missing">Не хватает: {{ r.missing_information }}</div>
+            {% endif %}
+          </div>
+          <form method="post" action="/threads/{{ thread.id }}/requests/{{ r.id }}/toggle" class="inline-form no-print">
+            <button class="btn small" type="submit">{{ 'Снять отметку' if r.fulfilled else 'Отметить выполненным' }}</button>
+          </form>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+        <div class="empty">Задачи клиента не распознаны. Проверьте переписку вручную.</div>
+      {% endif %}
+
+      <form method="post" action="/threads/{{ thread.id }}/requests/add" class="field-row no-print" style="margin-top:14px">
+        <div class="field">
+          <label>Добавить задачу</label>
+          <select name="request_type">
+            {% for code, label in request_types %}<option value="{{ code }}">{{ label }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="field" style="flex:1">
+          <label>Описание</label>
+          <input type="text" name="description" placeholder="что именно просил клиент">
+        </div>
+        <button class="btn small" type="submit">Добавить</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="panel">
+    <header>Объяснение статуса и следующее действие</header>
+    <div class="body">
+      <div class="k small muted">КРАТКОЕ СОДЕРЖАНИЕ</div>
+      <p>{{ thread.summary or '—' }}</p>
+
+      <div class="k small muted">ПОЧЕМУ ТАКОЙ СТАТУС</div>
+      <p>{{ thread.status_reason or '—' }}</p>
+
+      <div class="k small muted">СЛЕДУЮЩЕЕ ДЕЙСТВИЕ</div>
+      <p><strong>{{ thread.next_action or '—' }}</strong></p>
+
+      <div class="k small muted">КТО ДОЛЖЕН ДЕЙСТВОВАТЬ</div>
+      <p>{{ thread.responsible_party|party_ru }}</p>
+
+      {% if thread.needs_review %}
+        <div class="alert warn">Обращение помечено как требующее ручной проверки.</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="panel no-print">
+  <header>Ручная корректировка</header>
+  <div class="body">
+    <form method="post" action="/threads/{{ thread.id }}/status" class="field-row">
+      <div class="field">
+        <label>Статус</label>
+        <select name="status">
+          {% for code, label in statuses %}
+            <option value="{{ code }}" {{ 'selected' if code == thread.current_status }}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label>Ответственный менеджер</label>
+        <input type="text" name="assigned_manager" value="{{ thread.assigned_manager or '' }}" placeholder="email">
+      </div>
+      <div class="field" style="flex:1;min-width:260px">
+        <label>Комментарий</label>
+        <input type="text" name="comment" placeholder="почему статус изменён">
+      </div>
+      <button class="btn primary" type="submit">Сохранить</button>
+    </form>
+    {% if reviews %}
+      <div class="section-title">История ручных изменений</div>
+      <table class="data">
+        <thead><tr><th>Дата</th><th>Поле</th><th>Было</th><th>Стало</th><th>Комментарий</th></tr></thead>
+        <tbody>
+        {% for r in reviews %}
+          <tr>
+            <td class="nowrap small">{{ r.created_at|local_dt }}</td>
+            <td class="small">{{ r.field or '—' }}</td>
+            <td class="small">{{ r.previous_status|status_ru if r.previous_status else '—' }}</td>
+            <td class="small">{{ r.new_status|status_ru if r.new_status else '—' }}</td>
+            <td class="small">{{ r.comment or '—' }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </div>
+</div>
+
+<div class="panel">
+  <header>Переписка <span class="count">{{ messages|length }} писем</span></header>
+  <div class="body">
+    <div class="messages">
+      {% for m in messages %}
+      <div class="message {{ m.direction }}">
+        <header>
+          <div>
+            <span class="who">{{ m.sender_name or m.sender_email }}</span>
+            <span class="muted">&lt;{{ m.sender_email }}&gt;</span>
+            <span class="chip">{{ m.direction|direction_ru }}</span>
+            {% if m.is_automated %}<span class="chip fail">авто: {{ m.exclusion_reason|short(40) }}</span>{% endif %}
+          </div>
+          <div class="muted small">
+            {{ m.sent_at|local_dt }}
+            {% if m.direction == 'incoming' %} · {{ 'прочитано' if m.is_seen else 'не прочитано' }}{% endif %}
+          </div>
+        </header>
+        <div class="body">{{ m.clean_text or m.body_text or '(пустое письмо)' }}</div>
+        {% set atts = attachments.get(m.id, []) %}
+        {% if atts %}
+        <div class="attachments">
+          <strong>Вложения:</strong>
+          {% for a in atts %}
+            <span class="chip">{{ a.filename }} · {{ a.attachment_category|attachment_ru }}{% if a.size %} · {{ (a.size / 1024)|round|int }} КБ{% endif %}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% if analyses %}
+<div class="panel">
+  <header>История анализа</header>
+  <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th>Дата</th><th>Источник</th><th>Модель</th><th>Статус</th><th>Уверенность</th><th>Токены</th><th>Ошибка</th></tr></thead>
+      <tbody>
+      {% for a in analyses %}
+        <tr>
+          <td class="nowrap small">{{ a.analyzed_at|local_dt }}</td>
+          <td class="small">{{ 'OpenAI' if a.source == 'ai' else 'правила' }}</td>
+          <td class="small mono">{{ a.model or '—' }}</td>
+          <td class="small">{{ a.status|status_ru if a.status else '—' }}</td>
+          <td class="small">{{ a.confidence|percent }}</td>
+          <td class="small">{{ a.token_usage or 0 }}</td>
+          <td class="small">{{ a.error|short(60) or '—' }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

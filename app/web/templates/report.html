@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% from "partials/thread_table.html" import thread_table %}
+
+{% block content %}
+{% set m = report.metrics %}
+<div class="page-header">
+  <div>
+    <h1>Аналитика за {{ target.strftime('%d.%m.%Y') }}</h1>
+    <div class="sub">Ежедневный отчёт по обработке клиентской почты</div>
+  </div>
+  <div class="toolbar">
+    <a class="btn small" href="/report?day={{ prev_day }}">← {{ prev_day.strftime('%d.%m') }}</a>
+    <a class="btn small" href="/report?day={{ today }}">Сегодня</a>
+    <a class="btn small" href="/report?day={{ next_day }}">{{ next_day.strftime('%d.%m') }} →</a>
+    <a class="btn" href="/export/excel?day={{ target }}">Excel</a>
+    <a class="btn" href="/export/html?day={{ target }}">HTML</a>
+  </div>
+</div>
+
+<div class="panel">
+  <header>Сводка</header>
+  <div class="body">
+    <table class="data" style="max-width:520px">
+      <tbody>
+        <tr><td>Входящих писем</td><td class="right"><strong>{{ m.incoming_messages }}</strong></td></tr>
+        <tr><td>Новых клиентских обращений</td><td class="right"><strong>{{ m.new_threads }}</strong></td></tr>
+        <tr><td>Полностью выполнено</td><td class="right"><strong>{{ m.completed }}</strong></td></tr>
+        <tr><td>Ответ есть, запрос не выполнен</td><td class="right"><strong>{{ m.incomplete }}</strong></td></tr>
+        <tr><td>Ожидается ответ клиента</td><td class="right"><strong>{{ m.waiting_client }}</strong></td></tr>
+        <tr><td>Прочитано без ответа</td><td class="right"><strong>{{ m.read_unanswered }}</strong></td></tr>
+        <tr><td>Не прочитано</td><td class="right"><strong>{{ m.unread_unanswered }}</strong></td></tr>
+        <tr><td>Требует ручной проверки</td><td class="right"><strong>{{ m.needs_review }}</strong></td></tr>
+        <tr><td>Не относится к клиентам (рассылки, уведомления)</td><td class="right"><strong>{{ m.not_relevant }}</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section-title">1. Критические обращения</div>
+{{ thread_table(report.sections.critical, requests_map, compact=True) }}
+
+<div class="section-title">2. Прочитано, но не отвечено</div>
+{{ thread_table(report.sections.read_unanswered, requests_map, compact=True) }}
+
+<div class="section-title">3. Ответ есть, но запрос не выполнен</div>
+{{ thread_table(report.sections.answered_incomplete, requests_map, compact=True) }}
+
+<div class="section-title">4. Частично выполненные запросы</div>
+{{ thread_table(report.sections.partially_done, requests_map, compact=True) }}
+
+<div class="section-title">5. Ожидается ответ клиента</div>
+{{ thread_table(report.sections.waiting_client, requests_map, compact=True) }}
+
+<div class="section-title">6. Завершённые обращения</div>
+{{ thread_table(report.sections.completed, requests_map, compact=True) }}
+
+<div class="section-title">7. Запросы по категориям</div>
+<div class="panel">
+  <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th>Тип запроса</th><th class="right">Всего</th><th class="right">Выполнено</th><th class="right">Не выполнено</th><th class="right">Доля выполнения</th></tr></thead>
+      <tbody>
+      {% for c in report.categories %}
+        <tr>
+          <td>{{ c.label }}</td>
+          <td class="right">{{ c.total }}</td>
+          <td class="right" style="color:var(--green)">{{ c.fulfilled }}</td>
+          <td class="right" style="color:var(--red)">{{ c.unfulfilled }}</td>
+          <td class="right">{{ (c.fulfilled / c.total * 100)|round|int if c.total else 0 }}%</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="5" class="empty">Данных нет</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section-title">8. Статистика по менеджерам</div>
+<div class="panel">
+  <div class="table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Менеджер</th><th class="right">Обращений</th><th class="right">С ответом</th>
+          <th class="right">Завершено</th><th class="right">Не выполнено</th><th class="right">Без ответа</th>
+          <th class="right">Ср. время первого ответа</th><th class="right">Доля завершённых</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for r in report.managers %}
+        <tr>
+          <td>{{ r.name }}</td>
+          <td class="right">{{ r.threads }}</td>
+          <td class="right">{{ r.processed }}</td>
+          <td class="right">{{ r.completed }}</td>
+          <td class="right">{{ r.incomplete }}</td>
+          <td class="right">{{ r.no_reply }}</td>
+          <td class="right">{{ r.avg_first_response_text }}</td>
+          <td class="right">{{ r.completion_rate }}%</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="8" class="empty">Данных нет</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="body small muted">Показатели носят аналитический характер и не являются оценкой сотрудника.</div>
+</div>
+
+<div class="section-title">9. Повторные обращения клиентов</div>
+{{ thread_table(report.sections.repeats, requests_map, compact=True) }}
+
+<div class="section-title">10. Самые долгие ожидания ответа</div>
+{{ thread_table(report.sections.longest_waiting, requests_map, compact=True) }}
+
+{% if report.sections.needs_review %}
+<div class="section-title">Дополнительно: требуют ручной проверки</div>
+{{ thread_table(report.sections.needs_review, requests_map, compact=True) }}
+{% endif %}
+{% endblock %}

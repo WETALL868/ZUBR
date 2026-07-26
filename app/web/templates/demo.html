@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Демонстрационный режим</h1>
+    <div class="sub">Проверка логики программы на тестовых переписках без подключения к реальной почте</div>
+  </div>
+  <form method="post" action="/actions/demo/load" class="toolbar"
+        data-confirm="Загрузить демонстрационные данные? Существующие демо-переписки будут заменены. Данные реального ящика не затрагиваются.">
+    <input type="hidden" name="analyze" value="1">
+    <button class="btn primary" type="submit">Загрузить демо-данные и проанализировать</button>
+  </form>
+</div>
+
+<div class="alert info">
+  Демонстрационные письма формируются как настоящие MIME-сообщения и проходят весь конвейер:
+  разбор → определение направления → сборка цепочек → анализ. Это проверка реальной логики,
+  а не заранее подготовленные результаты. Демо-данные хранятся в отдельном ящике
+  <span class="mono">demo@example.local</span> и не смешиваются с рабочей почтой.
+</div>
+
+<div class="panel">
+  <header>
+    Сценарии <span class="count">{{ scenarios|length }}</span>
+    {% if actual %}
+      {% set matched = actual.values()|selectattr('match')|list|length %}
+      <span class="count">Совпало ожидаемых статусов: {{ matched }} из {{ actual|length }}</span>
+    {% endif %}
+  </header>
+  <div class="table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>№</th><th>Сценарий</th><th>Ожидаемый статус</th>
+          <th>Фактический статус</th><th>Совпадение</th><th>Задачи клиента</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for s in scenarios %}
+        {% set a = actual.get(s.code) %}
+        <tr>
+          <td class="nowrap">{{ s.code }}</td>
+          <td>
+            {{ s.title }}
+            {% if s.note %}<div class="small muted">{{ s.note }}</div>{% endif %}
+          </td>
+          <td class="nowrap"><span class="status {{ s.expected_status|status_color }}">{{ s.expected_status|status_ru }}</span></td>
+          <td class="nowrap">
+            {% if a %}<span class="status {{ a.status|status_color }}">{{ a.status|status_ru }}</span>
+            {% else %}<span class="muted">—</span>{% endif %}
+          </td>
+          <td class="nowrap">
+            {% if a %}
+              {% if a.match %}<span style="color:var(--green)">✓ да</span>
+              {% else %}<span style="color:var(--red)">✕ нет</span>{% endif %}
+            {% else %}—{% endif %}
+          </td>
+          <td>
+            {% if a and a.requests %}
+              {% for rtype, done in a.requests.items() %}
+                <span class="chip {{ 'done' if done else 'fail' }}">{{ rtype|request_ru }}</span>
+              {% endfor %}
+            {% elif s.expected_requests %}
+              {% for rtype, done in s.expected_requests.items() %}
+                <span class="chip">ожидается: {{ rtype|request_ru }} — {{ 'выполнено' if done else 'не выполнено' }}</span>
+              {% endfor %}
+            {% else %}<span class="muted">—</span>{% endif %}
+          </td>
+          <td class="nowrap">
+            {% if a %}<a class="btn small" href="/threads/{{ a.thread.id }}">Открыть</a>{% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

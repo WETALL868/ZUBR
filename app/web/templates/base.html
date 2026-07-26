@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }} — Аналитика почты</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      Аналитика почты
+      <small>контроль обработки клиентских обращений</small>
+      {% if read_only %}<span class="badge-readonly">Только чтение</span>{% endif %}
+    </div>
+    <nav>
+      {% set path = request.url.path %}
+      <a href="/" class="{{ 'active' if path == '/' }}">Главная панель</a>
+      <a href="/threads" class="{{ 'active' if path.startswith('/threads') }}">Обращения</a>
+      <a href="/report" class="{{ 'active' if path == '/report' }}">Ежедневный отчёт</a>
+      <a href="/managers" class="{{ 'active' if path == '/managers' }}">По менеджерам</a>
+      <a href="/demo" class="{{ 'active' if path == '/demo' }}">Демо-режим</a>
+      <a href="/settings" class="{{ 'active' if path == '/settings' }}">Настройки</a>
+      <a href="/limitations" class="{{ 'active' if path == '/limitations' }}">Ограничения</a>
+    </nav>
+    <div class="sidebar-footer">
+      {% if demo_mode %}Демонстрационный режим<br>{% endif %}
+      Письма не изменяются:<br>отправка, удаление, перемещение<br>и пометка прочтения отключены.
+    </div>
+  </aside>
+
+  <main class="content">
+    {% set msg = request.query_params.get('msg') %}
+    {% if msg %}
+      <div class="alert {{ request.query_params.get('kind', 'ok') }}">{{ msg }}</div>
+    {% endif %}
+
+    {% if warnings %}
+      <div class="alert warn">
+        <strong>Проверьте настройки:</strong>
+        <ul style="margin:6px 0 0 18px;padding:0;">
+          {% for w in warnings %}<li>{{ w }}</li>{% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    {% for name, job in (jobs or {}).items() %}
+      {% if job.running %}
+        <div class="alert info" data-job="{{ name }}">
+          Выполняется: {{ job.message }} <span class="muted small">(страница обновится автоматически)</span>
+        </div>
+      {% elif job.status == 'error' %}
+        <div class="alert error">Задача «{{ name }}» завершилась ошибкой: {{ job.message }}</div>
+      {% endif %}
+    {% endfor %}
+
+    {% block content %}{% endblock %}
+  </main>
+</div>
+<script src="/static/app.js"></script>
+</body>
+</html>

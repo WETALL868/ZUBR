@@ -1,0 +1,77 @@
+{% macro thread_table(threads, requests_map, show_manager=True, compact=False) %}
+<div class="table-wrap">
+  <table class="data">
+    <thead>
+      <tr>
+        <th>Статус</th>
+        <th class="nowrap">Последнее письмо</th>
+        <th>Клиент</th>
+        {% if not compact %}<th>Компания</th>{% endif %}
+        <th>Тема / краткий запрос</th>
+        <th>Задачи клиента</th>
+        {% if show_manager %}<th>Менеджер</th>{% endif %}
+        <th class="nowrap">Без ответа</th>
+        {% if not compact %}<th class="nowrap">Вложения</th>{% endif %}
+        {% if not compact %}<th class="nowrap">AI</th>{% endif %}
+        <th>Рекомендуемое действие</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for t in threads %}
+      <tr>
+        <td class="nowrap">
+          <a href="/threads/{{ t.id }}"><span class="status {{ t.current_status|status_color }}">{{ t.current_status|status_ru }}</span></a>
+          {% if t.manual_override %}<div class="small muted">исправлено вручную</div>{% endif %}
+          {% if t.sla_exceeded %}<div class="small" style="color:var(--red)">срок нарушен</div>{% endif %}
+        </td>
+        <td class="nowrap small">
+          {{ t.last_message_at|local_dt }}
+          <div class="muted">{{ t.last_message_direction|direction_ru }}</div>
+        </td>
+        <td>
+          <a href="/threads/{{ t.id }}">{{ t.client_name or t.client_email or '—' }}</a>
+          <div class="small muted">{{ t.client_email or '' }}</div>
+          {% if t.is_read_unanswered %}<div class="small" style="color:var(--red)">прочитано, без ответа</div>
+          {% elif t.has_unread_incoming %}<div class="small muted">не прочитано</div>{% endif %}
+        </td>
+        {% if not compact %}<td class="small">{{ t.company_name or '—' }}</td>{% endif %}
+        <td class="subject-cell">
+          <a href="/threads/{{ t.id }}" class="subject">{{ t.subject|short(70) or '(без темы)' }}</a>
+          <div class="summary">{{ t.summary|short(110) or '' }}</div>
+        </td>
+        <td>
+          {% set reqs = requests_map.get(t.id, []) %}
+          {% if reqs %}
+            {% for r in reqs %}
+              <span class="chip {{ 'done' if r.fulfilled else 'fail' }}">{{ r.request_type|request_ru }}</span>
+            {% endfor %}
+          {% else %}<span class="muted small">—</span>{% endif %}
+        </td>
+        {% if show_manager %}
+        <td class="small">{{ t.assigned_manager or '—' }}</td>
+        {% endif %}
+        <td class="nowrap small">
+          {% if t.waiting_seconds %}
+            <strong>{{ t.waiting_seconds|duration }}</strong>
+            <div class="muted">раб.: {{ t.waiting_business_seconds|duration }}</div>
+          {% else %}—{% endif %}
+        </td>
+        {% if not compact %}<td class="nowrap small">{{ 'есть' if t.has_attachments else '—' }}</td>{% endif %}
+        {% if not compact %}
+        <td class="nowrap small">
+          {% if t.ai_confidence is not none %}
+            <span class="confidence-bar"><span style="width: {{ (t.ai_confidence * 100)|round|int }}%"></span></span>
+            {{ (t.ai_confidence * 100)|round|int }}%
+          {% else %}—{% endif %}
+          {% if t.needs_review %}<div class="small" style="color:var(--purple)">проверить</div>{% endif %}
+        </td>
+        {% endif %}
+        <td class="small">{{ t.next_action|short(90) or '—' }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="12" class="empty">Обращений нет</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endmacro %}

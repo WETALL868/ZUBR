@@ -1,0 +1,40 @@
+# Секреты и локальные настройки
+.env
+*.env
+!.env.example
+
+# База данных
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+data/*.db
+data/attachments/
+data/exports/
+
+# Логи
+logs/
+*.log
+*.log.*
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# ОС и редакторы
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Временные файлы приложения
+tmp/
+*.pid

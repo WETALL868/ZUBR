@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Аналитика почты за {{ target.strftime('%d.%m.%Y') }}</title>
+<style>
+  body { font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif; font-size: 13px; color: #1c2431; margin: 24px; background: #fff; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  h2 { font-size: 15px; margin: 26px 0 8px; padding-bottom: 5px; border-bottom: 2px solid #dfe4ec; }
+  .sub { color: #667287; font-size: 12px; margin-bottom: 18px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 8px; }
+  th { background: #f7f9fc; text-align: left; padding: 7px 8px; border-bottom: 1px solid #dfe4ec; font-size: 11.5px; }
+  td { padding: 7px 8px; border-bottom: 1px solid #eef1f5; vertical-align: top; }
+  .summary td:last-child { text-align: right; font-weight: 600; }
+  .summary { max-width: 460px; }
+  .status { display: inline-block; padding: 2px 7px; border-radius: 12px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .red { background: #fdecec; color: #c62828; }
+  .orange { background: #fdf1e3; color: #d97706; }
+  .yellow { background: #fdf8e3; color: #a98207; }
+  .green { background: #eaf5ea; color: #2e7d32; }
+  .gray { background: #f0f1f3; color: #6b7280; }
+  .purple { background: #f2ecfd; color: #6d28d9; }
+  .chip { display: inline-block; padding: 1px 6px; border: 1px solid #dfe4ec; border-radius: 3px; font-size: 11px; margin: 1px 2px 1px 0; }
+  .chip.done { background: #eaf5ea; border-color: #bfdfc1; color: #2e7d32; }
+  .chip.fail { background: #fdecec; border-color: #f3c2c2; color: #c62828; }
+  .empty { color: #667287; font-style: italic; padding: 8px; }
+  .note { font-size: 11px; color: #667287; margin-top: 4px; }
+  @media print { body { margin: 8mm; } h2 { break-after: avoid; } table { break-inside: auto; } }
+</style>
+</head>
+<body>
+{% macro rows(threads) %}
+  <table>
+    <thead>
+      <tr><th>Статус</th><th>Клиент</th><th>Компания</th><th>Тема</th><th>Задачи клиента</th><th>Менеджер</th><th>Без ответа</th><th>Действие</th></tr>
+    </thead>
+    <tbody>
+    {% for t in threads %}
+      <tr>
+        <td><span class="status {{ t.current_status|status_color }}">{{ t.current_status|status_ru }}</span></td>
+        <td>{{ t.client_name or t.client_email or '—' }}<br><span style="color:#667287">{{ t.client_email or '' }}</span></td>
+        <td>{{ t.company_name or '—' }}</td>
+        <td>{{ t.subject|short(60) or '—' }}</td>
+        <td>
+          {% for r in requests_map.get(t.id, []) %}
+            <span class="chip {{ 'done' if r.fulfilled else 'fail' }}">{{ r.request_type|request_ru }}</span>
+          {% else %}—{% endfor %}
+        </td>
+        <td>{{ t.assigned_manager or '—' }}</td>
+        <td>{{ t.waiting_seconds|duration if t.waiting_seconds else '—' }}</td>
+        <td>{{ t.next_action|short(70) or '—' }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="8" class="empty">Обращений нет</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endmacro %}
+
+{% set m = report.metrics %}
+<h1>Аналитика клиентской почты за {{ target.strftime('%d.%m.%Y') }}</h1>
+<div class="sub">Отчёт сформирован {{ generated_at.strftime('%d.%m.%Y %H:%M') }} · режим только для чтения</div>
+
+<h2>Сводка</h2>
+<table class="summary">
+  <tbody>
+    <tr><td>Входящих писем</td><td>{{ m.incoming_messages }}</td></tr>
+    <tr><td>Новых клиентских обращений</td><td>{{ m.new_threads }}</td></tr>
+    <tr><td>Полностью выполнено</td><td>{{ m.completed }}</td></tr>
+    <tr><td>Ответ есть, запрос не выполнен</td><td>{{ m.incomplete }}</td></tr>
+    <tr><td>Ожидается ответ клиента</td><td>{{ m.waiting_client }}</td></tr>
+    <tr><td>Прочитано без ответа</td><td>{{ m.read_unanswered }}</td></tr>
+    <tr><td>Не прочитано</td><td>{{ m.unread_unanswered }}</td></tr>
+    <tr><td>Требует ручной проверки</td><td>{{ m.needs_review }}</td></tr>
+  </tbody>
+</table>
+
+<h2>1. Критические обращения</h2>{{ rows(report.sections.critical) }}
+<h2>2. Прочитано, но не отвечено</h2>{{ rows(report.sections.read_unanswered) }}
+<div class="note">Точное время прочтения через IMAP недоступно; показано время получения письма и прошедшее с тех пор время.</div>
+<h2>3. Ответ есть, но запрос не выполнен</h2>{{ rows(report.sections.answered_incomplete) }}
+<h2>4. Частично выполненные запросы</h2>{{ rows(report.sections.partially_done) }}
+<h2>5. Ожидается ответ клиента</h2>{{ rows(report.sections.waiting_client) }}
+<h2>6. Завершённые обращения</h2>{{ rows(report.sections.completed) }}
+
+<h2>7. Запросы по категориям</h2>
+<table>
+  <thead><tr><th>Тип запроса</th><th>Всего</th><th>Выполнено</th><th>Не выполнено</th></tr></thead>
+  <tbody>
+  {% for c in report.categories %}
+    <tr><td>{{ c.label }}</td><td>{{ c.total }}</td><td>{{ c.fulfilled }}</td><td>{{ c.unfulfilled }}</td></tr>
+  {% else %}<tr><td colspan="4" class="empty">Данных нет</td></tr>{% endfor %}
+  </tbody>
+</table>
+
+<h2>8. Статистика по менеджерам</h2>
+<table>
+  <thead><tr><th>Менеджер</th><th>Обращений</th><th>С ответом</th><th>Завершено</th><th>Не выполнено</th><th>Без ответа</th><th>Ср. первый ответ</th><th>Доля завершённых</th></tr></thead>
+  <tbody>
+  {% for r in report.managers %}
+    <tr><td>{{ r.name }}</td><td>{{ r.threads }}</td><td>{{ r.processed }}</td><td>{{ r.completed }}</td><td>{{ r.incomplete }}</td><td>{{ r.no_reply }}</td><td>{{ r.avg_first_response_text }}</td><td>{{ r.completion_rate }}%</td></tr>
+  {% else %}<tr><td colspan="8" class="empty">Данных нет</td></tr>{% endfor %}
+  </tbody>
+</table>
+<div class="note">Показатели носят аналитический характер и не являются оценкой сотрудника.</div>
+
+<h2>9. Повторные обращения клиентов</h2>{{ rows(report.sections.repeats) }}
+<h2>10. Самые долгие ожидания ответа</h2>{{ rows(report.sections.longest_waiting) }}
+</body>
+</html>

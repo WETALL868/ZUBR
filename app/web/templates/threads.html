@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% from "partials/thread_table.html" import thread_table %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Обращения</h1>
+    <div class="sub">Найдено: {{ threads|length }}</div>
+  </div>
+  <div class="toolbar">
+    <a class="btn small" href="/export/excel">Экспорт в Excel</a>
+    <a class="btn small" href="/export/html">Экспорт в HTML</a>
+  </div>
+</div>
+
+<div class="panel">
+  <header>Фильтры</header>
+  <div class="body">
+    <form method="get" action="/threads">
+      <div class="filters">
+        <div class="field">
+          <label>Дата с</label>
+          <input type="date" name="date_from" value="{{ filters.date_from or '' }}">
+        </div>
+        <div class="field">
+          <label>Дата по</label>
+          <input type="date" name="date_to" value="{{ filters.date_to or '' }}">
+        </div>
+        <div class="field">
+          <label>Статус</label>
+          <select name="status">
+            <option value="">— любой —</option>
+            {% for code, label in statuses %}
+              <option value="{{ code }}" {{ 'selected' if code in filters.status }}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label>Менеджер</label>
+          <select name="manager">
+            <option value="">— любой —</option>
+            {% for m in managers %}
+              <option value="{{ m }}" {{ 'selected' if filters.manager == m }}>{{ m }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label>Тип запроса</label>
+          <select name="request_type">
+            <option value="">— любой —</option>
+            {% for code, label in request_types %}
+              <option value="{{ code }}" {{ 'selected' if filters.request_type == code }}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label>Клиент (email)</label>
+          <input type="text" name="client" value="{{ filters.client or '' }}" placeholder="часть адреса">
+        </div>
+        <div class="field">
+          <label>Есть ответ</label>
+          <select name="has_reply">
+            <option value="">— неважно —</option>
+            <option value="1" {{ 'selected' if filters.has_reply is true }}>да</option>
+            <option value="0" {{ 'selected' if filters.has_reply is false }}>нет</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Вложения</label>
+          <select name="has_attachments">
+            <option value="">— неважно —</option>
+            <option value="1" {{ 'selected' if filters.has_attachments is true }}>есть</option>
+            <option value="0" {{ 'selected' if filters.has_attachments is false }}>нет</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Прочитано</label>
+          <select name="is_seen">
+            <option value="">— неважно —</option>
+            <option value="1" {{ 'selected' if filters.is_seen is true }}>прочитано</option>
+            <option value="0" {{ 'selected' if filters.is_seen is false }}>не прочитано</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Сортировка</label>
+          <select name="sort">
+            <option value="priority" {{ 'selected' if filters.sort == 'priority' }}>Сначала критические</option>
+            <option value="waiting" {{ 'selected' if filters.sort == 'waiting' }}>По времени ожидания</option>
+            <option value="date" {{ 'selected' if filters.sort == 'date' }}>По дате</option>
+            <option value="client" {{ 'selected' if filters.sort == 'client' }}>По клиенту</option>
+            <option value="manager" {{ 'selected' if filters.sort == 'manager' }}>По менеджеру</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Поиск (тема, email, компания, артикул)</label>
+          <input type="text" name="search" value="{{ filters.search or '' }}" placeholder="текст для поиска">
+        </div>
+        <div class="field">
+          <label>Дополнительно</label>
+          <div class="checkbox-row"><input type="checkbox" name="read_unanswered" value="1" {{ 'checked' if filters.read_unanswered }}> прочитано без ответа</div>
+          <div class="checkbox-row"><input type="checkbox" name="needs_review" value="1" {{ 'checked' if filters.needs_review }}> требует проверки</div>
+          <div class="checkbox-row"><input type="checkbox" name="show_not_relevant" value="1" {{ 'checked' if filters.include_not_relevant }}> показывать рассылки</div>
+        </div>
+        <div class="field actions">
+          <button class="btn primary" type="submit">Применить</button>
+          <button class="btn" type="button" data-reset-filters>Сбросить</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="panel">
+  <header>Список обращений <span class="count">{{ threads|length }}</span></header>
+  {{ thread_table(threads, requests_map) }}
+</div>
+{% endblock %}
