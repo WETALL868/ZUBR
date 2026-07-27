@@ -1,0 +1,121 @@
+Options -Indexes
+
+# ---------------------------------------------------------------------------
+# Routing
+# ---------------------------------------------------------------------------
+RewriteEngine On
+
+# YML feed for Yandex.Market on a clean URL.
+RewriteRule ^yandexmarket\.xml$ yandexmarket/index.php [L,QSA]
+
+# Order form endpoint without the .php suffix (the front-end tries /api/order
+# first; without this rule every submit wasted a round-trip on a 404).
+RewriteRule ^api/order/?$ api/order.php [L,QSA]
+
+# Product pages: only fall through to the PHP renderer when no static
+# products/<slug>/index.html exists for that URL.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^products/([^/]+)/?$ products/index.php?slug=$1 [L,QSA]
+
+# ---------------------------------------------------------------------------
+# Compression
+# ---------------------------------------------------------------------------
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
+  AddOutputFilterByType DEFLATE application/javascript application/x-javascript
+  AddOutputFilterByType DEFLATE application/json application/ld+json
+  AddOutputFilterByType DEFLATE application/xml application/rss+xml
+  AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+<IfModule mod_brotli.c>
+  AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/xml text/css
+  AddOutputFilterByType BROTLI_COMPRESS application/javascript application/json
+  AddOutputFilterByType BROTLI_COMPRESS application/ld+json application/xml
+  AddOutputFilterByType BROTLI_COMPRESS image/svg+xml
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# Caching
+#
+# Static assets are versioned in markup (styles.css?v=2) or have stable
+# content-addressed names, so they can be cached hard. HTML must stay
+# revalidated, otherwise a redeploy is invisible to returning visitors.
+# ---------------------------------------------------------------------------
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/webp             "access plus 1 year"
+  ExpiresByType image/png              "access plus 1 year"
+  ExpiresByType image/jpeg             "access plus 1 year"
+  ExpiresByType image/svg+xml          "access plus 1 year"
+  ExpiresByType image/x-icon           "access plus 1 year"
+  ExpiresByType text/css               "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType font/woff2             "access plus 1 year"
+  ExpiresByType text/html              "access plus 0 seconds"
+</IfModule>
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.(webp|png|jpe?g|gif|svg|ico|woff2?)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.(css|js)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.(html|php)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+  <FilesMatch "\.(xml|txt)$">
+    Header set Cache-Control "public, max-age=3600"
+  </FilesMatch>
+
+  # -------------------------------------------------------------------------
+  # Security headers
+  # -------------------------------------------------------------------------
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=()"
+
+  # Enable once the domain is confirmed HTTPS-only (max-age is hard to undo).
+  # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+  # Never leak the PHP version.
+  Header always unset X-Powered-By
+  Header unset X-Powered-By
+</IfModule>
+
+<IfModule mod_php.c>
+  php_flag expose_php Off
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# MIME types / charset
+# ---------------------------------------------------------------------------
+AddDefaultCharset UTF-8
+<IfModule mod_mime.c>
+  AddType image/webp .webp
+  AddType font/woff2 .woff2
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# Block access to sensitive files
+# ---------------------------------------------------------------------------
+<FilesMatch "^(mail-config|config)\.php$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+<FilesMatch "\.(jsonl|log|bak|sql|ini|sh)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Deny from all
+  </IfModule>
+</FilesMatch>

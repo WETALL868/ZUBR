@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /yandexmarket/cache/
+
+Sitemap: https://comp-uter.ru/sitemap.xml
+Host: comp-uter.ru
+Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term /
