@@ -1,53 +1,51 @@
 @echo off
-chcp 65001 >nul
 setlocal
-title Обновление программы
 cd /d "%~dp0"
+title Mail Analytics - update
 
 echo ============================================================
-echo   Обновление программы "Аналитика корпоративной почты"
+echo   Mail Analytics - update / obnovlenie
 echo ============================================================
 echo.
 
-if not exist ".venv\Scripts\python.exe" (
-    echo [ОШИБКА] Виртуальное окружение не найдено. Сначала запустите start.bat.
-    pause
-    exit /b 1
-)
+if not exist ".venv\Scripts\python.exe" goto :no_venv
 
-echo [1/4] Резервная копия базы данных...
+echo [1/3] Database backup / rezervnaya kopiya bazy...
 if not exist "backup" mkdir "backup"
-for /f "tokens=2 delims==" %%I in ('wmic os get localdatetime /value 2^>nul') do set DT=%%I
-if not defined DT set DT=00000000000000
-set STAMP=%DT:~0,8%_%DT:~8,6%
-if exist "data\mail_assistant.db" (
-    copy "data\mail_assistant.db" "backup\mail_assistant_%STAMP%.db" >nul
-    echo     Создана копия: backup\mail_assistant_%STAMP%.db
-) else (
-    echo     База данных ещё не создана - копировать нечего.
-)
+if not exist "data\mail_assistant.db" goto :no_db
+".venv\Scripts\python.exe" -c "import shutil,datetime,pathlib;p=pathlib.Path('backup')/('mail_assistant_'+datetime.datetime.now().strftime('%%Y%%m%%d_%%H%%M%%S')+'.db');shutil.copy2('data/mail_assistant.db',p);print('    ->',p)"
+goto :deps
 
-echo [2/4] Обновление исходного кода...
-git --version >nul 2>&1
-if errorlevel 1 (
-    echo     Git не установлен - обновите файлы программы вручную.
-) else (
-    git pull
-)
+:no_db
+echo     Database not created yet - nothing to back up.
 
-echo [3/4] Обновление зависимостей...
-.venv\Scripts\python.exe -m pip install -r requirements.txt --quiet --upgrade
+:deps
+echo [2/3] Updating dependencies...
+".venv\Scripts\python.exe" -m pip install -r requirements.txt --quiet --upgrade
+if errorlevel 1 goto :deps_failed
 
-echo [4/4] Обновление структуры базы данных...
-.venv\Scripts\python.exe -m alembic upgrade head
-if errorlevel 1 (
-    echo [ОШИБКА] Не удалось обновить базу данных.
-    echo Восстановите копию из папки backup и обратитесь за помощью.
-    pause
-    exit /b 1
-)
+echo [3/3] Updating database structure...
+".venv\Scripts\python.exe" -m alembic upgrade head
+if errorlevel 1 goto :db_failed
 
 echo.
-echo Обновление завершено успешно. Запустите start.bat.
+echo Update finished / Obnovlenie zaversheno. Zapustite start.bat
 pause
-endlocal
+exit /b 0
+
+:no_venv
+echo [ERROR] Virtual environment not found. Run start.bat first.
+echo Snachala zapustite start.bat
+pause
+exit /b 1
+
+:deps_failed
+echo [ERROR] Could not update dependencies. Check the internet connection.
+pause
+exit /b 1
+
+:db_failed
+echo [ERROR] Could not update the database.
+echo Restore a copy from the "backup" folder.
+pause
+exit /b 1

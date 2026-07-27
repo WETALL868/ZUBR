@@ -1,98 +1,106 @@
 @echo off
-chcp 65001 >nul
-setlocal enabledelayedexpansion
-title Аналитика корпоративной почты
+setlocal
 cd /d "%~dp0"
+title Mail Analytics
 
 echo ============================================================
-echo   Аналитика корпоративной почты - запуск
-echo   Режим: только чтение (письма не изменяются)
+echo   Mail Analytics / Analitika korporativnoy pochty
+echo   Read-only mode
 echo ============================================================
 echo.
 
-rem --- 1. Проверка Python ---
-set PYTHON_CMD=
-py -3 --version >nul 2>&1 && set PYTHON_CMD=py -3
-if "!PYTHON_CMD!"=="" (
-    python --version >nul 2>&1 && set PYTHON_CMD=python
-)
-if "!PYTHON_CMD!"=="" (
-    echo [ОШИБКА] Python не найден.
-    echo Установите Python 3.12 с https://www.python.org/downloads/
-    echo При установке обязательно отметьте "Add Python to PATH".
-    echo.
-    pause
-    exit /b 1
-)
-echo [1/5] Python найден.
+if exist ".venv\Scripts\python.exe" goto :check_deps
 
-rem --- 2. Виртуальное окружение ---
-if not exist ".venv\Scripts\python.exe" (
-    echo [2/5] Создание виртуального окружения (один раз, ~1 минута)...
-    !PYTHON_CMD! -m venv .venv
-    if errorlevel 1 (
-        echo [ОШИБКА] Не удалось создать виртуальное окружение.
-        pause
-        exit /b 1
-    )
-    set FIRST_RUN=1
-) else (
-    echo [2/5] Виртуальное окружение найдено.
-)
+rem ---------- Step 1: find Python ----------
+echo [1/4] Looking for Python...
+set "BOOT="
 
-rem --- 3. Зависимости ---
-if defined FIRST_RUN (
-    echo [3/5] Установка зависимостей, подождите...
-    .venv\Scripts\python.exe -m pip install --upgrade pip --quiet
-    .venv\Scripts\python.exe -m pip install -r requirements.txt --quiet
-    if errorlevel 1 (
-        echo [ОШИБКА] Не удалось установить зависимости. Проверьте интернет.
-        pause
-        exit /b 1
-    )
-) else (
-    .venv\Scripts\python.exe -c "import fastapi, sqlalchemy, openai, openpyxl" >nul 2>&1
-    if errorlevel 1 (
-        echo [3/5] Доустановка недостающих зависимостей...
-        .venv\Scripts\python.exe -m pip install -r requirements.txt --quiet
-    ) else (
-        echo [3/5] Зависимости на месте.
-    )
-)
+py -3 --version >nul 2>&1
+if not errorlevel 1 set "BOOT=py -3"
+if defined BOOT goto :make_venv
 
-rem --- 4. Файл настроек ---
-if not exist ".env" (
-    if exist ".env.example" (
-        copy ".env.example" ".env" >nul
-        echo [4/5] Создан файл .env из примера.
-        echo.
-        echo ВНИМАНИЕ: откройте файл .env в Блокноте и заполните:
-        echo   YANDEX_EMAIL         - ваш адрес почты
-        echo   YANDEX_APP_PASSWORD  - пароль приложения Яндекса
-        echo   OPENAI_API_KEY       - ключ OpenAI (можно оставить пустым)
-        echo.
-        echo Без этих настроек будет доступен только демонстрационный режим.
-        echo.
-        pause
-    ) else (
-        echo [ПРЕДУПРЕЖДЕНИЕ] Нет файлов .env и .env.example.
-    )
-) else (
-    echo [4/5] Файл .env найден.
-)
+python --version >nul 2>&1
+if not errorlevel 1 set "BOOT=python"
+if defined BOOT goto :make_venv
 
-rem --- 5. Запуск ---
-echo [5/5] Запуск программы...
+goto :no_python
+
+rem ---------- Step 2: create virtual environment ----------
+:make_venv
+echo [2/4] Creating virtual environment (one time, 1-2 minutes)...
+%BOOT% -m venv .venv
+if errorlevel 1 goto :venv_failed
+if not exist ".venv\Scripts\python.exe" goto :venv_failed
+
+echo [3/4] Installing dependencies, please wait...
+".venv\Scripts\python.exe" -m pip install --upgrade pip --quiet
+".venv\Scripts\python.exe" -m pip install -r requirements.txt
+if errorlevel 1 goto :deps_failed
+goto :launch
+
+rem ---------- Step 3: verify dependencies ----------
+:check_deps
+".venv\Scripts\python.exe" -c "import fastapi, sqlalchemy, openai, openpyxl, jinja2" >nul 2>&1
+if not errorlevel 1 goto :launch
+echo [3/4] Installing missing dependencies...
+".venv\Scripts\python.exe" -m pip install -r requirements.txt
+if errorlevel 1 goto :deps_failed
+
+rem ---------- Step 4: run ----------
+:launch
+echo [4/4] Starting the application...
 echo.
-echo Интерфейс откроется в браузере. Для остановки закройте это окно
-echo или нажмите Ctrl+C.
-echo.
-.venv\Scripts\python.exe run.py %*
+".venv\Scripts\python.exe" run.py %*
+if errorlevel 1 goto :run_failed
+goto :finished
 
-if errorlevel 1 (
-    echo.
-    echo [ОШИБКА] Программа завершилась с ошибкой.
-    echo Подробности в файле logs\app.log
-    pause
-)
+rem ---------- Error handlers ----------
+:no_python
+echo.
+echo [ERROR] Python not found / Python ne naiden.
+echo.
+echo Install Python 3.12 from https://www.python.org/downloads/
+echo IMPORTANT: check the box "Add python.exe to PATH" during setup.
+echo.
+echo Ustanovite Python 3.12 s sayta https://www.python.org/downloads/
+echo VAZHNO: pri ustanovke otmette galochku "Add python.exe to PATH".
+echo.
+pause
+exit /b 1
+
+:venv_failed
+echo.
+echo [ERROR] Could not create the virtual environment.
+echo Ne udalos sozdat virtualnoe okruzhenie.
+echo.
+echo Possible reasons / Vozmozhnye prichiny:
+echo   - no write permission in this folder (move it to C:\mail-analytics)
+echo   - antivirus blocked the operation
+echo   - Python installed without the venv module
+echo.
+pause
+exit /b 1
+
+:deps_failed
+echo.
+echo [ERROR] Could not install dependencies.
+echo Ne udalos ustanovit zavisimosti. Proverte internet-soedinenie.
+echo.
+echo If your company uses a proxy, see README.md section 15.
+echo.
+pause
+exit /b 1
+
+:run_failed
+echo.
+echo [ERROR] The application stopped with an error.
+echo Programma zavershilas s oshibkoy. Podrobnosti vyshe i v logs\app.log
+echo.
+pause
+exit /b 1
+
+:finished
+echo.
+echo Application stopped / Programma ostanovlena.
+pause
 endlocal
