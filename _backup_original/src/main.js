@@ -355,7 +355,7 @@ function updateProductHash(productId) {
 function openProductViewer(card, trigger, { updateHash = true } = {}) {
   const image = card.querySelector(".model-photo img");
   const title = card.querySelector("h3")?.textContent?.trim() || image?.alt || "Процессор Xeon";
-  const priceNode = card.querySelector(".model-price");
+  const price = card.querySelector(".model-price")?.textContent?.trim() || "";
   const lead = card.querySelector("p:not(.model-price)")?.textContent?.trim() || "";
   const specs = card.querySelector(".model-specs");
   const tags = card.querySelector(".model-tags");
@@ -370,9 +370,7 @@ function openProductViewer(card, trigger, { updateHash = true } = {}) {
   viewerImage.src = image.currentSrc || image.src;
   viewerImage.alt = image.alt;
   viewerTitle.textContent = title;
-  // Копируем узел целиком, чтобы зачёркнутая старая цена осталась зачёркнутой.
-  clearNode(viewerPrice);
-  priceNode?.childNodes.forEach((node) => viewerPrice.appendChild(node.cloneNode(true)));
+  viewerPrice.textContent = price;
   viewerLead.textContent = lead;
   clearNode(viewerSpecs);
   clearNode(viewerTags);
@@ -430,7 +428,6 @@ function loadCart() {
         title: String(item.title).slice(0, 200),
         price: Math.max(0, Number(item.price) || 0),
         priceText: String(item.priceText ?? "").slice(0, 40),
-        unit: String(item.unit ?? "шт.").slice(0, 16),
         image: String(item.image ?? "").slice(0, 300),
         qty: Math.min(999, Math.max(1, parseInt(item.qty, 10) || 1)),
       }))
@@ -448,35 +445,24 @@ function saveCart() {
   }
 }
 
-function formatMoney(value) {
-  const amount = Math.max(0, Number(value) || 0);
-  return `${new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 }).format(amount)}\u00a0₽`;
+function parseMoney(value) {
+  return Number(String(value || "").replace(/[^\d]/g, "")) || 0;
 }
 
-// Цена берётся из data-price, который сервер печатает из /data/prices.json,
-// а не из текста карточки: так цена в корзине не может разойтись с ценой на
-// странице (пробелы, знак рубля и «Цена по запросу» больше ни на что не влияют).
-function getCardPrice(card) {
-  const raw = card.dataset.price;
-  if (raw === undefined || raw === "") {
-    return 0;
-  }
-
-  const price = Number(String(raw).replace(",", "."));
-  return Number.isFinite(price) && price > 0 ? price : 0;
+function formatMoney(value) {
+  return `${new Intl.NumberFormat("ru-RU").format(Math.max(0, Number(value) || 0))} ₽`;
 }
 
 function getProductFromCard(card) {
   const image = card.querySelector(".model-photo img");
   const title = card.querySelector("h3")?.textContent?.trim() || image?.alt || "Xeon";
-  const price = getCardPrice(card);
+  const priceText = card.querySelector(".model-price")?.textContent?.trim() || "0 ₽";
 
   return {
     id: card.id,
     title,
-    price,
-    priceText: price > 0 ? formatMoney(price) : "",
-    unit: card.dataset.unit || "шт.",
+    price: parseMoney(priceText),
+    priceText,
     image: image?.getAttribute("src") || image?.currentSrc || "",
   };
 }
@@ -532,7 +518,7 @@ function buildCartRow(item) {
   title.textContent = item.title;
 
   const unitPrice = document.createElement("span");
-  unitPrice.textContent = `${formatMoney(item.price)} за ${item.unit || "шт."}`;
+  unitPrice.textContent = `${formatMoney(item.price)} за шт.`;
 
   const actions = document.createElement("div");
   actions.className = "cart-item-actions";
@@ -839,7 +825,7 @@ productCards.forEach((card) => {
     specs.after(detailButton);
   }
 
-  if (card.dataset.orderable !== "false" && !card.querySelector(".model-cart-button")) {
+  if (!card.querySelector(".model-cart-button")) {
     const cartButton = document.createElement("button");
     cartButton.className = "model-cart-button";
     cartButton.type = "button";

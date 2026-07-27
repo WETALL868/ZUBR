@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/src/prices.php';
-
 function yml_text(string $value): string
 {
     return htmlspecialchars($value, ENT_XML1 | ENT_COMPAT, 'UTF-8');
@@ -52,11 +50,6 @@ function yml_product_url(string $base_url, array $product, string $utm): string
 
 function yml_offer(array $config, array $product, string $base_url): string
 {
-    // Цена и наличие приходят из единого файла /data/prices.json.
-    $price = prices_value((string)($product['slug'] ?? '')) ?? prices_value((string)($product['id'] ?? ''));
-    $stock = prices_stock((string)($product['slug'] ?? ''));
-    $available = $stock !== 'out_of_stock' ? 'true' : 'false';
-
     $currency_id = (string)($config['currency_id'] ?? 'RUR');
     $category_id = (string)($product['category_id'] ?? ($config['default_category_id'] ?? 1));
     $vendor = (string)($product['brand'] ?? 'Intel');
@@ -68,9 +61,9 @@ function yml_offer(array $config, array $product, string $base_url): string
         $params .= '      <param name="' . yml_text((string)$name) . '">' . yml_text((string)$value) . "</param>\n";
     }
 
-    return '    <offer id="' . yml_text((string)$product['id']) . '" available="' . $available . "\">\n"
+    return '    <offer id="' . yml_text((string)$product['id']) . "\" available=\"true\">\n"
         . '      <url>' . yml_text(yml_product_url($base_url, $product, $utm)) . "</url>\n"
-        . '      <price>' . yml_text(prices_machine($price)) . "</price>\n"
+        . '      <price>' . yml_text((string)$product['price']) . "</price>\n"
         . '      <currencyId>' . yml_text($currency_id) . "</currencyId>\n"
         . '      <categoryId>' . yml_text($category_id) . "</categoryId>\n"
         . '      <picture>' . yml_text(yml_absolute_url($base_url, (string)$product['picture'])) . "</picture>\n"
@@ -100,14 +93,8 @@ function yml_generate_catalog(array $config, array $products): string
         $categoriesXml .= '      <category id="' . yml_text((string)$id) . '">' . yml_text((string)$name) . "</category>\n";
     }
 
-    // Позиция без цены в /data/prices.json в фид не попадает: Яндекс.Маркет
-    // отклоняет предложение без <price>, а пустой тег сломал бы весь фид.
     $offers = '';
     foreach ($products as $product) {
-        $price = prices_value((string)($product['slug'] ?? '')) ?? prices_value((string)($product['id'] ?? ''));
-        if ($price === null) {
-            continue;
-        }
         $offers .= yml_offer($config, $product, $base_url);
     }
 
@@ -136,15 +123,8 @@ function yml_cached_catalog(array $config, array $products): array
     $cache_dir = __DIR__ . '/cache';
     $cache_file = $cache_dir . '/yandexmarket.xml';
 
-    // Кэш сбрасывается и по TTL, и как только /data/prices.json стал новее:
-    // иначе после замены файла цен фид ещё минуту отдавал бы старые цены.
-    $prices_mtime = is_file(PRICES_FILE) ? (int)filemtime(PRICES_FILE) : 0;
-
-    if (is_file($cache_file) && is_readable($cache_file)) {
-        $cache_mtime = (int)filemtime($cache_file);
-        if ((time() - $cache_mtime < $ttl) && $cache_mtime >= $prices_mtime) {
-            return [file_get_contents($cache_file), 'hit'];
-        }
+    if (is_file($cache_file) && is_readable($cache_file) && (time() - filemtime($cache_file) < $ttl)) {
+        return [file_get_contents($cache_file), 'hit'];
     }
 
     $xml = yml_generate_catalog($config, $products);

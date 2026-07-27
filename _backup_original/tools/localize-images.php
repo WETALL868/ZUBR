@@ -100,8 +100,8 @@ if (!$done) {
 
 // ---------------------------------------------------------------- rewrite
 $targets = array_merge(
-    [$productsFile, $root . '/index.php', $root . '/processors/index.php', $root . '/drives/index.php'],
-    glob($root . '/products/*/index.php') ?: []
+    [$productsFile, $root . '/index.html'],
+    glob($root . '/products/*/index.html') ?: []
 );
 
 $changed = 0;

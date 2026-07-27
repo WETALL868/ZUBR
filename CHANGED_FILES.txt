@@ -1,0 +1,70 @@
+===============================================================================
+   СПИСОК ИЗМЕНЁННЫХ ФАЙЛОВ — перевод цен на единый файл data/prices.json
+   comp-uter.ru, 27.07.2026
+===============================================================================
+
+ДОБАВЛЕНО (новые файлы)
+-------------------------------------------------------------------------------
+  data/prices.json                  ЕДИНЫЙ ФАЙЛ ЦЕН — только его вы правите
+  src/prices.php                    чтение файла цен, защита от ошибок,
+                                    форматирование «15 500 ₽», разметка
+  tools/check-prices.php            проверка полноты цен (браузер + консоль)
+  PRICE_MANAGEMENT_INSTRUCTION.txt  инструкция для владельца сайта
+  CHANGED_FILES.txt                 этот файл
+  _backup_original/                 копии всех файлов ДО изменений (24 файла),
+                                    папка закрыта от посетителей
+
+
+ПЕРЕИМЕНОВАНО .html -> .php (адреса страниц НЕ изменились)
+-------------------------------------------------------------------------------
+  index.html                     -> index.php
+  processors/index.html          -> processors/index.php
+  drives/index.html              -> drives/index.php
+  products/e5-2667-v3/index.html -> products/e5-2667-v3/index.php
+  products/e5-2673-v3/index.html -> products/e5-2673-v3/index.php
+  products/e5-2690-v4/index.html -> products/e5-2690-v4/index.php
+  products/e5-2696-v3/index.html -> products/e5-2696-v3/index.php
+  products/e5-2697-v4/index.html -> products/e5-2697-v4/index.php
+  products/e5-2699-v3/index.html -> products/e5-2699-v3/index.php
+  products/e5-2699-v4/index.html -> products/e5-2699-v4/index.php
+  products/st10000nm0016/index.html -> products/st10000nm0016/index.php
+  products/st3000nm0005/index.html  -> products/st3000nm0005/index.php
+  products/st3000nm0033/index.html  -> products/st3000nm0033/index.php
+  products/st4000nm0033/index.html  -> products/st4000nm0033/index.php
+  products/st6000nm0115/index.html  -> products/st6000nm0115/index.php
+
+  В этих файлах заменены ТОЛЬКО места с ценой, наличием и стоимостью доставки.
+  Вёрстка, тексты, картинки, ссылки, SEO-теги, мобильный дизайн — без изменений.
+
+
+ИЗМЕНЕНО
+-------------------------------------------------------------------------------
+  .htaccess                  добавлено DirectoryIndex index.php index.html
+                             и запрет кэша для prices.json
+  src/main.js                корзина берёт цену из data-price (сервер), а не из
+                             текста карточки; учитывается единица измерения;
+                             у товара «нет в наличии» нет кнопки «В корзину»
+  src/styles.css             добавлены только служебные правила: зачёркнутая
+                             старая цена и вид «Цена по запросу».
+                             Существующее оформление не тронуто
+  api/order.php              цена каждой позиции и сумма заказа пересчитываются
+                             по data/prices.json, а не берутся из браузера
+  yandexmarket/products.php  УДАЛЕНЫ все 12 строк 'price' => ...
+                             файл остался каталогом (названия, фото, параметры)
+  yandexmarket/feed.php      цена и признак наличия берутся из файла цен;
+                             кэш фида сбрасывается при замене файла цен;
+                             позиция без цены в фид не попадает
+  products/index.php         автоматическая страница товара: цена, похожие
+                             товары и JSON-LD берут цену из файла цен
+  tools/localize-images.php  пути обновлены с index.html на index.php
+
+
+НЕ ИЗМЕНЯЛОСЬ
+-------------------------------------------------------------------------------
+  sitemap.xml, robots.txt, favicon.ico, public/assets/*, src/nav.js,
+  src/cpu-article.js, src/scroll-restore.js, src/product-page.js,
+  api/mail-config.php, api/mail-config.example.php, api/README-SMTP.txt,
+  yandexmarket/config.php, yandexmarket/index.php, yandexmarket/.htaccess,
+  privacy_policy/, polzovatelskoe-soglashenie/
+
+===============================================================================

@@ -3,11 +3,15 @@
 declare(strict_types=1);
 
 $products = require __DIR__ . '/../yandexmarket/products.php';
-require_once __DIR__ . '/../src/prices.php';
 
 function page_text(string $value): string
 {
     return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+}
+
+function page_money(int $value): string
+{
+    return number_format($value, 0, '', ' ') . ' ₽';
 }
 
 function page_absolute_url(string $path): string
@@ -97,13 +101,16 @@ $schema = [
         'name' => (string)($product['brand'] ?? 'Intel'),
     ],
     'category' => $categoryName,
+    'offers' => [
+        '@type' => 'Offer',
+        'url' => $canonical,
+        'price' => (string)$product['price'],
+        'priceCurrency' => 'RUB',
+        'availability' => 'https://schema.org/InStock',
+        'itemCondition' => 'https://schema.org/NewCondition',
+    ],
     'additionalProperty' => [],
 ];
-
-$offer = prices_offer_array((string)$product['slug'], $canonical);
-if ($offer !== null) {
-    $schema['offers'] = $offer;
-}
 
 foreach (($product['params'] ?? []) as $name => $value) {
     $schema['additionalProperty'][] = [
@@ -325,8 +332,7 @@ if ($faq) {
         <div class="product-dialog-copy">
           <p class="section-label">Карточка товара</p>
           <h1><?= page_text($displayName) ?></h1>
-          <?= prices_page_html((string)$product['slug']) ?>
-
+          <p class="product-dialog-price"><?= page_money((int)$product['price']) ?></p>
           <p class="product-dialog-lead"><?= page_text((string)$product['description']) ?></p>
           <dl class="product-dialog-specs">
             <?php foreach ($params as $name => $value): ?>
@@ -355,8 +361,7 @@ if ($faq) {
           <?php foreach ($related as $item): ?>
             <a class="related-product-card" href="<?= page_text('/products/' . $item['slug'] . '/') ?>">
               <h3><?= page_text(trim(($item['display_prefix'] ?? '') . ' ' . $item['model'])) ?></h3>
-              <?= prices_related_html((string)$item['slug']) ?>
-
+              <span class="related-price"><?= page_money((int)$item['price']) ?></span>
               <p><?= page_text((string)$item['description']) ?></p>
             </a>
           <?php endforeach; ?>

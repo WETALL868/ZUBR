@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/src/prices.php';
-
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
 
@@ -34,39 +32,14 @@ function bool_field($value): bool
     return $value === true || $value === 'on' || $value === '1' || $value === 1;
 }
 
-/**
- * Денежное значение из формы. Дробные цены поддерживаются: раньше здесь
- * вырезались все нецифровые символы, и «2800.50» превращалось в 280050.
- */
-function money_value($value): float
+function money_value($value): int
 {
-    if (is_int($value) || is_float($value)) {
-        return max(0.0, round((float)$value, 2));
-    }
-
-    $text = preg_replace('~[\s\x{00A0}\x{202F}]+~u', '', (string)($value ?? ''));
-    $text = str_replace(',', '.', (string)$text);
-    if (!preg_match('~\d+(\.\d+)?~', $text, $match)) {
-        return 0.0;
-    }
-
-    return max(0.0, round((float)$match[0], 2));
+    return max(0, (int)preg_replace('/\D+/', '', (string)($value ?? '')));
 }
 
-/** Один и тот же формат цены, что и на сайте: «15 500 ₽», «15 500,50 ₽». */
-function format_money_value(float $value): string
+function format_money_value(int $value): string
 {
-    return prices_format($value);
-}
-
-/**
- * Цена, которой можно доверять: клиент присылает свою, но заказ считается по
- * /data/prices.json. Так цена в письме не может разойтись с ценой на сайте,
- * даже если у покупателя открыта старая вкладка или подменён localStorage.
- */
-function authoritative_price(string $id, float $client_price): float
-{
-    return prices_value($id) ?? $client_price;
+    return number_format($value, 0, '.', ' ') . ' ₽';
 }
 
 function normalize_cart_items($value): array
@@ -89,7 +62,7 @@ function normalize_cart_items($value): array
         $title = clean_value($item['title'] ?? '');
         $id = preg_replace('/[^a-zA-Z0-9_-]/', '', clean_value($item['id'] ?? ''));
         $qty = max(1, min(999, (int)($item['qty'] ?? 1)));
-        $price = authoritative_price($id, money_value($item['price'] ?? 0));
+        $price = money_value($item['price'] ?? 0);
 
         if ($title === '' || $id === '' || $price <= 0) {
             continue;
@@ -100,7 +73,7 @@ function normalize_cart_items($value): array
             'title' => $title,
             'qty' => $qty,
             'price' => $price,
-            'total' => round($price * $qty, 2),
+            'total' => $price * $qty,
         ];
     }
 
@@ -210,10 +183,7 @@ function normalize_order(array $raw): array
         'privacy' => bool_field($raw['privacy'] ?? false),
         'terms' => bool_field($raw['terms'] ?? false),
         'cart_items' => $cart_items,
-        // Сумма пересчитывается по проверенным ценам, а не берётся из формы.
-        'cart_total' => $cart_items
-            ? round(array_sum(array_column($cart_items, 'total')), 2)
-            : money_value($raw['cart_total'] ?? 0),
+        'cart_total' => money_value($raw['cart_total'] ?? 0),
         'delivery_method' => clean_value($raw['delivery_method'] ?? ''),
         'delivery_price' => $delivery_price_raw === '' ? null : money_value($delivery_price_raw),
         'delivery_city' => clean_value($raw['delivery_city'] ?? ''),
@@ -221,13 +191,6 @@ function normalize_order(array $raw): array
         'delivery_comment' => clean_value($raw['delivery_comment'] ?? ''),
         'order_total' => $order_total_raw === '' ? null : money_value($order_total_raw),
     ];
-
-    // Итог по заказу считается здесь же: товары по проверенным ценам + доставка.
-    if ($order['cart_items']) {
-        $order['order_total'] = $order['delivery_price'] === null
-            ? null
-            : round($order['cart_total'] + $order['delivery_price'], 2);
-    }
 
     $errors = [];
     if ($order['name'] === '') {

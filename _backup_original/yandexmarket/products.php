@@ -1,16 +1,5 @@
 <?php
 
-/**
- * Каталог товаров: названия, описания, изображения и характеристики.
- *
- * ЦЕН ЗДЕСЬ БОЛЬШЕ НЕТ. Все цены, старые цены и наличие живут в одном файле
- * /data/prices.json и читаются через src/prices.php. Связь между каталогом и
- * ценой — по полю 'slug' (внутренний идентификатор) и по полю 'id' (артикул).
- *
- * Чтобы изменить цену — откройте /data/prices.json, а не этот файл.
- * Инструкция: PRICE_MANAGEMENT_INSTRUCTION.txt в корне сайта.
- */
-
 return [
     [
         'id' => '4946900889',
@@ -23,6 +12,7 @@ return [
         'category_url' => '/processors/',
         'category_id' => 1,
         'brand' => 'Intel',
+        'price' => 15500,
         'picture' => '/public/assets/cpu-e5-2699-v4.webp',
         'description' => 'Флагманский процессор Intel Xeon E5-2699 V4 для тяжелой многопоточности: рендер, виртуализация, инженерные задачи, серверные нагрузки и производительные рабочие станции на X99.',
         'params' => [
@@ -55,6 +45,7 @@ return [
         'category_url' => '/processors/',
         'category_id' => 1,
         'brand' => 'Intel',
+        'price' => 2800,
         'picture' => '/public/assets/cpu-e5-2699-v3.webp',
         'description' => 'Производительный Xeon поколения Haswell для X99-сборок, где нужно много потоков за разумный бюджет: монтаж, стриминг, домашний сервер и рабочие задачи.',
         'params' => [
@@ -87,6 +78,7 @@ return [
         'category_url' => '/processors/',
         'category_id' => 1,
         'brand' => 'Intel',
+        'price' => 4800,
         'picture' => '/public/assets/cpu-e5-2697-v4.webp',
         'description' => 'Сбалансированная V4-модель для стабильной рабочей станции: много потоков, DDR4-память и предсказуемая работа под длительной нагрузкой.',
         'params' => [
@@ -119,6 +111,7 @@ return [
         'category_url' => '/processors/',
         'category_id' => 1,
         'brand' => 'Intel',
+        'price' => 5400,
         'picture' => '/public/assets/cpu-e5-2696-v3.webp',
         'description' => 'Популярная позиция для производительных X99-сборок: много потоков, высокий Turbo Boost и понятная экономика для сборщиков ПК.',
         'params' => [
@@ -151,6 +144,7 @@ return [
         'category_url' => '/processors/',
         'category_id' => 1,
         'brand' => 'Intel',
+        'price' => 3300,
         'picture' => '/public/assets/cpu-e5-2690-v4.webp',
         'description' => 'Универсальный процессор для рабочей станции: монтаж, разработка, 3D-пакеты, виртуализация и повседневные профессиональные нагрузки.',
         'params' => [
@@ -183,6 +177,7 @@ return [
         'category_url' => '/processors/',
         'category_id' => 1,
         'brand' => 'Intel',
+        'price' => 2200,
         'picture' => '/public/assets/cpu-e5-2673-v3.webp',
         'description' => 'Практичный Xeon для бюджетных производительных сборок: подходит, когда нужно получить 12 ядер и понятную конфигурацию под продажу.',
         'params' => [
@@ -215,6 +210,7 @@ return [
         'category_url' => '/processors/',
         'category_id' => 1,
         'brand' => 'Intel',
+        'price' => 2900,
         'picture' => '/public/assets/cpu-e5-2667-v3.webp',
         'description' => 'Модель с акцентом на высокую частоту на ядро: отзывчивые рабочие станции, прикладные задачи и точечные апгрейды X99.',
         'params' => [
@@ -247,6 +243,7 @@ return [
         'category_url' => '/drives/',
         'category_id' => 2,
         'brand' => 'Seagate',
+        'price' => 81266,
         'picture' => 'https://cdn1.ozone.ru/s3/multimedia-1-t/12183483917.jpg',
         'description' => 'Флагманский серверный жесткий диск на 10 ТБ для дата-центров: RAID-массивы, NAS-хранилища, резервное копирование, видеонаблюдение и корпоративные файловые серверы.',
         'params' => [
@@ -285,6 +282,7 @@ return [
         'category_url' => '/drives/',
         'category_id' => 2,
         'brand' => 'Seagate',
+        'price' => 44866,
         'picture' => 'https://cdn1.ozone.ru/s3/multimedia-1-n/12245200655.jpg',
         'description' => 'Диск корпоративного класса для непрерывной нагрузки 24/7: серверы, RAID-массивы, NAS-системы, видеонаблюдение и резервное копирование данных.',
         'params' => [
@@ -323,6 +321,7 @@ return [
         'category_url' => '/drives/',
         'category_id' => 2,
         'brand' => 'Seagate',
+        'price' => 33333,
         'picture' => 'https://cdn1.ozone.ru/s3/multimedia-1-r/12278044503.jpg',
         'description' => 'Проверенный временем серверный HDD на 4 ТБ для RAID-массивов, NAS и файловых серверов, где важна предсказуемая долгосрочная надежность.',
         'params' => [
@@ -361,6 +360,7 @@ return [
         'category_url' => '/drives/',
         'category_id' => 2,
         'brand' => 'Seagate',
+        'price' => 25000,
         'picture' => 'https://cdn1.ozone.ru/s3/multimedia-1-3/12156663171.jpg',
         'description' => 'Диск нового поколения на 3 ТБ с повышенной скоростью и наработкой на отказ: серверы, рабочие станции, RAID и системы хранения данных.',
         'params' => [
@@ -399,6 +399,7 @@ return [
         'category_url' => '/drives/',
         'category_id' => 2,
         'brand' => 'Seagate',
+        'price' => 25000,
         'picture' => 'https://cdn1.ozone.ru/s3/multimedia-1-q/12208461578.jpg',
         'description' => 'Надежный корпоративный HDD на 3 ТБ для серверов, NAS, RAID-массивов и резервного копирования, когда важна не игровая скорость, а стабильность хранения.',
         'params' => [

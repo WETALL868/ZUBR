@@ -3,6 +3,12 @@ Options -Indexes
 # ---------------------------------------------------------------------------
 # Routing
 # ---------------------------------------------------------------------------
+
+# Страницы каталога и карточек товаров теперь index.php: они подставляют цены
+# из /data/prices.json. index.php должен идти первым, иначе оставшийся на
+# сервере старый index.html перекрыл бы новую страницу со свежими ценами.
+DirectoryIndex index.php index.html
+
 RewriteEngine On
 
 # YML feed for Yandex.Market on a clean URL.
@@ -68,6 +74,13 @@ RewriteRule ^products/([^/]+)/?$ products/index.php?slug=$1 [L,QSA]
   </FilesMatch>
   <FilesMatch "\.(xml|txt)$">
     Header set Cache-Control "public, max-age=3600"
+  </FilesMatch>
+
+  # Файл цен читает PHP на сервере, поэтому кэш браузера на цены не влияет.
+  # Запрет кэша нужен для другого: чтобы владелец сайта мог открыть
+  # https://comp-uter.ru/data/prices.json и увидеть именно то, что залил.
+  <FilesMatch "^prices\.json$">
+    Header set Cache-Control "no-store, must-revalidate"
   </FilesMatch>
 
   # -------------------------------------------------------------------------
