@@ -23,6 +23,7 @@
       <a href="/managers" class="{{ 'active' if path == '/managers' }}">По менеджерам</a>
       <a href="/demo" class="{{ 'active' if path == '/demo' }}">Демо-режим</a>
       <a href="/settings" class="{{ 'active' if path == '/settings' }}">Настройки</a>
+      <a href="/guide" class="{{ 'active' if path == '/guide' }}">Инструкция</a>
       <a href="/limitations" class="{{ 'active' if path == '/limitations' }}">Ограничения</a>
     </nav>
     <div class="sidebar-footer">
@@ -32,6 +33,25 @@
   </aside>
 
   <main class="content">
+    {% if demo_threads %}
+      <div class="alert demo-banner">
+        <div>
+          <strong>Это демонстрационные данные, а не ваша почта.</strong>
+          Показано тестовых обращений: {{ demo_threads }}. Письма созданы самой программой
+          для проверки логики и хранятся в отдельном ящике <span class="mono">demo@example.local</span>.
+          {% if real_threads %}
+            Обращений из реальной почты: {{ real_threads }} — они помечены без ярлыка «демо».
+          {% else %}
+            Реальная почта ещё не загружалась.
+          {% endif %}
+        </div>
+        <form method="post" action="/actions/demo/clear" class="no-print"
+              data-confirm="Удалить все демонстрационные данные? Реальная почта не пострадает.">
+          <button class="btn small" type="submit">Удалить демо-данные</button>
+        </form>
+      </div>
+    {% endif %}
+
     {% set msg = request.query_params.get('msg') %}
     {% if msg %}
       <div class="alert {{ request.query_params.get('kind', 'ok') }}">{{ msg }}</div>

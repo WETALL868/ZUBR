@@ -7,6 +7,9 @@
     <div class="sub">
       Обращение №{{ thread.id }} ·
       <span class="status {{ thread.current_status|status_color }}">{{ thread.current_status|status_ru }}</span>
+      {% if demo_account_id and thread.account_id == demo_account_id %}
+        <span class="chip demo">демонстрационное письмо, не из вашей почты</span>
+      {% endif %}
       {% if thread.manual_override %}<span class="chip">статус изменён вручную</span>{% endif %}
       {% if thread.grouping_confidence < 0.85 %}
         <span class="chip fail">цепочка собрана с низкой уверенностью</span>

@@ -357,6 +357,19 @@ def load_demo(analyze: str | None = Form("1")) -> RedirectResponse:
     return _flash("/demo", "Демонстрационные данные загружаются…", "ok")
 
 
+@router.post("/actions/demo/clear")
+def clear_demo(db: Session = Depends(get_db)) -> RedirectResponse:
+    """Удаляет демонстрационные переписки. Реальная почта не затрагивается."""
+    from app.services.demo_data import clear_demo_data
+
+    clear_demo_data(db)
+    return _flash(
+        "/",
+        "Демонстрационные данные удалены. Реальная почта не затронута.",
+        "ok",
+    )
+
+
 # ------------------------------------------------------------------
 # Экспорт
 # ------------------------------------------------------------------

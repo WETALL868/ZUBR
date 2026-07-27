@@ -58,10 +58,28 @@ def _parse_date(value: str | None, default: date) -> date:
         return default
 
 
+def demo_state(db: Session) -> dict:
+    """Сведения о демонстрационных данных: их наличие видно на каждой странице."""
+    account = db.scalar(select(MailAccount).where(MailAccount.is_demo.is_(True)))
+    if account is None:
+        return {"demo_account_id": None, "demo_threads": 0, "real_threads": 0}
+    demo_threads = db.scalar(
+        select(func.count(Thread.id)).where(Thread.account_id == account.id)
+    ) or 0
+    real_threads = db.scalar(
+        select(func.count(Thread.id)).where(Thread.account_id != account.id)
+    ) or 0
+    return {
+        "demo_account_id": account.id,
+        "demo_threads": demo_threads,
+        "real_threads": real_threads,
+    }
+
+
 def _base_context(request: Request, db: Session) -> dict:
     from app.main import STARTUP_WARNINGS
 
-    return {
+    context = {
         "request": request,
         "read_only": settings.read_only_mode,
         "demo_mode": settings.demo_mode,
@@ -72,6 +90,8 @@ def _base_context(request: Request, db: Session) -> dict:
         "jobs": jobs.snapshot(),
         "today": _today(db),
     }
+    context.update(demo_state(db))
+    return context
 
 
 # ------------------------------------------------------------------
@@ -398,6 +418,13 @@ def demo_page(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
         }
     )
     return templates.TemplateResponse(request, "demo.html", context)
+
+
+@router.get("/guide", response_class=HTMLResponse)
+def guide_page(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
+    context = _base_context(request, db)
+    context["title"] = "Инструкция: работа с реальной почтой"
+    return templates.TemplateResponse(request, "guide.html", context)
 
 
 @router.get("/limitations", response_class=HTMLResponse)

@@ -186,7 +186,8 @@ def client(loaded, monkeypatch):
 
 @pytest.mark.parametrize(
     "url",
-    ["/", "/threads", "/report", "/managers", "/settings", "/demo", "/limitations", "/health"],
+    ["/", "/threads", "/report", "/managers", "/settings", "/demo", "/guide",
+     "/limitations", "/health"],
 )
 def test_pages_render(client, url):
     response = client.get(url)
@@ -255,3 +256,53 @@ def test_dashboard_shows_open_state_regardless_of_day(loaded):
     assert metrics["total_critical_all"] >= 3         # но открытые обращения видны
     assert metrics["total_incomplete_all"] >= 5
     assert metrics["read_unanswered"] >= 1
+
+
+# ------------------------------------------------------------------
+# Демонстрационные данные должны быть явно обозначены
+# ------------------------------------------------------------------
+
+def test_demo_banner_visible_on_every_page(client):
+    """Пользователь должен видеть, что перед ним тестовые письма, а не его почта."""
+    for url in ("/", "/threads", "/report", "/managers"):
+        text = client.get(url).text
+        assert "Это демонстрационные данные, а не ваша почта" in text, url
+        assert "demo@example.local" in text, url
+
+
+def test_demo_rows_marked_in_table(client):
+    assert 'class="chip demo"' in client.get("/threads").text
+
+
+def test_demo_marker_in_thread_card(client, loaded):
+    thread = loaded.scalar(select(Thread))
+    text = client.get(f"/threads/{thread.id}").text
+    assert "демонстрационное письмо, не из вашей почты" in text
+
+
+def test_demo_data_can_be_removed(client, loaded):
+    from app.models import MailAccount, Message
+
+    assert loaded.scalars(select(Thread)).all()
+    response = client.post("/actions/demo/clear", follow_redirects=False)
+    assert response.status_code == 303
+
+    demo = loaded.scalar(select(MailAccount).where(MailAccount.is_demo.is_(True)))
+    assert demo is not None  # сам ящик остаётся, чтобы демо можно было загрузить снова
+    assert loaded.scalars(select(Thread).where(Thread.account_id == demo.id)).all() == []
+    assert loaded.scalars(select(Message).where(Message.account_id == demo.id)).all() == []
+    assert "Это демонстрационные данные" not in client.get("/").text
+
+
+def test_guide_page_covers_real_mail_setup(client):
+    """Инструкция должна вести пользователя от пароля приложения до ежедневной работы."""
+    text = client.get("/guide").text
+    for fragment in [
+        "Пароли приложений",
+        "Настройки → Почтовые программы",
+        "CORPORATE_DOMAINS",
+        "Отправленные",
+        "Проверить подключение",
+        "Удалить демо-данные",
+    ]:
+        assert fragment in text, fragment

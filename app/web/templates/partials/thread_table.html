@@ -21,6 +21,9 @@
       <tr>
         <td class="nowrap">
           <a href="/threads/{{ t.id }}"><span class="status {{ t.current_status|status_color }}">{{ t.current_status|status_ru }}</span></a>
+          {% if demo_account_id and t.account_id == demo_account_id %}
+            <div><span class="chip demo">демо</span></div>
+          {% endif %}
           {% if t.manual_override %}<div class="small muted">исправлено вручную</div>{% endif %}
           {% if t.sla_exceeded %}<div class="small" style="color:var(--red)">срок нарушен</div>{% endif %}
         </td>

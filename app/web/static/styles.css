@@ -245,6 +245,17 @@ label { font-size: 12.5px; color: #45506a; }
 .alert.warn { background: var(--yellow-bg); border-color: #f0e0a8; color: #7a6208; }
 .alert.error { background: var(--red-bg); border-color: #f3c2c2; color: var(--red); }
 .alert.info { background: #eef4fc; border-color: #cadcf3; color: #1f3a5f; }
+.alert.demo-banner {
+  background: repeating-linear-gradient(45deg, #fdf6e3, #fdf6e3 12px, #fbf0d6 12px, #fbf0d6 24px);
+  border-color: #e0c877;
+  color: #6b5310;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.chip.demo { background: #fdf6e3; border-color: #e0c877; color: #6b5310; font-weight: 600; }
 
 /* ---------- Карточка обращения ---------- */
 .thread-head { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
