@@ -25,7 +25,7 @@
   <header>Обращение</header>
   <div class="body">
     <div class="thread-head">
-      <div class="item"><div class="k">Клиент</div><div class="v">{{ thread.client_name or '—' }}</div></div>
+      <div class="item"><div class="k">Клиент</div><div class="v">{{ thread.client_name or thread.client_email or '—' }}</div></div>
       <div class="item"><div class="k">Email</div><div class="v">{{ thread.client_email or '—' }}</div></div>
       <div class="item"><div class="k">Компания</div><div class="v">{{ thread.company_name or '—' }}</div></div>
       <div class="item"><div class="k">Ответственный</div><div class="v">{{ thread.assigned_manager or 'не определён' }}</div></div>

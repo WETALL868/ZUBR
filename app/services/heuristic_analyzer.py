@@ -447,14 +447,18 @@ def analyze(context: ThreadContext, sla_exceeded: bool = False) -> ThreadAnalysi
     if sla_exceeded and status in {ThreadStatus.INCOMPLETE, ThreadStatus.NEEDS_REVIEW}:
         reason += " Превышен допустимый срок ответа."
 
-    summary_parts = []
+    sentences: list[str] = []
     if incoming:
-        summary_parts.append(f"Обращение от {context.client_name or context.client_email or 'клиента'}")
+        who = context.client_name or context.client_email or "клиента"
+        sentences.append(f"Обращение от {who}")
     if items:
-        summary_parts.append("запросы: " + ", ".join(_ru_type(i.type) for i in items))
-    if fulfilled_items:
-        summary_parts.append(f"выполнено {len(fulfilled_items)} из {len(items)}")
-    summary = ". ".join(summary_parts) or (context.subject or "Переписка без распознанных запросов")
+        sentences.append("Запросы: " + ", ".join(_ru_type(i.type).lower() for i in items))
+        sentences.append(f"Выполнено {len(fulfilled_items)} из {len(items)}")
+    summary = (
+        ". ".join(sentences) + "."
+        if sentences
+        else (context.subject or "Переписка без распознанных запросов")
+    )
 
     return ThreadAnalysis(
         thread_summary=summary[:500],
