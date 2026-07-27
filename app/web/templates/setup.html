@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Подключение вашей почты</h1>
+    <div class="sub">Три поля — и программа начнёт показывать реальные письма вместо демонстрационных</div>
+  </div>
+</div>
+
+<div class="setup-steps">
+  <div class="setup-step {{ 'done' if state.email_set and state.password_set else 'current' }}">
+    <div class="num">1</div>
+    <div>
+      <div class="t">Подключить почту</div>
+      <div class="d">{{ 'Готово: ' + state.email if state.email_set and state.password_set else 'Заполните форму ниже' }}</div>
+    </div>
+  </div>
+  <div class="setup-step {{ 'done' if state.domains_set else ('current' if state.email_set else '') }}">
+    <div class="num">2</div>
+    <div>
+      <div class="t">Указать домен компании</div>
+      <div class="d">{{ state.domains|join(', ') if state.domains_set else 'Нужно, чтобы отличать клиентов от сотрудников' }}</div>
+    </div>
+  </div>
+  <div class="setup-step {{ 'done' if state.has_real_data else ('current' if state.password_set and state.domains_set else '') }}">
+    <div class="num">3</div>
+    <div>
+      <div class="t">Загрузить письма</div>
+      <div class="d">{{ 'Загружено обращений: ' ~ real_threads if state.has_real_data else 'Кнопка появится после шагов 1 и 2' }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel">
+  <header>Шаг 1 и 2. Данные для подключения</header>
+  <div class="body">
+    <div class="alert info">
+      <strong>Сначала получите пароль приложения Яндекса</strong> — обычный пароль от почты не подойдёт.
+      <ol style="margin:8px 0 0 18px;padding:0">
+        <li>Откройте <span class="mono">id.yandex.ru</span> → <strong>Безопасность</strong> → <strong>Пароли приложений</strong>.</li>
+        <li>Выберите тип <strong>«Почта»</strong>, придумайте название, нажмите «Создать».</li>
+        <li>Скопируйте пароль из 16 символов и вставьте его в поле ниже.</li>
+      </ol>
+      Ещё нужно один раз включить IMAP: в Яндекс.Почте
+      <strong>Настройки → Почтовые программы → разрешить доступ по IMAP</strong>.
+    </div>
+
+    <form method="post" action="/actions/setup">
+      <div class="field-row">
+        <div class="field" style="flex:1;min-width:280px">
+          <label>Адрес вашей корпоративной почты</label>
+          <input type="text" name="email" value="{{ state.email if state.email_set else '' }}"
+                 placeholder="sales@вашакомпания.ru" required>
+          <div class="hint">Тот ящик, куда пишут клиенты</div>
+        </div>
+        <div class="field" style="flex:1;min-width:280px">
+          <label>Пароль приложения Яндекса</label>
+          <input type="password" name="password" autocomplete="new-password"
+                 placeholder="{{ 'пароль уже сохранён — оставьте пустым' if state.password_set else '16 символов' }}">
+          <div class="hint">Сохраняется только в файле .env на вашем компьютере</div>
+        </div>
+      </div>
+
+      <div class="field-row" style="margin-top:12px">
+        <div class="field" style="flex:1;min-width:280px">
+          <label>Домен вашей компании</label>
+          <input type="text" name="domains" value="{{ state.domains|join(', ') }}"
+                 placeholder="вашакомпания.ru" required>
+          <div class="hint">
+            Часть адреса после «собаки». Письма с этого домена программа считает
+            письмами сотрудников, все остальные — клиентскими.
+            Несколько доменов пишите через запятую.
+          </div>
+        </div>
+        <div class="field" style="flex:1;min-width:280px">
+          <label>Ключ OpenAI (необязательно)</label>
+          <input type="password" name="openai_key" autocomplete="new-password"
+                 placeholder="{{ 'ключ уже сохранён' if state.openai_set else 'можно оставить пустым' }}">
+          <div class="hint">Без ключа программа работает на встроенных правилах — бесплатно</div>
+        </div>
+      </div>
+
+      <div class="toolbar" style="margin-top:16px">
+        <button class="btn primary" type="submit">Сохранить и проверить подключение</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if state.password_set and state.domains_set %}
+<div class="panel accent-orange">
+  <header>Шаг 3. Загрузить письма из почты</header>
+  <div class="body">
+    <p>
+      Программа прочитает письма за выбранный период и разберёт их.
+      Ничего в вашей почте не изменится: письма не будут отмечены прочитанными,
+      не будут перемещены или удалены.
+    </p>
+    <form method="post" action="/actions/sync" class="field-row">
+      <div class="field">
+        <label>За сколько последних дней загрузить</label>
+        <select name="days">
+          <option value="3">3 дня</option>
+          <option value="7" selected>7 дней</option>
+          <option value="14">14 дней</option>
+          <option value="30">30 дней</option>
+        </select>
+      </div>
+      <input type="hidden" name="run_analysis" value="1">
+      <button class="btn primary" type="submit">Загрузить письма и проанализировать</button>
+    </form>
+    <div class="hint" style="margin-top:8px">
+      Первая загрузка занимает от одной до нескольких минут — зависит от количества писем.
+      Страница обновится сама.
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if demo_threads %}
+<div class="panel">
+  <header>Шаг 4. Убрать демонстрационные письма</header>
+  <div class="body">
+    <p>
+      Сейчас в программе показаны {{ demo_threads }} тестовых обращений. Они помечены
+      ярлыком <span class="chip demo">демо</span>. Когда разберётесь с настоящей почтой,
+      их можно удалить — реальные письма не пострадают.
+    </p>
+    <form method="post" action="/actions/demo/clear"
+          data-confirm="Удалить демонстрационные данные? Реальная почта не пострадает.">
+      <button class="btn" type="submit">Удалить демонстрационные данные</button>
+    </form>
+  </div>
+</div>
+{% endif %}
+
+{% if state.has_real_data %}
+<div class="panel accent-red">
+  <header>Готово — куда смотреть дальше</header>
+  <div class="body">
+    <p>Реальные письма загружены. Обращений из вашей почты: <strong>{{ real_threads }}</strong>.</p>
+    <ul>
+      <li><a href="/">Главная панель</a> — что требует действий прямо сейчас.</li>
+      <li><a href="/threads">Обращения</a> — полный список с фильтрами.</li>
+      <li><a href="/report">Ежедневный отчёт</a> — итог за день, выгрузка в Excel.</li>
+    </ul>
+  </div>
+</div>
+{% endif %}
+
+<div class="panel">
+  <header>Если что-то не получилось</header>
+  <div class="body">
+    <table class="data">
+      <thead><tr><th>Сообщение</th><th>Что делать</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>«Не удалось войти в почтовый ящик»</td>
+          <td>Введён обычный пароль вместо пароля приложения, либо не включён IMAP
+              в настройках Яндекс.Почты, либо адрес указан без домена.</td>
+        </tr>
+        <tr>
+          <td>«Не удалось подключиться»</td>
+          <td>Нет интернета либо порт 993 закрыт антивирусом или брандмауэром.</td>
+        </tr>
+        <tr>
+          <td>Загрузилось, но все письма «входящие», менеджеров нет</td>
+          <td>Неверно указан домен компании. Исправьте в поле выше и нажмите
+              «Запустить анализ» на главной панели.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="margin-top:12px">
+      Подробное описание всех возможностей — в разделе <a href="/guide">Инструкция</a>.
+    </p>
+  </div>
+</div>
+{% endblock %}

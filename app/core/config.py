@@ -125,12 +125,16 @@ class Settings(BaseSettings):
         problems: list[str] = []
         if not self.demo_mode:
             if not self.yandex_email:
-                problems.append("Не задан YANDEX_EMAIL в .env — синхронизация почты недоступна.")
+                problems.append(
+                    "Почта не подключена. Откройте раздел «Подключение почты» "
+                    "и укажите адрес и пароль приложения."
+                )
             elif "@" not in self.yandex_email:
                 problems.append(f"YANDEX_EMAIL выглядит некорректно: {self.yandex_email}")
             if not self.yandex_app_password:
                 problems.append(
-                    "Не задан YANDEX_APP_PASSWORD в .env — нужен пароль приложения Яндекса."
+                    "Не указан пароль приложения Яндекса — задайте его в разделе "
+                    "«Подключение почты»."
                 )
             elif len(self.yandex_app_password) < 8:
                 problems.append(
@@ -138,13 +142,13 @@ class Settings(BaseSettings):
                 )
         if self.ai_enabled and not self.ai_test_mode and not self.openai_api_key:
             problems.append(
-                "AI_ENABLED=true, но OPENAI_API_KEY не задан — "
-                "смысловой анализ будет выполняться только правилами."
+                "Ключ OpenAI не указан — анализ выполняется встроенными правилами. "
+                "Это бесплатно; ключ можно добавить в разделе «Подключение почты»."
             )
         if not self.corporate_domain_list and not self.corporate_email_list:
             problems.append(
-                "Не заданы корпоративные домены/адреса — определение «клиент/менеджер» "
-                "может быть неточным. Задайте их в разделе «Настройки»."
+                "Не указан домен вашей компании — программа не сможет отличить письма "
+                "сотрудников от клиентских. Задайте его в разделе «Подключение почты»."
             )
         return problems
 

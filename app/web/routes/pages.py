@@ -77,7 +77,11 @@ def demo_state(db: Session) -> dict:
 
 
 def _base_context(request: Request, db: Session) -> dict:
-    from app.main import STARTUP_WARNINGS
+    # Предупреждения пересчитываются на каждый запрос: после настройки
+    # через мастер они должны исчезать без перезапуска программы.
+    warnings = settings.validate_startup()
+    if not (get_all_settings(db).get("corporate.domains") or []):
+        pass  # текст уже есть в validate_startup
 
     context = {
         "request": request,
@@ -86,7 +90,7 @@ def _base_context(request: Request, db: Session) -> dict:
         "ai_enabled": bool(get_all_settings(db).get("ai.enabled")),
         "openai_configured": settings.openai_configured(),
         "imap_configured": settings.imap_configured(),
-        "warnings": STARTUP_WARNINGS,
+        "warnings": warnings,
         "jobs": jobs.snapshot(),
         "today": _today(db),
     }
@@ -418,6 +422,32 @@ def demo_page(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
         }
     )
     return templates.TemplateResponse(request, "demo.html", context)
+
+
+@router.get("/setup", response_class=HTMLResponse)
+def setup_page(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
+    """Мастер первоначальной настройки: подключение почты без правки файлов."""
+    from app.services.demo_data import DEMO_DOMAIN
+
+    data = get_all_settings(db)
+    # Домен демо-ящика не является настройкой пользователя и в мастере не показывается
+    domains = [d for d in (data.get("corporate.domains") or []) if d and d != DEMO_DOMAIN]
+    context = _base_context(request, db)
+    context.update(
+        {
+            "title": "Подключение почты",
+            "state": {
+                "email": settings.yandex_email,
+                "email_set": bool(settings.yandex_email),
+                "password_set": bool(settings.yandex_app_password),
+                "openai_set": bool(settings.openai_api_key),
+                "domains": domains,
+                "domains_set": bool(domains),
+                "has_real_data": context["real_threads"] > 0,
+            },
+        }
+    )
+    return templates.TemplateResponse(request, "setup.html", context)
 
 
 @router.get("/guide", response_class=HTMLResponse)

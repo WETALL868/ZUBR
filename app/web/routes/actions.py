@@ -85,6 +85,59 @@ def start_sync(
     return _flash("/settings", "Синхронизация запущена. Обновите страницу через минуту.", "ok")
 
 
+@router.post("/actions/setup")
+def save_setup(
+    email: str = Form(...),
+    password: str = Form(""),
+    domains: str = Form(""),
+    openai_key: str = Form(""),
+    db: Session = Depends(get_db),
+) -> RedirectResponse:
+    """Мастер настройки: сохраняет подключение и сразу его проверяет."""
+    from app.services.env_writer import save_connection_settings
+
+    email = email.strip()
+    if "@" not in email:
+        return _flash("/setup", "Адрес почты указан неверно — нужен полный адрес с доменом.", "error")
+
+    if not password.strip() and not settings.yandex_app_password:
+        return _flash(
+            "/setup",
+            "Укажите пароль приложения Яндекса — без него программа не сможет прочитать почту.",
+            "error",
+        )
+
+    domain_list = [
+        d.strip().lower().lstrip("@")
+        for d in domains.replace("\n", ",").split(",")
+        if d.strip()
+    ]
+    if not domain_list:
+        return _flash("/setup", "Укажите домен вашей компании, например mycompany.ru", "error")
+
+    save_connection_settings(
+        email=email,
+        password=password.strip() or None,
+        corporate_domains=", ".join(domain_list),
+        openai_key=openai_key.strip() or None,
+    )
+    update_settings(db, {"corporate.domains": domain_list})
+
+    ok, message = test_connection(
+        settings.yandex_imap_host,
+        settings.yandex_imap_port,
+        settings.yandex_email,
+        settings.yandex_app_password,
+    )
+    if ok:
+        return _flash(
+            "/setup",
+            "Настройки сохранены, подключение работает. Теперь нажмите «Загрузить письма».",
+            "ok",
+        )
+    return _flash("/setup", f"Настройки сохранены, но подключиться не удалось. {message}", "error")
+
+
 @router.post("/actions/test-connection")
 def check_connection() -> RedirectResponse:
     ok, message = test_connection(

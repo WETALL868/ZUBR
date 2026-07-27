@@ -17,6 +17,7 @@
     </div>
     <nav>
       {% set path = request.url.path %}
+      <a href="/setup" class="{{ 'active' if path == '/setup' }}">Подключение почты</a>
       <a href="/" class="{{ 'active' if path == '/' }}">Главная панель</a>
       <a href="/threads" class="{{ 'active' if path.startswith('/threads') }}">Обращения</a>
       <a href="/report" class="{{ 'active' if path == '/report' }}">Ежедневный отчёт</a>

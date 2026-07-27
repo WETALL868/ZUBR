@@ -187,7 +187,7 @@ def client(loaded, monkeypatch):
 @pytest.mark.parametrize(
     "url",
     ["/", "/threads", "/report", "/managers", "/settings", "/demo", "/guide",
-     "/limitations", "/health"],
+     "/setup", "/limitations", "/health"],
 )
 def test_pages_render(client, url):
     response = client.get(url)
@@ -306,3 +306,70 @@ def test_guide_page_covers_real_mail_setup(client):
         "Удалить демо-данные",
     ]:
         assert fragment in text, fragment
+
+
+# ------------------------------------------------------------------
+# Мастер подключения почты
+# ------------------------------------------------------------------
+
+def test_setup_page_renders(client):
+    text = client.get("/setup").text
+    assert "Подключение вашей почты" in text
+    assert "Пароли приложений" in text
+    assert "Домен вашей компании" in text
+
+
+def test_setup_rejects_bad_email(client):
+    response = client.post(
+        "/actions/setup",
+        data={"email": "не-адрес", "password": "x" * 16, "domains": "company.ru"},
+        follow_redirects=False,
+    )
+    assert response.status_code == 303
+    from urllib.parse import unquote
+
+    assert "kind=error" in response.headers["location"]
+    assert "неверно" in unquote(response.headers["location"])
+
+
+def test_setup_requires_domain(client):
+    response = client.post(
+        "/actions/setup",
+        data={"email": "sales@company.ru", "password": "x" * 16, "domains": ""},
+        follow_redirects=False,
+    )
+    assert response.status_code == 303
+    assert "kind=error" in response.headers["location"]
+
+
+def test_setup_saves_settings_without_touching_db_password(client, loaded, tmp_path, monkeypatch):
+    """Пароль уходит в .env, а домен — в настройки. В базе пароля быть не должно."""
+    import app.services.env_writer as env_writer
+    from app.models import AppSetting
+
+    env_file = tmp_path / ".env"
+    env_file.write_text("YANDEX_EMAIL=\nYANDEX_APP_PASSWORD=\n", encoding="utf-8")
+    monkeypatch.setattr(env_writer, "ENV_PATH", env_file)
+
+    client.post(
+        "/actions/setup",
+        data={
+            "email": "sales@mycompany.ru",
+            "password": "abcdefghijklmnop",
+            "domains": "mycompany.ru, mycompany.com",
+        },
+        follow_redirects=False,
+    )
+
+    saved = env_file.read_text(encoding="utf-8")
+    assert "YANDEX_EMAIL=sales@mycompany.ru" in saved
+    assert "abcdefghijklmnop" in saved
+
+    rows = loaded.scalars(select(AppSetting)).all()
+    assert all("abcdefghijklmnop" not in (r.value or "") for r in rows), (
+        "Пароль не должен попадать в базу данных"
+    )
+
+    from app.services.settings_service import get_all_settings
+
+    assert "mycompany.ru" in get_all_settings(loaded)["corporate.domains"]
