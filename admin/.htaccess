@@ -1,0 +1,23 @@
+# Панель управления не должна попадать в поисковую выдачу.
+<IfModule mod_headers.c>
+  Header always set X-Robots-Tag "noindex, nofollow, noarchive"
+  Header always set Cache-Control "no-store, no-cache, must-revalidate"
+  Header always set X-Frame-Options "DENY"
+</IfModule>
+
+# Внутренности панели подключаются из index.php и по прямому адресу не
+# открываются: иначе экран, рассчитанный на уже проверенный вход, можно было
+# бы запросить напрямую.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^(bootstrap\.php|layout/|screens/) - [F,L]
+</IfModule>
+
+<FilesMatch "^bootstrap\.php$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Deny from all
+  </IfModule>
+</FilesMatch>

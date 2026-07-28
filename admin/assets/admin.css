@@ -1,0 +1,306 @@
+/*
+ * Стили панели управления.
+ *
+ * Панель намеренно светлая и простая: это рабочий инструмент, им пользуются
+ * подолгу и часто с ноутбука. Тёмное оформление сайта здесь не повторяется,
+ * чтобы владелец всегда видел, где он находится — на витрине или в панели.
+ */
+
+:root {
+  --ink: #16201c;
+  --muted: #5d6b64;
+  --line: #dde4e0;
+  --bg: #f4f6f5;
+  --panel: #ffffff;
+  --accent: #0f7a68;
+  --accent-soft: #e4f4f0;
+  --warn: #8a5a00;
+  --warn-soft: #fdf1dc;
+  --bad: #a32020;
+  --bad-soft: #fbe9e9;
+  --radius: 10px;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+a { color: var(--accent); }
+
+/* --------------------------------------------------------------- шапка */
+
+.adm-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.adm-brand {
+  font-weight: 800;
+  font-size: 17px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.adm-top-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.adm-who { color: var(--muted); font-size: 14px; }
+.adm-link { font-size: 14px; }
+.adm-inline { margin: 0; }
+
+/* --------------------------------------------------------------- каркас */
+
+.adm-shell {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+  padding: 20px;
+  max-width: 1360px;
+  margin: 0 auto;
+}
+
+.adm-side {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 8px;
+  position: sticky;
+  top: 76px;
+}
+
+.adm-nav {
+  display: block;
+  padding: 9px 12px;
+  border-radius: 8px;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.adm-nav:hover { background: var(--bg); }
+.adm-nav.active { background: var(--accent-soft); color: var(--accent); font-weight: 650; }
+
+.adm-main { min-width: 0; }
+
+/* ------------------------------------------------------------ сообщения */
+
+.adm-flash {
+  margin: 0 0 14px;
+  padding: 11px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--accent-soft);
+  color: #0b5749;
+}
+
+.adm-flash.warn { background: var(--warn-soft); color: var(--warn); }
+.adm-flash.bad { background: var(--bad-soft); color: var(--bad); }
+
+/* --------------------------------------------------------------- блоки */
+
+.adm-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.adm-head h1 { margin: 0; font-size: 22px; }
+.adm-head p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+
+.adm-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.adm-card > h2 { margin: 0 0 12px; font-size: 16px; }
+.adm-card > p.hint { margin: -6px 0 12px; color: var(--muted); font-size: 13px; }
+
+.adm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.adm-tile {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+
+.adm-tile b { display: block; font-size: 26px; line-height: 1.2; }
+.adm-tile span { color: var(--muted); font-size: 13px; }
+
+/* -------------------------------------------------------------- таблицы */
+
+.adm-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  font-size: 14px;
+}
+
+.adm-table th,
+.adm-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.adm-table th { background: #fafbfa; font-weight: 650; font-size: 13px; color: var(--muted); }
+.adm-table tr:last-child td { border-bottom: 0; }
+.adm-table td.num, .adm-table th.num { text-align: right; white-space: nowrap; }
+.adm-table img.thumb { width: 40px; height: 53px; object-fit: contain; background: var(--bg); border-radius: 4px; display: block; }
+
+.adm-scroll { overflow-x: auto; }
+
+/* --------------------------------------------------------------- формы */
+
+.adm-field { margin-bottom: 14px; }
+.adm-field > label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+.adm-field .note { font-size: 12px; color: var(--muted); margin: 4px 0 0; }
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="url"],
+input[type="file"],
+select,
+textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font: inherit;
+  color: inherit;
+  background: #fff;
+}
+
+textarea { min-height: 90px; resize: vertical; }
+textarea.tall { min-height: 260px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
+
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  border-color: var(--accent);
+}
+
+.adm-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0 16px;
+}
+
+.adm-check { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 14px; }
+.adm-check input { width: auto; }
+
+/* --------------------------------------------------------------- кнопки */
+
+.adm-btn {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.adm-btn:hover { filter: brightness(1.06); }
+.adm-btn.ghost { background: transparent; color: var(--accent); }
+.adm-btn.grey { background: transparent; color: var(--ink); border-color: var(--line); }
+.adm-btn.danger { background: var(--bad); border-color: var(--bad); }
+.adm-btn.small { padding: 5px 10px; font-size: 13px; }
+
+.adm-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+
+/* --------------------------------------------------------------- метки */
+
+.adm-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: var(--bg);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.adm-tag.ok { background: var(--accent-soft); color: #0b5749; }
+.adm-tag.warn { background: var(--warn-soft); color: var(--warn); }
+.adm-tag.bad { background: var(--bad-soft); color: var(--bad); }
+
+/* --------------------------------------------------------------- вкладки */
+
+.adm-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 14px; }
+
+.adm-tab {
+  padding: 7px 13px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.adm-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+
+/* ---------------------------------------------------------------- вход */
+
+.adm-login {
+  max-width: 380px;
+  margin: 8vh auto;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 26px;
+}
+
+.adm-login h1 { margin: 0 0 4px; font-size: 20px; }
+.adm-login p.lead { margin: 0 0 18px; color: var(--muted); font-size: 14px; }
+
+/* -------------------------------------------------------------- мобильно */
+
+@media (max-width: 860px) {
+  .adm-shell { grid-template-columns: 1fr; padding: 14px; }
+  .adm-side { position: static; flex-direction: row; overflow-x: auto; }
+  .adm-nav { white-space: nowrap; }
+}
