@@ -1,0 +1,3 @@
+# Боевая конфигурация и база — не в Git и не в архивы
+config/database.php
+storage/
