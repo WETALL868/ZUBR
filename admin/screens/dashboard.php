@@ -15,6 +15,10 @@ $noPrice    = array_filter($published, static fn($p) => repo_price($p) === null)
 $noPhoto    = array_filter($published, static fn($p) => repo_image_is_placeholder($p));
 $outOfStock = array_filter($published, static fn($p) => $p['availability'] === 'out_of_stock');
 
+$newOrders = (int)cms_value("SELECT COUNT(*) FROM orders WHERE status = 'new'");
+$todayOrders = (int)cms_value('SELECT COUNT(*) FROM orders WHERE created_at >= ?', [date('Y-m-d') . ' 00:00:00']);
+$failedMail = (int)cms_value("SELECT COUNT(*) FROM orders WHERE mail_status LIKE '%failed%'");
+
 $recent = cms_all('SELECT * FROM audit_log ORDER BY created_at DESC, id DESC LIMIT 8');
 
 require __DIR__ . '/../layout/header.php';
@@ -25,12 +29,17 @@ require __DIR__ . '/../layout/header.php';
             <p>Каталог, цены и фотографии — коротко.</p>
           </div>
           <div class="adm-actions">
-            <a class="adm-btn" href="<?= e(admin_url('product', ['id' => 'new'])) ?>">Добавить товар</a>
+            <a class="adm-btn" href="<?= e(admin_url('orders')) ?>">Заказы</a>
             <a class="adm-btn ghost" href="<?= e(admin_url('prices')) ?>">Изменить цены</a>
+            <a class="adm-btn ghost" href="<?= e(admin_url('product', ['id' => 'new'])) ?>">Добавить товар</a>
           </div>
         </div>
 
         <div class="adm-grid">
+          <div class="adm-tile">
+            <b><?= $newOrders ?></b>
+            <span>новых заказов<?= $todayOrders > 0 ? ', сегодня ' . $todayOrders : '' ?></span>
+          </div>
           <div class="adm-tile">
             <b><?= count($published) ?></b>
             <span>товаров опубликовано<?= count($products) > count($published)
@@ -49,6 +58,14 @@ require __DIR__ . '/../layout/header.php';
             <span>без фотографии — не попадают в фид</span>
           </div>
         </div>
+
+        <?php if ($failedMail > 0): ?>
+        <p class="adm-flash bad">
+          Заказов, о которых не удалось отправить письмо: <?= $failedMail ?>.
+          Сами заказы сохранены — откройте <a href="<?= e(admin_url('orders')) ?>">список заказов</a>,
+          а причину смотрите в настройках почты <code>api/mail-config.php</code>.
+        </p>
+        <?php endif; ?>
 
         <?php if ($noPrice || $noPhoto || $outOfStock): ?>
         <div class="adm-card">

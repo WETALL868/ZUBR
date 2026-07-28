@@ -53,6 +53,7 @@ admin_check_csrf();
 
 $screens = [
     'dashboard'  => ['file' => 'dashboard.php',  'title' => 'Обзор'],
+    'orders'     => ['file' => 'orders.php',     'title' => 'Заказы'],
     'products'   => ['file' => 'products.php',   'title' => 'Товары'],
     'product'    => ['file' => 'product.php',    'title' => 'Карточка товара'],
     'prices'     => ['file' => 'prices.php',     'title' => 'Цены и наличие'],

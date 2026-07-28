@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/src/prices.php';
+// Каталог, цены, доставка и хранение заказов — из базы CMS. Файл цен
+// data/prices.json больше не читается: он был единственным источником до
+// перехода на базу, и держать два источника значит однажды их рассогласовать.
+require_once dirname(__DIR__) . '/cms/orders.php';
 
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
@@ -56,19 +59,19 @@ function money_value($value): float
 /** Один и тот же формат цены, что и на сайте: «15 500 ₽», «15 500,50 ₽». */
 function format_money_value(float $value): string
 {
-    return prices_format($value);
+    return cms_money($value);
 }
 
 /**
- * Цена, которой можно доверять: клиент присылает свою, но заказ считается по
- * /data/prices.json. Так цена в письме не может разойтись с ценой на сайте,
- * даже если у покупателя открыта старая вкладка или подменён localStorage.
+ * Состав корзины, пересчитанный по базе.
+ *
+ * Из присланного берутся только адрес товара и количество. Название, цена и
+ * сумма строки приходят из каталога: подделать их из браузера невозможно.
+ * Строка, которую нельзя купить (товар снят, нет цены, нет в наличии), в
+ * заказ не попадает, а причина возвращается покупателю.
+ *
+ * @return array{0:array,1:string[]} позиции и замечания
  */
-function authoritative_price(string $id, float $client_price): float
-{
-    return prices_value($id) ?? $client_price;
-}
-
 function normalize_cart_items($value): array
 {
     if (is_string($value)) {
@@ -77,34 +80,12 @@ function normalize_cart_items($value): array
     }
 
     if (!is_array($value)) {
-        return [];
+        return [[], []];
     }
 
-    $items = [];
-    foreach ($value as $item) {
-        if (!is_array($item)) {
-            continue;
-        }
+    $priced = orders_price_cart($value);
 
-        $title = clean_value($item['title'] ?? '');
-        $id = preg_replace('/[^a-zA-Z0-9_-]/', '', clean_value($item['id'] ?? ''));
-        $qty = max(1, min(999, (int)($item['qty'] ?? 1)));
-        $price = authoritative_price($id, money_value($item['price'] ?? 0));
-
-        if ($title === '' || $id === '' || $price <= 0) {
-            continue;
-        }
-
-        $items[] = [
-            'id' => $id,
-            'title' => $title,
-            'qty' => $qty,
-            'price' => $price,
-            'total' => round($price * $qty, 2),
-        ];
-    }
-
-    return $items;
+    return [$priced['items'], $priced['problems']];
 }
 
 function cart_summary_text(array $items): string
@@ -192,8 +173,7 @@ function rate_limit_reason(array $config): string
 
 function normalize_order(array $raw): array
 {
-    $cart_items = normalize_cart_items($raw['cart_items'] ?? []);
-    $delivery_price_raw = clean_value($raw['delivery_price'] ?? '');
+    [$cart_items, $cart_problems] = normalize_cart_items($raw['cart_items'] ?? []);
     $order_total_raw = clean_value($raw['order_total'] ?? '');
     $order = [
         'id' => create_order_id(),
@@ -215,21 +195,29 @@ function normalize_order(array $raw): array
             ? round(array_sum(array_column($cart_items, 'total')), 2)
             : money_value($raw['cart_total'] ?? 0),
         'delivery_method' => clean_value($raw['delivery_method'] ?? ''),
-        'delivery_price' => $delivery_price_raw === '' ? null : money_value($delivery_price_raw),
+        'delivery_code' => null,
+        'delivery_price' => null,
         'delivery_city' => clean_value($raw['delivery_city'] ?? ''),
         'delivery_address' => clean_value($raw['delivery_address'] ?? ''),
         'delivery_comment' => clean_value($raw['delivery_comment'] ?? ''),
         'order_total' => $order_total_raw === '' ? null : money_value($order_total_raw),
     ];
 
-    // Итог по заказу считается здесь же: товары по проверенным ценам + доставка.
+    // Доставка тоже берётся из базы, а не из формы: способ определяется по
+    // названию, а цену, скидку «бесплатно от суммы» и «по тарифам службы»
+    // решает магазин.
     if ($order['cart_items']) {
+        $delivery = orders_delivery($order['delivery_method'], $order['cart_total']);
+        $order['delivery_method'] = $delivery['title'];
+        $order['delivery_code'] = $delivery['method']['code'] ?? null;
+        $order['delivery_price'] = $delivery['price'];
+
         $order['order_total'] = $order['delivery_price'] === null
             ? null
             : round($order['cart_total'] + $order['delivery_price'], 2);
     }
 
-    $errors = [];
+    $errors = $cart_problems;
     if ($order['name'] === '') {
         $errors[] = 'Укажите имя.';
     }
@@ -357,11 +345,6 @@ function save_order_to_error_log(array $order, string $status, string $smtp_erro
         'order' => $order,
     ];
     error_log('XEON_ORDER ' . json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
-}
-
-function e(string $value): string
-{
-    return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
 function build_html(array $order, string $intro): string
@@ -749,6 +732,32 @@ if ($errors) {
     json_response(['ok' => false, 'message' => implode(' ', $errors)], 400);
 }
 
+/*
+ * Заказ записывается в базу ДО отправки писем.
+ *
+ * Порядок именно такой: почтовый сервер может не ответить, а заказ терять
+ * нельзя. Раньше единственным следом был файл orders-YYYY-MM.jsonl, который
+ * никто не открывал, — теперь заказ виден в панели сразу.
+ */
+$db_order_id = orders_store([
+    'number'         => $order['id'],
+    'name'           => $order['name'],
+    'phone'          => $order['phone'],
+    'email'          => $order['email'],
+    'company'        => $order['company'],
+    'city'           => $order['delivery_city'],
+    'address'        => trim($order['delivery_address'] . "\n" . $order['delivery_comment']),
+    'delivery_code'  => $order['delivery_code'],
+    'delivery_title' => $order['delivery_method'],
+    'delivery_price' => $order['delivery_price'],
+    'payment'        => $order['payment'],
+    'goal'           => $order['goal'],
+    'comment'        => $order['message'],
+    'items_total'    => $order['cart_total'],
+    'total'          => $order['order_total'] ?? $order['cart_total'],
+    'source'         => $order['cart_items'] ? 'cart' : 'form',
+], $order['cart_items']);
+
 $to_email = clean_value($config['mail_to'] ?? '');
 $to_name = clean_value($config['mail_to_name'] ?? '');
 if (!filter_var($to_email, FILTER_VALIDATE_EMAIL)) {
@@ -781,7 +790,9 @@ try {
     );
 
     $telegram_error = telegram_notify_safely($config, $order, $site_name);
-    save_order_to_file($order, $config, $telegram_error === '' ? 'mail_sent' : 'mail_sent_telegram_failed', $telegram_error);
+    $mail_status = $telegram_error === '' ? 'mail_sent' : 'mail_sent_telegram_failed';
+    orders_set_mail_status($db_order_id, $mail_status);
+    save_order_to_file($order, $config, $mail_status, $telegram_error);
 } catch (Throwable $error) {
     $smtp_error = $error->getMessage();
     $fallback_error = '';
@@ -805,7 +816,9 @@ try {
                 $client_text
             );
             $telegram_error = telegram_notify_safely($config, $order, $site_name);
-            save_order_to_file($order, $config, $telegram_error === '' ? 'mail_sent_via_php_mail' : 'mail_sent_via_php_mail_telegram_failed', trim($smtp_error . ' ' . $telegram_error));
+            $mail_status = $telegram_error === '' ? 'mail_sent_via_php_mail' : 'mail_sent_via_php_mail_telegram_failed';
+            orders_set_mail_status($db_order_id, $mail_status);
+            save_order_to_file($order, $config, $mail_status, trim($smtp_error . ' ' . $telegram_error));
             json_response(['ok' => true, 'orderId' => $order['id'], 'mailStatus' => 'php_mail_fallback']);
         } catch (Throwable $fallback) {
             $fallback_error = $fallback->getMessage();
@@ -813,7 +826,9 @@ try {
     }
 
     $telegram_error = telegram_notify_safely($config, $order, $site_name);
-    $saved = save_order_to_file($order, $config, $telegram_error === '' ? 'smtp_failed' : 'smtp_failed_telegram_failed', trim($smtp_error . ' ' . $fallback_error . ' ' . $telegram_error));
+    $mail_status = $telegram_error === '' ? 'smtp_failed' : 'smtp_failed_telegram_failed';
+    orders_set_mail_status($db_order_id, $mail_status);
+    $saved = save_order_to_file($order, $config, $mail_status, trim($smtp_error . ' ' . $fallback_error . ' ' . $telegram_error));
     if (!$saved) {
         save_order_to_error_log($order, 'smtp_failed_not_saved', trim($smtp_error . ' ' . $fallback_error));
     }

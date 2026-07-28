@@ -5,6 +5,7 @@
 $adminUser = admin_user();
 $menu = [
     'dashboard'  => 'Обзор',
+    'orders'     => 'Заказы',
     'products'   => 'Товары',
     'prices'     => 'Цены и наличие',
     'categories' => 'Категории',
