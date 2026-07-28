@@ -1,4 +1,4 @@
-<?php require_once __DIR__ . '/../../src/prices.php'; ?><!doctype html>
+<?php require_once __DIR__ . '/../../src/prices.php'; require_once __DIR__ . '/../../src/images.php'; ?><!doctype html>
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
@@ -11,17 +11,17 @@
     <meta property="og:type" content="product" />
     <meta property="og:url" content="https://comp-uter.ru/products/e5-2690-v4/" />
     <meta property="og:site_name" content="Comp-Uter" />
-    <meta property="og:image" content="https://comp-uter.ru/public/assets/cpu-e5-2690-v4.webp" />
+    <meta property="og:image" content="<?= product_image_absolute('e5-2690-v4') ?>" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Процессор Intel Xeon E5-2690 V4 LGA 2011-3 OEM" />
     <meta name="twitter:description" content="Универсальный процессор для рабочей станции: монтаж, разработка, 3D-пакеты, виртуализация и повседневные профессиональные нагрузки." />
-    <meta name="twitter:image" content="https://comp-uter.ru/public/assets/cpu-e5-2690-v4.webp" />
+    <meta name="twitter:image" content="<?= product_image_absolute('e5-2690-v4') ?>" />
     <link rel="canonical" href="https://comp-uter.ru/products/e5-2690-v4/" />
     <link rel="preconnect" href="https://mc.yandex.ru" />
     <link rel="stylesheet" href="/src/styles.css?v=2" />
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <title>Процессор Intel Xeon E5-2690 V4 купить | Comp-Uter</title>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Процессор Intel Xeon E5-2690 V4 LGA 2011-3 OEM","description":"Универсальный процессор для рабочей станции: монтаж, разработка, 3D-пакеты, виртуализация и повседневные профессиональные нагрузки.","image":"https://comp-uter.ru/public/assets/cpu-e5-2690-v4.webp","sku":"4946900697","mpn":"Xeon E5-2690 V4","url":"https://comp-uter.ru/products/e5-2690-v4/","brand":{"@type":"Brand","name":"Intel"},"category":"Серверные процессоры",<?= prices_offer_json('e5-2690-v4', 'https://comp-uter.ru/products/e5-2690-v4/') ?>,"additionalProperty":[{"@type":"PropertyValue","name":"Артикул","value":"4946900697"},{"@type":"PropertyValue","name":"Архитектура","value":"Broadwell-E"},{"@type":"PropertyValue","name":"Сокет","value":"LGA 2011-3"},{"@type":"PropertyValue","name":"Количество ядер","value":"14"},{"@type":"PropertyValue","name":"Количество потоков","value":"28"},{"@type":"PropertyValue","name":"Базовая частота","value":"2.6 ГГц"},{"@type":"PropertyValue","name":"Турбо-частота","value":"3.5 ГГц"},{"@type":"PropertyValue","name":"Кэш L3","value":"35 МБ"},{"@type":"PropertyValue","name":"Техпроцесс","value":"14 нм"},{"@type":"PropertyValue","name":"TDP","value":"135 Вт"},{"@type":"PropertyValue","name":"Память","value":"DDR4 до 2400 МГц"},{"@type":"PropertyValue","name":"Максимальный объем ОЗУ","value":"1 ТБ и более"},{"@type":"PropertyValue","name":"Комплектация","value":"OEM, без кулера"},{"@type":"PropertyValue","name":"Гарантия","value":"3 месяца"},{"@type":"PropertyValue","name":"Страна-изготовитель","value":"Малайзия"},{"@type":"PropertyValue","name":"Особенности","value":"Turbo Boost, ECC, Virtualization Technology, Intel vPro"}]}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Процессор Intel Xeon E5-2690 V4 LGA 2011-3 OEM","description":"Универсальный процессор для рабочей станции: монтаж, разработка, 3D-пакеты, виртуализация и повседневные профессиональные нагрузки.","image":"<?= product_image_absolute('e5-2690-v4') ?>","sku":"4946900697","mpn":"Xeon E5-2690 V4","url":"https://comp-uter.ru/products/e5-2690-v4/","brand":{"@type":"Brand","name":"Intel"},"category":"Серверные процессоры",<?= prices_offer_json('e5-2690-v4', 'https://comp-uter.ru/products/e5-2690-v4/') ?>,"additionalProperty":[{"@type":"PropertyValue","name":"Артикул","value":"4946900697"},{"@type":"PropertyValue","name":"Архитектура","value":"Broadwell-E"},{"@type":"PropertyValue","name":"Сокет","value":"LGA 2011-3"},{"@type":"PropertyValue","name":"Количество ядер","value":"14"},{"@type":"PropertyValue","name":"Количество потоков","value":"28"},{"@type":"PropertyValue","name":"Базовая частота","value":"2.6 ГГц"},{"@type":"PropertyValue","name":"Турбо-частота","value":"3.5 ГГц"},{"@type":"PropertyValue","name":"Кэш L3","value":"35 МБ"},{"@type":"PropertyValue","name":"Техпроцесс","value":"14 нм"},{"@type":"PropertyValue","name":"TDP","value":"135 Вт"},{"@type":"PropertyValue","name":"Память","value":"DDR4 до 2400 МГц"},{"@type":"PropertyValue","name":"Максимальный объем ОЗУ","value":"1 ТБ и более"},{"@type":"PropertyValue","name":"Комплектация","value":"OEM, без кулера"},{"@type":"PropertyValue","name":"Гарантия","value":"3 месяца"},{"@type":"PropertyValue","name":"Страна-изготовитель","value":"Малайзия"},{"@type":"PropertyValue","name":"Особенности","value":"Turbo Boost, ECC, Virtualization Technology, Intel vPro"}]}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Главная","item":"https://comp-uter.ru/"},{"@type":"ListItem","position":2,"name":"Серверные процессоры","item":"https://comp-uter.ru/processors/"},{"@type":"ListItem","position":3,"name":"Xeon E5-2690 V4","item":"https://comp-uter.ru/products/e5-2690-v4/"}]}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Какая архитектура у E5-2690 V4?","acceptedAnswer":{"@type":"Answer","text":"Broadwell-E, 14 нм — на поколение новее большинства Haswell-моделей линейки."}},{"@type":"Question","name":"Какая память поддерживается?","acceptedAnswer":{"@type":"Answer","text":"DDR4 до 2400 МГц, что быстрее, чем у Haswell-аналогов с 2133 МГц."}},{"@type":"Question","name":"Для каких задач лучше всего подходит?","acceptedAnswer":{"@type":"Answer","text":"Для универсальной рабочей станции — монтаж видео, 3D, разработка и виртуализация без явного перекоса в сторону только ядер или только частоты."}},{"@type":"Question","name":"Сколько ядер у процессора?","acceptedAnswer":{"@type":"Answer","text":"Четырнадцать ядер, двадцать восемь потоков."}}]}</script>
   </head>
@@ -98,7 +98,7 @@
       </nav>
       <article class="product-page-card product-dialog">
         <div class="product-dialog-media">
-          <img src="/public/assets/cpu-e5-2690-v4.webp" alt="Процессор Intel Xeon E5-2690 V4 LGA 2011-3 OEM" />
+          <?= product_image_tag('e5-2690-v4', 'Процессор Intel Xeon E5-2690 V4 LGA 2011-3 OEM') ?>
         </div>
         <div class="product-dialog-copy">
           <p class="section-label">Карточка товара</p>

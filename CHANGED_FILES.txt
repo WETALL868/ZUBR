@@ -57,6 +57,7 @@
   products/index.php         автоматическая страница товара: цена, похожие
                              товары и JSON-LD берут цену из файла цен
   tools/localize-images.php  пути обновлены с index.html на index.php
+                             (позже заменён на tools/import-product-images.php)
 
 
 НЕ ИЗМЕНЯЛОСЬ
@@ -67,4 +68,72 @@
   yandexmarket/config.php, yandexmarket/index.php, yandexmarket/.htaccess,
   privacy_policy/, polzovatelskoe-soglashenie/
 
+===============================================================================
+
+
+===============================================================================
+   ВТОРОЙ ЭТАП — перевод фотографий товаров на локальное хранение
+   comp-uter.ru, 28.07.2026
+===============================================================================
+
+ДОБАВЛЕНО
+-------------------------------------------------------------------------------
+  public/images/products/          НОВАЯ ПАПКА ДЛЯ ФОТО ТОВАРОВ
+      e5-2699-v4.jpg / .webp       7 процессоров: JPG-оригинал + WebP для сайта
+      e5-2699-v3.jpg / .webp
+      e5-2697-v4.jpg / .webp
+      e5-2696-v3.jpg / .webp
+      e5-2690-v4.jpg / .webp
+      e5-2673-v3.jpg / .webp
+      e5-2667-v3.jpg / .webp
+      placeholder.jpg / .webp      заглушка «Фото товара готовится»
+  src/images.php                   единый механизм изображений товаров
+  tools/check-images.php           проверка фотографий (браузер + консоль)
+  tools/import-product-images.php  скачивание оригиналов с внешних адресов
+  IMAGE_MANAGEMENT_INSTRUCTION.txt инструкция по фотографиям
+  _backup_before_images/           копии всех файлов ДО этих изменений (28 шт.)
+
+ИЗМЕНЕНО
+-------------------------------------------------------------------------------
+  yandexmarket/products.php  поле 'picture' у всех 12 товаров переведено на
+                             локальный путь /public/images/products/<slug>.jpg;
+                             у 5 дисков добавлено 'picture_source' — адрес,
+                             откуда скачать оригинал
+  yandexmarket/feed.php      <picture> берётся из src/images.php (абсолютный
+                             адрес на нашем домене); товар без настоящего фото
+                             временно не выгружается; кэш фида сбрасывается
+                             при изменении фото и каталога
+  index.php                  12 карточек: <img> из src/images.php
+  processors/index.php       7 карточек: <img> из src/images.php
+  drives/index.php           5 карточек: <img> из src/images.php
+  products/*/index.php (12)  фото товара, og:image, twitter:image и "image"
+                             в JSON-LD берутся из src/images.php
+  products/index.php         автостраница товара: фото и og:image оттуда же
+
+УДАЛЕНО
+-------------------------------------------------------------------------------
+  tools/localize-images.php      устарел: переписывал HTML-страницы, которых
+                                 больше нет. Замена — import-product-images.php
+  public/assets/cpu-*.webp (7)   переехали в public/images/products/
+                                 копии сохранены в _backup_before_images/
+
+УБРАННЫЕ ВНЕШНИЕ ССЫЛКИ НА КАРТИНКИ ТОВАРОВ (22 штуки)
+-------------------------------------------------------------------------------
+  https://cdn1.ozone.ru/s3/multimedia-1-t/12183483917.jpg   (ST10000NM0016)
+  https://cdn1.ozone.ru/s3/multimedia-1-n/12245200655.jpg   (ST6000NM0115)
+  https://cdn1.ozone.ru/s3/multimedia-1-r/12278044503.jpg   (ST4000NM0033)
+  https://cdn1.ozone.ru/s3/multimedia-1-3/12156663171.jpg   (ST3000NM0005)
+  https://cdn1.ozone.ru/s3/multimedia-1-q/12208461578.jpg   (ST3000NM0033)
+
+  Каждый адрес встречался в 4-5 местах: карточка на главной, карточка в
+  категории /drives/, фото на странице товара, og:image, twitter:image,
+  "image" в JSON-LD и <picture> в фиде Яндекс.Маркета.
+
+НЕ ТРОГАЛИ (это не картинки товаров)
+-------------------------------------------------------------------------------
+  https://mc.yandex.ru/...            счётчик Яндекс.Метрики
+  /public/assets/xeon-hero.webp       общая картинка сайта в og:image
+  /public/assets/bg-*.webp            фоны разделов
+  /public/assets/comp-uter-logo-*     логотипы
+  /public/assets/contact-map.webp     карта в разделе контактов
 ===============================================================================

@@ -1,4 +1,4 @@
-<?php require_once __DIR__ . '/../../src/prices.php'; ?><!doctype html>
+<?php require_once __DIR__ . '/../../src/prices.php'; require_once __DIR__ . '/../../src/images.php'; ?><!doctype html>
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
@@ -11,17 +11,17 @@
     <meta property="og:type" content="product" />
     <meta property="og:url" content="https://comp-uter.ru/products/e5-2699-v4/" />
     <meta property="og:site_name" content="Comp-Uter" />
-    <meta property="og:image" content="https://comp-uter.ru/public/assets/cpu-e5-2699-v4.webp" />
+    <meta property="og:image" content="<?= product_image_absolute('e5-2699-v4') ?>" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Процессор Intel Xeon E5-2699 V4 LGA 2011-3 OEM" />
     <meta name="twitter:description" content="Флагманский процессор Intel Xeon E5-2699 V4 для тяжелой многопоточности: рендер, виртуализация, инженерные задачи, серверные нагрузки и производительные рабочие станции на X99." />
-    <meta name="twitter:image" content="https://comp-uter.ru/public/assets/cpu-e5-2699-v4.webp" />
+    <meta name="twitter:image" content="<?= product_image_absolute('e5-2699-v4') ?>" />
     <link rel="canonical" href="https://comp-uter.ru/products/e5-2699-v4/" />
     <link rel="preconnect" href="https://mc.yandex.ru" />
     <link rel="stylesheet" href="/src/styles.css?v=2" />
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <title>Процессор Intel Xeon E5-2699 V4 купить | Comp-Uter</title>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Процессор Intel Xeon E5-2699 V4 LGA 2011-3 OEM","description":"Флагманский процессор Intel Xeon E5-2699 V4 для тяжелой многопоточности: рендер, виртуализация, инженерные задачи, серверные нагрузки и производительные рабочие станции на X99.","image":"https://comp-uter.ru/public/assets/cpu-e5-2699-v4.webp","sku":"4946900889","mpn":"Xeon E5-2699 V4","url":"https://comp-uter.ru/products/e5-2699-v4/","brand":{"@type":"Brand","name":"Intel"},"category":"Серверные процессоры",<?= prices_offer_json('e5-2699-v4', 'https://comp-uter.ru/products/e5-2699-v4/') ?>,"additionalProperty":[{"@type":"PropertyValue","name":"Артикул","value":"4946900889"},{"@type":"PropertyValue","name":"Архитектура","value":"Haswell-E"},{"@type":"PropertyValue","name":"Сокет","value":"LGA 2011-3"},{"@type":"PropertyValue","name":"Количество ядер","value":"22"},{"@type":"PropertyValue","name":"Количество потоков","value":"44"},{"@type":"PropertyValue","name":"Базовая частота","value":"2.2 ГГц"},{"@type":"PropertyValue","name":"Турбо-частота","value":"3.6 ГГц"},{"@type":"PropertyValue","name":"Кэш L3","value":"55 МБ"},{"@type":"PropertyValue","name":"Техпроцесс","value":"14 нм"},{"@type":"PropertyValue","name":"TDP","value":"145 Вт"},{"@type":"PropertyValue","name":"Память","value":"DDR4 до 2400 МГц"},{"@type":"PropertyValue","name":"Максимальный объем ОЗУ","value":"1 ТБ и более"},{"@type":"PropertyValue","name":"Комплектация","value":"OEM, без кулера"},{"@type":"PropertyValue","name":"Гарантия","value":"3 месяца"},{"@type":"PropertyValue","name":"Страна-изготовитель","value":"Малайзия"},{"@type":"PropertyValue","name":"Особенности","value":"Turbo Boost, ECC, Virtualization Technology, Intel vPro"}]}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Процессор Intel Xeon E5-2699 V4 LGA 2011-3 OEM","description":"Флагманский процессор Intel Xeon E5-2699 V4 для тяжелой многопоточности: рендер, виртуализация, инженерные задачи, серверные нагрузки и производительные рабочие станции на X99.","image":"<?= product_image_absolute('e5-2699-v4') ?>","sku":"4946900889","mpn":"Xeon E5-2699 V4","url":"https://comp-uter.ru/products/e5-2699-v4/","brand":{"@type":"Brand","name":"Intel"},"category":"Серверные процессоры",<?= prices_offer_json('e5-2699-v4', 'https://comp-uter.ru/products/e5-2699-v4/') ?>,"additionalProperty":[{"@type":"PropertyValue","name":"Артикул","value":"4946900889"},{"@type":"PropertyValue","name":"Архитектура","value":"Haswell-E"},{"@type":"PropertyValue","name":"Сокет","value":"LGA 2011-3"},{"@type":"PropertyValue","name":"Количество ядер","value":"22"},{"@type":"PropertyValue","name":"Количество потоков","value":"44"},{"@type":"PropertyValue","name":"Базовая частота","value":"2.2 ГГц"},{"@type":"PropertyValue","name":"Турбо-частота","value":"3.6 ГГц"},{"@type":"PropertyValue","name":"Кэш L3","value":"55 МБ"},{"@type":"PropertyValue","name":"Техпроцесс","value":"14 нм"},{"@type":"PropertyValue","name":"TDP","value":"145 Вт"},{"@type":"PropertyValue","name":"Память","value":"DDR4 до 2400 МГц"},{"@type":"PropertyValue","name":"Максимальный объем ОЗУ","value":"1 ТБ и более"},{"@type":"PropertyValue","name":"Комплектация","value":"OEM, без кулера"},{"@type":"PropertyValue","name":"Гарантия","value":"3 месяца"},{"@type":"PropertyValue","name":"Страна-изготовитель","value":"Малайзия"},{"@type":"PropertyValue","name":"Особенности","value":"Turbo Boost, ECC, Virtualization Technology, Intel vPro"}]}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Главная","item":"https://comp-uter.ru/"},{"@type":"ListItem","position":2,"name":"Серверные процессоры","item":"https://comp-uter.ru/processors/"},{"@type":"ListItem","position":3,"name":"Xeon E5-2699 V4","item":"https://comp-uter.ru/products/e5-2699-v4/"}]}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Сколько ядер у флагманского Xeon E5-2699 V4?","acceptedAnswer":{"@type":"Answer","text":"Двадцать два ядра и сорок четыре потока — максимум в линейке."}},{"@type":"Question","name":"Для каких задач оправдана покупка этой модели?","acceptedAnswer":{"@type":"Answer","text":"Для тяжёлого рендера, плотной виртуализации и инженерных расчётов, где меньшее число ядер уже становится ограничением."}},{"@type":"Question","name":"Стоит ли брать эту модель для игр?","acceptedAnswer":{"@type":"Answer","text":"Нет, для чисто игровой сборки это нерациональный выбор — переплата за ядра, которые игры не используют."}},{"@type":"Question","name":"Какой кэш и память у процессора?","acceptedAnswer":{"@type":"Answer","text":"55 МБ кэша L3 — самый большой в линейке, и поддержка DDR4 до 2400 МГц."}}]}</script>
   </head>
@@ -98,7 +98,7 @@
       </nav>
       <article class="product-page-card product-dialog">
         <div class="product-dialog-media">
-          <img src="/public/assets/cpu-e5-2699-v4.webp" alt="Процессор Intel Xeon E5-2699 V4 LGA 2011-3 OEM" />
+          <?= product_image_tag('e5-2699-v4', 'Процессор Intel Xeon E5-2699 V4 LGA 2011-3 OEM') ?>
         </div>
         <div class="product-dialog-copy">
           <p class="section-label">Карточка товара</p>

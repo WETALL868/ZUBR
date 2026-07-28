@@ -1,4 +1,4 @@
-<?php require_once __DIR__ . '/src/prices.php'; ?><!doctype html>
+<?php require_once __DIR__ . '/src/prices.php'; require_once __DIR__ . '/src/images.php'; ?><!doctype html>
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
@@ -1236,7 +1236,7 @@ button:disabled {
         <div class="model-grid">
           <article class="model-card featured" id="e5-2699-v4"<?= prices_card_attrs('e5-2699-v4') ?>>
             <figure class="model-photo" role="button" tabindex="0" aria-label="Увеличить фото Xeon E5-2699 V4">
-              <img src="/public/assets/cpu-e5-2699-v4.webp" alt="Процессор Xeon E5-2699 V4 без инфографики" loading="lazy" />
+              <?= product_image_tag('e5-2699-v4', 'Процессор Xeon E5-2699 V4 без инфографики', true) ?>
             </figure>
             <?= prices_stock_badge('e5-2699-v4') ?>
 
@@ -1267,7 +1267,7 @@ button:disabled {
           </article>
           <article class="model-card" id="e5-2699-v3"<?= prices_card_attrs('e5-2699-v3') ?>>
             <figure class="model-photo" role="button" tabindex="0" aria-label="Увеличить фото Xeon E5-2699 V3">
-              <img src="/public/assets/cpu-e5-2699-v3.webp" alt="Процессор Xeon E5-2699 V3 без инфографики" loading="lazy" />
+              <?= product_image_tag('e5-2699-v3', 'Процессор Xeon E5-2699 V3 без инфографики', true) ?>
             </figure>
             <?= prices_stock_badge('e5-2699-v3') ?>
 
@@ -1298,7 +1298,7 @@ button:disabled {
           </article>
           <article class="model-card" id="e5-2697-v4"<?= prices_card_attrs('e5-2697-v4') ?>>
             <figure class="model-photo" role="button" tabindex="0" aria-label="Увеличить фото Xeon E5-2697 V4">
-              <img src="/public/assets/cpu-e5-2697-v4.webp" alt="Процессор Xeon E5-2697 V4 без инфографики" loading="lazy" />
+              <?= product_image_tag('e5-2697-v4', 'Процессор Xeon E5-2697 V4 без инфографики', true) ?>
             </figure>
             <?= prices_stock_badge('e5-2697-v4') ?>
 
@@ -1329,7 +1329,7 @@ button:disabled {
           </article>
           <article class="model-card" id="e5-2696-v3"<?= prices_card_attrs('e5-2696-v3') ?>>
             <figure class="model-photo" role="button" tabindex="0" aria-label="Увеличить фото Xeon E5-2696 V3">
-              <img src="/public/assets/cpu-e5-2696-v3.webp" alt="Процессор Xeon E5-2696 V3 без инфографики" loading="lazy" />
+              <?= product_image_tag('e5-2696-v3', 'Процессор Xeon E5-2696 V3 без инфографики', true) ?>
             </figure>
             <?= prices_stock_badge('e5-2696-v3') ?>
 
@@ -1359,7 +1359,7 @@ button:disabled {
           </article>
           <article class="model-card" id="e5-2690-v4"<?= prices_card_attrs('e5-2690-v4') ?>>
             <figure class="model-photo" role="button" tabindex="0" aria-label="Увеличить фото Xeon E5-2690 V4">
-              <img src="/public/assets/cpu-e5-2690-v4.webp" alt="Процессор Xeon E5-2690 V4 без инфографики" loading="lazy" />
+              <?= product_image_tag('e5-2690-v4', 'Процессор Xeon E5-2690 V4 без инфографики', true) ?>
             </figure>
             <?= prices_stock_badge('e5-2690-v4') ?>
 
@@ -1390,7 +1390,7 @@ button:disabled {
           </article>
           <article class="model-card" id="e5-2673-v3"<?= prices_card_attrs('e5-2673-v3') ?>>
             <figure class="model-photo" role="button" tabindex="0" aria-label="Увеличить фото Xeon E5-2673 V3">
-              <img src="/public/assets/cpu-e5-2673-v3.webp" alt="Процессор Xeon E5-2673 V3 без инфографики" loading="lazy" />
+              <?= product_image_tag('e5-2673-v3', 'Процессор Xeon E5-2673 V3 без инфографики', true) ?>
             </figure>
             <?= prices_stock_badge('e5-2673-v3') ?>
 
@@ -1421,7 +1421,7 @@ button:disabled {
           </article>
           <article class="model-card" id="e5-2667-v3"<?= prices_card_attrs('e5-2667-v3') ?>>
             <figure class="model-photo" role="button" tabindex="0" aria-label="Увеличить фото Xeon E5-2667 V3">
-              <img src="/public/assets/cpu-e5-2667-v3.webp" alt="Процессор Xeon E5-2667 V3 без инфографики" loading="lazy" />
+              <?= product_image_tag('e5-2667-v3', 'Процессор Xeon E5-2667 V3 без инфографики', true) ?>
             </figure>
             <?= prices_stock_badge('e5-2667-v3') ?>
 
@@ -1481,7 +1481,7 @@ button:disabled {
         <div class="model-grid">
           <article class="model-card featured" id="st10000nm0016"<?= prices_card_attrs('st10000nm0016') ?>>
             <figure class="model-photo" role="button" tabindex="0" aria-label="Увеличить фото Seagate Exos X10 10TB ST10000NM0016">
-              <img src="https://cdn1.ozone.ru/s3/multimedia-1-t/12183483917.jpg" alt="Жесткий диск Seagate Exos X10 10TB ST10000NM0016" loading="lazy" />
+              <?= product_image_tag('st10000nm0016', 'Жесткий диск Seagate Exos X10 10TB ST10000NM0016', true) ?>
             </figure>
             <?= prices_stock_badge('st10000nm0016') ?>
 
@@ -1511,7 +1511,7 @@ button:disabled {
           </article>
           <article class="model-card" id="st6000nm0115"<?= prices_card_attrs('st6000nm0115') ?>>
             <figure class="model-photo" role="button" tabindex="0" aria-label="Увеличить фото Seagate Exos 7E8 6TB ST6000NM0115">
-              <img src="https://cdn1.ozone.ru/s3/multimedia-1-n/12245200655.jpg" alt="Жесткий диск Seagate Exos 7E8 6TB ST6000NM0115" loading="lazy" />
+              <?= product_image_tag('st6000nm0115', 'Жесткий диск Seagate Exos 7E8 6TB ST6000NM0115', true) ?>
             </figure>
             <?= prices_stock_badge('st6000nm0115') ?>
 
@@ -1541,7 +1541,7 @@ button:disabled {
           </article>
           <article class="model-card" id="st4000nm0033"<?= prices_card_attrs('st4000nm0033') ?>>
             <figure class="model-photo" role="button" tabindex="0" aria-label="Увеличить фото Seagate Constellation ES.3 4TB ST4000NM0033">
-              <img src="https://cdn1.ozone.ru/s3/multimedia-1-r/12278044503.jpg" alt="Жесткий диск Seagate Constellation ES.3 4TB ST4000NM0033" loading="lazy" />
+              <?= product_image_tag('st4000nm0033', 'Жесткий диск Seagate Constellation ES.3 4TB ST4000NM0033', true) ?>
             </figure>
             <?= prices_stock_badge('st4000nm0033') ?>
 
@@ -1571,7 +1571,7 @@ button:disabled {
           </article>
           <article class="model-card" id="st3000nm0005"<?= prices_card_attrs('st3000nm0005') ?>>
             <figure class="model-photo" role="button" tabindex="0" aria-label="Увеличить фото Seagate Enterprise Capacity 3.5 HDD v5 3TB ST3000NM0005">
-              <img src="https://cdn1.ozone.ru/s3/multimedia-1-3/12156663171.jpg" alt="Жесткий диск Seagate Enterprise Capacity 3.5 HDD v5 3TB ST3000NM0005" loading="lazy" />
+              <?= product_image_tag('st3000nm0005', 'Жесткий диск Seagate Enterprise Capacity 3.5 HDD v5 3TB ST3000NM0005', true) ?>
             </figure>
             <?= prices_stock_badge('st3000nm0005') ?>
 
@@ -1602,7 +1602,7 @@ button:disabled {
           </article>
           <article class="model-card" id="st3000nm0033"<?= prices_card_attrs('st3000nm0033') ?>>
             <figure class="model-photo" role="button" tabindex="0" aria-label="Увеличить фото Seagate Constellation ES.3 3TB ST3000NM0033">
-              <img src="https://cdn1.ozone.ru/s3/multimedia-1-q/12208461578.jpg" alt="Жесткий диск Seagate Constellation ES.3 3TB ST3000NM0033" loading="lazy" />
+              <?= product_image_tag('st3000nm0033', 'Жесткий диск Seagate Constellation ES.3 3TB ST3000NM0033', true) ?>
             </figure>
             <?= prices_stock_badge('st3000nm0033') ?>
 

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/src/prices.php';
+require_once dirname(__DIR__) . '/src/images.php';
 
 function yml_text(string $value): string
 {
@@ -73,7 +74,7 @@ function yml_offer(array $config, array $product, string $base_url): string
         . '      <price>' . yml_text(prices_machine($price)) . "</price>\n"
         . '      <currencyId>' . yml_text($currency_id) . "</currencyId>\n"
         . '      <categoryId>' . yml_text($category_id) . "</categoryId>\n"
-        . '      <picture>' . yml_text(yml_absolute_url($base_url, (string)$product['picture'])) . "</picture>\n"
+        . '      <picture>' . yml_text(product_image_absolute((string)($product['slug'] ?? ''), $base_url)) . "</picture>\n"
         . "      <store>true</store>\n"
         . "      <pickup>true</pickup>\n"
         . "      <delivery>true</delivery>\n"
@@ -102,10 +103,15 @@ function yml_generate_catalog(array $config, array $products): string
 
     // Позиция без цены в /data/prices.json в фид не попадает: Яндекс.Маркет
     // отклоняет предложение без <price>, а пустой тег сломал бы весь фид.
+    //
+    // Позиция без настоящей фотографии — тоже: отдавать в маркетплейс картинку
+    // «Фото товара готовится» хуже, чем на день не показать позицию. Как только
+    // файл появится в /public/images/products/, товар вернётся в фид сам.
     $offers = '';
     foreach ($products as $product) {
-        $price = prices_value((string)($product['slug'] ?? '')) ?? prices_value((string)($product['id'] ?? ''));
-        if ($price === null) {
+        $slug = (string)($product['slug'] ?? '');
+        $price = prices_value($slug) ?? prices_value((string)($product['id'] ?? ''));
+        if ($price === null || product_image_is_placeholder($slug)) {
             continue;
         }
         $offers .= yml_offer($config, $product, $base_url);
@@ -136,13 +142,19 @@ function yml_cached_catalog(array $config, array $products): array
     $cache_dir = __DIR__ . '/cache';
     $cache_file = $cache_dir . '/yandexmarket.xml';
 
-    // Кэш сбрасывается и по TTL, и как только /data/prices.json стал новее:
-    // иначе после замены файла цен фид ещё минуту отдавал бы старые цены.
-    $prices_mtime = is_file(PRICES_FILE) ? (int)filemtime(PRICES_FILE) : 0;
+    // Кэш сбрасывается и по TTL, и как только стали новее исходные данные:
+    // файл цен, каталог товаров или папка с фотографиями. Иначе после замены
+    // цены или загрузки фото фид ещё минуту отдавал бы старые данные.
+    $source_mtime = 0;
+    foreach ([PRICES_FILE, __DIR__ . '/products.php', product_image_root() . PRODUCT_IMAGES_DIR] as $source) {
+        if (file_exists($source)) {
+            $source_mtime = max($source_mtime, (int)filemtime($source));
+        }
+    }
 
     if (is_file($cache_file) && is_readable($cache_file)) {
         $cache_mtime = (int)filemtime($cache_file);
-        if ((time() - $cache_mtime < $ttl) && $cache_mtime >= $prices_mtime) {
+        if ((time() - $cache_mtime < $ttl) && $cache_mtime >= $source_mtime) {
             return [file_get_contents($cache_file), 'hit'];
         }
     }

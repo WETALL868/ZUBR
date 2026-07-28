@@ -1,4 +1,4 @@
-<?php require_once __DIR__ . '/../src/prices.php'; ?><!doctype html>
+<?php require_once __DIR__ . '/../src/prices.php'; require_once __DIR__ . '/../src/images.php'; ?><!doctype html>
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
@@ -201,7 +201,7 @@
 
           <article class="model-card featured" id="st10000nm0016"<?= prices_card_attrs('st10000nm0016') ?>>
             <figure class="model-photo" role="button" tabindex="0" aria-label="Увеличить фото Seagate Exos X10 10TB ST10000NM0016">
-              <img src="https://cdn1.ozone.ru/s3/multimedia-1-t/12183483917.jpg" alt="Жесткий диск Seagate Exos X10 10TB ST10000NM0016" loading="lazy" />
+              <?= product_image_tag('st10000nm0016', 'Жесткий диск Seagate Exos X10 10TB ST10000NM0016', true) ?>
             </figure>
             <?= prices_stock_badge('st10000nm0016') ?>
 
@@ -231,7 +231,7 @@
           </article>
           <article class="model-card" id="st6000nm0115"<?= prices_card_attrs('st6000nm0115') ?>>
             <figure class="model-photo" role="button" tabindex="0" aria-label="Увеличить фото Seagate Exos 7E8 6TB ST6000NM0115">
-              <img src="https://cdn1.ozone.ru/s3/multimedia-1-n/12245200655.jpg" alt="Жесткий диск Seagate Exos 7E8 6TB ST6000NM0115" loading="lazy" />
+              <?= product_image_tag('st6000nm0115', 'Жесткий диск Seagate Exos 7E8 6TB ST6000NM0115', true) ?>
             </figure>
             <?= prices_stock_badge('st6000nm0115') ?>
 
@@ -261,7 +261,7 @@
           </article>
           <article class="model-card" id="st4000nm0033"<?= prices_card_attrs('st4000nm0033') ?>>
             <figure class="model-photo" role="button" tabindex="0" aria-label="Увеличить фото Seagate Constellation ES.3 4TB ST4000NM0033">
-              <img src="https://cdn1.ozone.ru/s3/multimedia-1-r/12278044503.jpg" alt="Жесткий диск Seagate Constellation ES.3 4TB ST4000NM0033" loading="lazy" />
+              <?= product_image_tag('st4000nm0033', 'Жесткий диск Seagate Constellation ES.3 4TB ST4000NM0033', true) ?>
             </figure>
             <?= prices_stock_badge('st4000nm0033') ?>
 
@@ -291,7 +291,7 @@
           </article>
           <article class="model-card" id="st3000nm0005"<?= prices_card_attrs('st3000nm0005') ?>>
             <figure class="model-photo" role="button" tabindex="0" aria-label="Увеличить фото Seagate Enterprise Capacity 3.5 HDD v5 3TB ST3000NM0005">
-              <img src="https://cdn1.ozone.ru/s3/multimedia-1-3/12156663171.jpg" alt="Жесткий диск Seagate Enterprise Capacity 3.5 HDD v5 3TB ST3000NM0005" loading="lazy" />
+              <?= product_image_tag('st3000nm0005', 'Жесткий диск Seagate Enterprise Capacity 3.5 HDD v5 3TB ST3000NM0005', true) ?>
             </figure>
             <?= prices_stock_badge('st3000nm0005') ?>
 
@@ -322,7 +322,7 @@
           </article>
           <article class="model-card" id="st3000nm0033"<?= prices_card_attrs('st3000nm0033') ?>>
             <figure class="model-photo" role="button" tabindex="0" aria-label="Увеличить фото Seagate Constellation ES.3 3TB ST3000NM0033">
-              <img src="https://cdn1.ozone.ru/s3/multimedia-1-q/12208461578.jpg" alt="Жесткий диск Seagate Constellation ES.3 3TB ST3000NM0033" loading="lazy" />
+              <?= product_image_tag('st3000nm0033', 'Жесткий диск Seagate Constellation ES.3 3TB ST3000NM0033', true) ?>
             </figure>
             <?= prices_stock_badge('st3000nm0033') ?>
 

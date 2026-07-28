@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 $products = require __DIR__ . '/../yandexmarket/products.php';
 require_once __DIR__ . '/../src/prices.php';
+require_once __DIR__ . '/../src/images.php';
 
 function page_text(string $value): string
 {
@@ -78,7 +79,7 @@ if (!$product) {
 }
 
 $canonical = page_absolute_url('/products/' . $product['slug'] . '/');
-$image = page_absolute_url((string)$product['picture']);
+$image = product_image_absolute((string)$product['slug']);
 $displayName = trim(($product['display_prefix'] ?? '') . ' ' . $product['model']);
 $categoryName = (string)($product['category'] ?? 'Процессоры Intel Xeon');
 $categoryUrl = (string)($product['category_url'] ?? '/#stock');
@@ -320,7 +321,7 @@ if ($faq) {
       </nav>
       <article class="product-page-card product-dialog">
         <div class="product-dialog-media">
-          <img src="<?= page_text((string)$product['picture']) ?>" alt="<?= page_text((string)$product['name']) ?>" />
+          <?= product_image_tag((string)$product['slug'], (string)$product['name']) ?>
         </div>
         <div class="product-dialog-copy">
           <p class="section-label">Карточка товара</p>

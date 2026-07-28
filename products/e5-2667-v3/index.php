@@ -1,4 +1,4 @@
-<?php require_once __DIR__ . '/../../src/prices.php'; ?><!doctype html>
+<?php require_once __DIR__ . '/../../src/prices.php'; require_once __DIR__ . '/../../src/images.php'; ?><!doctype html>
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
@@ -11,17 +11,17 @@
     <meta property="og:type" content="product" />
     <meta property="og:url" content="https://comp-uter.ru/products/e5-2667-v3/" />
     <meta property="og:site_name" content="Comp-Uter" />
-    <meta property="og:image" content="https://comp-uter.ru/public/assets/cpu-e5-2667-v3.webp" />
+    <meta property="og:image" content="<?= product_image_absolute('e5-2667-v3') ?>" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Процессор Intel Xeon E5-2667 V3 LGA 2011-3 OEM" />
     <meta name="twitter:description" content="Модель с акцентом на высокую частоту на ядро: отзывчивые рабочие станции, прикладные задачи и точечные апгрейды X99." />
-    <meta name="twitter:image" content="https://comp-uter.ru/public/assets/cpu-e5-2667-v3.webp" />
+    <meta name="twitter:image" content="<?= product_image_absolute('e5-2667-v3') ?>" />
     <link rel="canonical" href="https://comp-uter.ru/products/e5-2667-v3/" />
     <link rel="preconnect" href="https://mc.yandex.ru" />
     <link rel="stylesheet" href="/src/styles.css?v=2" />
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <title>Процессор Intel Xeon E5-2667 V3 купить | Comp-Uter</title>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Процессор Intel Xeon E5-2667 V3 LGA 2011-3 OEM","description":"Модель с акцентом на высокую частоту на ядро: отзывчивые рабочие станции, прикладные задачи и точечные апгрейды X99.","image":"https://comp-uter.ru/public/assets/cpu-e5-2667-v3.webp","sku":"4946899626","mpn":"Xeon E5-2667 V3","url":"https://comp-uter.ru/products/e5-2667-v3/","brand":{"@type":"Brand","name":"Intel"},"category":"Серверные процессоры",<?= prices_offer_json('e5-2667-v3', 'https://comp-uter.ru/products/e5-2667-v3/') ?>,"additionalProperty":[{"@type":"PropertyValue","name":"Артикул","value":"4946899626"},{"@type":"PropertyValue","name":"Архитектура","value":"Haswell"},{"@type":"PropertyValue","name":"Сокет","value":"LGA 2011-3"},{"@type":"PropertyValue","name":"Количество ядер","value":"8"},{"@type":"PropertyValue","name":"Количество потоков","value":"16"},{"@type":"PropertyValue","name":"Базовая частота","value":"3.2 ГГц"},{"@type":"PropertyValue","name":"Турбо-частота","value":"3.6 ГГц"},{"@type":"PropertyValue","name":"Кэш L3","value":"20 МБ"},{"@type":"PropertyValue","name":"Техпроцесс","value":"22 нм"},{"@type":"PropertyValue","name":"TDP","value":"135 Вт"},{"@type":"PropertyValue","name":"Память","value":"DDR4 до 2133 МГц"},{"@type":"PropertyValue","name":"Максимальный объем ОЗУ","value":"768 ГБ"},{"@type":"PropertyValue","name":"Комплектация","value":"OEM, без кулера"},{"@type":"PropertyValue","name":"Гарантия","value":"3 месяца"},{"@type":"PropertyValue","name":"Страна-изготовитель","value":"Малайзия"},{"@type":"PropertyValue","name":"Особенности","value":"Turbo Boost, ECC, Virtualization Technology"}]}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Процессор Intel Xeon E5-2667 V3 LGA 2011-3 OEM","description":"Модель с акцентом на высокую частоту на ядро: отзывчивые рабочие станции, прикладные задачи и точечные апгрейды X99.","image":"<?= product_image_absolute('e5-2667-v3') ?>","sku":"4946899626","mpn":"Xeon E5-2667 V3","url":"https://comp-uter.ru/products/e5-2667-v3/","brand":{"@type":"Brand","name":"Intel"},"category":"Серверные процессоры",<?= prices_offer_json('e5-2667-v3', 'https://comp-uter.ru/products/e5-2667-v3/') ?>,"additionalProperty":[{"@type":"PropertyValue","name":"Артикул","value":"4946899626"},{"@type":"PropertyValue","name":"Архитектура","value":"Haswell"},{"@type":"PropertyValue","name":"Сокет","value":"LGA 2011-3"},{"@type":"PropertyValue","name":"Количество ядер","value":"8"},{"@type":"PropertyValue","name":"Количество потоков","value":"16"},{"@type":"PropertyValue","name":"Базовая частота","value":"3.2 ГГц"},{"@type":"PropertyValue","name":"Турбо-частота","value":"3.6 ГГц"},{"@type":"PropertyValue","name":"Кэш L3","value":"20 МБ"},{"@type":"PropertyValue","name":"Техпроцесс","value":"22 нм"},{"@type":"PropertyValue","name":"TDP","value":"135 Вт"},{"@type":"PropertyValue","name":"Память","value":"DDR4 до 2133 МГц"},{"@type":"PropertyValue","name":"Максимальный объем ОЗУ","value":"768 ГБ"},{"@type":"PropertyValue","name":"Комплектация","value":"OEM, без кулера"},{"@type":"PropertyValue","name":"Гарантия","value":"3 месяца"},{"@type":"PropertyValue","name":"Страна-изготовитель","value":"Малайзия"},{"@type":"PropertyValue","name":"Особенности","value":"Turbo Boost, ECC, Virtualization Technology"}]}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Главная","item":"https://comp-uter.ru/"},{"@type":"ListItem","position":2,"name":"Серверные процессоры","item":"https://comp-uter.ru/processors/"},{"@type":"ListItem","position":3,"name":"Xeon E5-2667 V3","item":"https://comp-uter.ru/products/e5-2667-v3/"}]}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Сколько ядер и потоков у Xeon E5-2667 V3?","acceptedAnswer":{"@type":"Answer","text":"Восемь физических ядер и шестнадцать потоков благодаря Hyper-Threading, с частотой 3.2–3.6 ГГц."}},{"@type":"Question","name":"Подходит ли этот процессор для игр?","acceptedAnswer":{"@type":"Answer","text":"Он не рассчитан специально под игры и не имеет встроенной графики, но высокая частота на ядро делает его заметно отзывчивее в играх, чем более многоядерные Xeon этой линейки с частотой около 2.3 ГГц."}},{"@type":"Question","name":"Какая материнская плата нужна?","acceptedAnswer":{"@type":"Answer","text":"Любая плата на чипсете X99 с сокетом LGA 2011-3; перед установкой стоит обновить BIOS до актуальной версии."}},{"@type":"Question","name":"Чем E5-2667 V3 отличается от более многоядерных моделей линейки?","acceptedAnswer":{"@type":"Answer","text":"Меньшим числом ядер, зато заметно более высокой частотой — оптимален для задач, которые не масштабируются на много потоков."}}]}</script>
   </head>
@@ -98,7 +98,7 @@
       </nav>
       <article class="product-page-card product-dialog">
         <div class="product-dialog-media">
-          <img src="/public/assets/cpu-e5-2667-v3.webp" alt="Процессор Intel Xeon E5-2667 V3 LGA 2011-3 OEM" />
+          <?= product_image_tag('e5-2667-v3', 'Процессор Intel Xeon E5-2667 V3 LGA 2011-3 OEM') ?>
         </div>
         <div class="product-dialog-copy">
           <p class="section-label">Карточка товара</p>

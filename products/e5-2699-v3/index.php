@@ -1,4 +1,4 @@
-<?php require_once __DIR__ . '/../../src/prices.php'; ?><!doctype html>
+<?php require_once __DIR__ . '/../../src/prices.php'; require_once __DIR__ . '/../../src/images.php'; ?><!doctype html>
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
@@ -11,17 +11,17 @@
     <meta property="og:type" content="product" />
     <meta property="og:url" content="https://comp-uter.ru/products/e5-2699-v3/" />
     <meta property="og:site_name" content="Comp-Uter" />
-    <meta property="og:image" content="https://comp-uter.ru/public/assets/cpu-e5-2699-v3.webp" />
+    <meta property="og:image" content="<?= product_image_absolute('e5-2699-v3') ?>" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Процессор Intel Xeon E5-2699 V3 LGA 2011-3 OEM" />
     <meta name="twitter:description" content="Производительный Xeon поколения Haswell для X99-сборок, где нужно много потоков за разумный бюджет: монтаж, стриминг, домашний сервер и рабочие задачи." />
-    <meta name="twitter:image" content="https://comp-uter.ru/public/assets/cpu-e5-2699-v3.webp" />
+    <meta name="twitter:image" content="<?= product_image_absolute('e5-2699-v3') ?>" />
     <link rel="canonical" href="https://comp-uter.ru/products/e5-2699-v3/" />
     <link rel="preconnect" href="https://mc.yandex.ru" />
     <link rel="stylesheet" href="/src/styles.css?v=2" />
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <title>Процессор Intel Xeon E5-2699 V3 купить | Comp-Uter</title>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Процессор Intel Xeon E5-2699 V3 LGA 2011-3 OEM","description":"Производительный Xeon поколения Haswell для X99-сборок, где нужно много потоков за разумный бюджет: монтаж, стриминг, домашний сервер и рабочие задачи.","image":"https://comp-uter.ru/public/assets/cpu-e5-2699-v3.webp","sku":"4946900090","mpn":"Xeon E5-2699 V3","url":"https://comp-uter.ru/products/e5-2699-v3/","brand":{"@type":"Brand","name":"Intel"},"category":"Серверные процессоры",<?= prices_offer_json('e5-2699-v3', 'https://comp-uter.ru/products/e5-2699-v3/') ?>,"additionalProperty":[{"@type":"PropertyValue","name":"Артикул","value":"4946900090"},{"@type":"PropertyValue","name":"Архитектура","value":"Haswell"},{"@type":"PropertyValue","name":"Сокет","value":"LGA 2011-3"},{"@type":"PropertyValue","name":"Количество ядер","value":"18"},{"@type":"PropertyValue","name":"Количество потоков","value":"36"},{"@type":"PropertyValue","name":"Базовая частота","value":"2.3 ГГц"},{"@type":"PropertyValue","name":"Турбо-частота","value":"3.6 ГГц"},{"@type":"PropertyValue","name":"Кэш L3","value":"45 МБ"},{"@type":"PropertyValue","name":"Техпроцесс","value":"22 нм"},{"@type":"PropertyValue","name":"TDP","value":"145 Вт"},{"@type":"PropertyValue","name":"Память","value":"DDR4 до 2133 МГц"},{"@type":"PropertyValue","name":"Максимальный объем ОЗУ","value":"768 ГБ"},{"@type":"PropertyValue","name":"Комплектация","value":"OEM, без кулера"},{"@type":"PropertyValue","name":"Гарантия","value":"3 месяца"},{"@type":"PropertyValue","name":"Страна-изготовитель","value":"Малайзия"},{"@type":"PropertyValue","name":"Особенности","value":"Turbo Boost, ECC, Virtualization Technology, Intel vPro"}]}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Процессор Intel Xeon E5-2699 V3 LGA 2011-3 OEM","description":"Производительный Xeon поколения Haswell для X99-сборок, где нужно много потоков за разумный бюджет: монтаж, стриминг, домашний сервер и рабочие задачи.","image":"<?= product_image_absolute('e5-2699-v3') ?>","sku":"4946900090","mpn":"Xeon E5-2699 V3","url":"https://comp-uter.ru/products/e5-2699-v3/","brand":{"@type":"Brand","name":"Intel"},"category":"Серверные процессоры",<?= prices_offer_json('e5-2699-v3', 'https://comp-uter.ru/products/e5-2699-v3/') ?>,"additionalProperty":[{"@type":"PropertyValue","name":"Артикул","value":"4946900090"},{"@type":"PropertyValue","name":"Архитектура","value":"Haswell"},{"@type":"PropertyValue","name":"Сокет","value":"LGA 2011-3"},{"@type":"PropertyValue","name":"Количество ядер","value":"18"},{"@type":"PropertyValue","name":"Количество потоков","value":"36"},{"@type":"PropertyValue","name":"Базовая частота","value":"2.3 ГГц"},{"@type":"PropertyValue","name":"Турбо-частота","value":"3.6 ГГц"},{"@type":"PropertyValue","name":"Кэш L3","value":"45 МБ"},{"@type":"PropertyValue","name":"Техпроцесс","value":"22 нм"},{"@type":"PropertyValue","name":"TDP","value":"145 Вт"},{"@type":"PropertyValue","name":"Память","value":"DDR4 до 2133 МГц"},{"@type":"PropertyValue","name":"Максимальный объем ОЗУ","value":"768 ГБ"},{"@type":"PropertyValue","name":"Комплектация","value":"OEM, без кулера"},{"@type":"PropertyValue","name":"Гарантия","value":"3 месяца"},{"@type":"PropertyValue","name":"Страна-изготовитель","value":"Малайзия"},{"@type":"PropertyValue","name":"Особенности","value":"Turbo Boost, ECC, Virtualization Technology, Intel vPro"}]}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Главная","item":"https://comp-uter.ru/"},{"@type":"ListItem","position":2,"name":"Серверные процессоры","item":"https://comp-uter.ru/processors/"},{"@type":"ListItem","position":3,"name":"Xeon E5-2699 V3","item":"https://comp-uter.ru/products/e5-2699-v3/"}]}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Сколько ядер у Xeon E5-2699 V3?","acceptedAnswer":{"@type":"Answer","text":"Восемнадцать ядер, тридцать шесть потоков."}},{"@type":"Question","name":"Почему этот процессор дешевле похожих 18-ядерных моделей?","acceptedAnswer":{"@type":"Answer","text":"Более старая архитектура Haswell и память DDR4-2133 вместо 2400 МГц — при тех же ядрах и потоках, что и у более новых и дорогих аналогов линейки."}},{"@type":"Question","name":"Подходит ли для домашнего сервера?","acceptedAnswer":{"@type":"Answer","text":"Да, большое число потоков хорошо подходит для одновременных задач: медиасервер, автоматизация, резервное копирование."}},{"@type":"Question","name":"Какая материнская плата нужна?","acceptedAnswer":{"@type":"Answer","text":"Любая плата на чипсете X99, сокет LGA 2011-3."}}]}</script>
   </head>
@@ -98,7 +98,7 @@
       </nav>
       <article class="product-page-card product-dialog">
         <div class="product-dialog-media">
-          <img src="/public/assets/cpu-e5-2699-v3.webp" alt="Процессор Intel Xeon E5-2699 V3 LGA 2011-3 OEM" />
+          <?= product_image_tag('e5-2699-v3', 'Процессор Intel Xeon E5-2699 V3 LGA 2011-3 OEM') ?>
         </div>
         <div class="product-dialog-copy">
           <p class="section-label">Карточка товара</p>
