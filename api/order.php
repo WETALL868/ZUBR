@@ -695,14 +695,20 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     json_response(['ok' => false, 'message' => 'Метод не поддерживается.'], 405);
 }
 
+/*
+ * Настройки почты необязательны.
+ *
+ * Раньше без файла api/mail-config.php форма отвечала ошибкой 500 — то есть
+ * сразу после установки, пока владелец не завёл почту, каждый заказ
+ * пропадал. Теперь заказ всё равно сохраняется в базу и виден в панели, а
+ * ненастроенная почта отмечается как «письмо не ушло».
+ */
 $config_path = __DIR__ . '/mail-config.php';
-if (!is_file($config_path)) {
-    json_response(['ok' => false, 'message' => 'Не найден файл настроек почты api/mail-config.php.'], 500);
-}
+$config = is_file($config_path) ? require $config_path : null;
+$mail_configured = is_array($config);
 
-$config = require $config_path;
-if (!is_array($config)) {
-    json_response(['ok' => false, 'message' => 'Файл настроек почты заполнен некорректно.'], 500);
+if (!$mail_configured) {
+    $config = [];
 }
 
 // Cap the request body: the order payload is a few KB at most, so anything
@@ -760,8 +766,18 @@ $db_order_id = orders_store([
 
 $to_email = clean_value($config['mail_to'] ?? '');
 $to_name = clean_value($config['mail_to_name'] ?? '');
-if (!filter_var($to_email, FILTER_VALIDATE_EMAIL)) {
-    json_response(['ok' => false, 'message' => 'В настройках почты указан некорректный получатель.'], 500);
+
+// Заказ уже в базе. Если отправлять некуда, это повод пометить заказ, а не
+// отказать покупателю, который со своей стороны всё сделал правильно.
+if (!$mail_configured || !filter_var($to_email, FILTER_VALIDATE_EMAIL)) {
+    $why = $mail_configured ? 'mail_recipient_invalid' : 'mail_not_configured';
+    orders_set_mail_status($db_order_id, $why);
+    error_log('COMP_UTER_ORDER ' . $order['id'] . ' ' . $why);
+
+    json_response($db_order_id
+        ? ['ok' => true, 'orderId' => $order['id'], 'mailStatus' => $why]
+        : ['ok' => false, 'message' => 'Заявку не удалось сохранить. Позвоните нам, пожалуйста.'],
+        $db_order_id ? 200 : 500);
 }
 
 try {

@@ -41,10 +41,10 @@ function upload_dir(): string
         @file_put_contents($guard, <<<'HTACCESS'
 # В этой папке лежат только картинки. Выполнять здесь ничего нельзя —
 # даже если файл с кодом каким-то образом сюда попадёт.
-php_flag engine off
-<IfModule mod_php.c>
-  php_admin_flag engine off
-</IfModule>
+#
+# Директивы php_flag понимает только mod_php. На хостинге с PHP-FPM их нет,
+# и без обёртки IfModule сервер отвечал бы на КАЖДУЮ фотографию ошибкой 500.
+# Поэтому основной запрет — правило ниже: оно работает везде.
 <FilesMatch "\.(php|phtml|phar|php[0-9]|cgi|pl|py|sh|htaccess)$">
   <IfModule mod_authz_core.c>
     Require all denied
@@ -53,6 +53,10 @@ php_flag engine off
     Deny from all
   </IfModule>
 </FilesMatch>
+
+<IfModule mod_php.c>
+  php_admin_flag engine off
+</IfModule>
 HTACCESS);
     }
 

@@ -159,7 +159,8 @@ $checks[] = check($noPhoto === 0, 'Фотографии товаров', 'у в�
 $mailConfig = CMS_ROOT . '/api/mail-config.php';
 $checks[] = check(is_file($mailConfig), 'Настройки почты',
     'файл api/mail-config.php на месте',
-    'нет файла api/mail-config.php — заказы не будут уходить письмом');
+    'нет файла api/mail-config.php — заказы сохраняются в базу, но письма не уходят. '
+    . 'Скопируйте api/mail-config.example.php и заполните.', true);
 
 $checks[] = check(
     is_file(CMS_ROOT . '/config/database.php'),

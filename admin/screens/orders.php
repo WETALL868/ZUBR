@@ -196,7 +196,10 @@ require __DIR__ . '/../layout/header.php';
                   <span class="adm-tag <?= $row['status'] === 'new' ? 'warn' : ($row['status'] === 'cancelled' ? 'bad' : 'ok') ?>">
                     <?= e(ORDER_STATUSES[$row['status']] ?? $row['status']) ?>
                   </span>
-                  <?php if ($row['mail_status'] && str_contains((string)$row['mail_status'], 'failed')): ?>
+                  <?php if ($row['mail_status'] === 'mail_not_configured'): ?>
+                  <span class="adm-tag warn">почта не настроена</span>
+                  <?php elseif ($row['mail_status'] && (str_contains((string)$row['mail_status'], 'failed')
+                      || str_contains((string)$row['mail_status'], 'invalid'))): ?>
                   <span class="adm-tag bad" title="<?= e((string)$row['mail_status']) ?>">письмо не ушло</span>
                   <?php endif; ?>
                 </td>

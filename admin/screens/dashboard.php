@@ -17,7 +17,10 @@ $outOfStock = array_filter($published, static fn($p) => $p['availability'] === '
 
 $newOrders = (int)cms_value("SELECT COUNT(*) FROM orders WHERE status = 'new'");
 $todayOrders = (int)cms_value('SELECT COUNT(*) FROM orders WHERE created_at >= ?', [date('Y-m-d') . ' 00:00:00']);
-$failedMail = (int)cms_value("SELECT COUNT(*) FROM orders WHERE mail_status LIKE '%failed%'");
+$failedMail = (int)cms_value(
+    "SELECT COUNT(*) FROM orders WHERE mail_status LIKE '%failed%' OR mail_status LIKE '%invalid%'"
+);
+$unconfiguredMail = (int)cms_value("SELECT COUNT(*) FROM orders WHERE mail_status = 'mail_not_configured'");
 
 $recent = cms_all('SELECT * FROM audit_log ORDER BY created_at DESC, id DESC LIMIT 8');
 
@@ -58,6 +61,15 @@ require __DIR__ . '/../layout/header.php';
             <span>без фотографии — не попадают в фид</span>
           </div>
         </div>
+
+        <?php if ($unconfiguredMail > 0): ?>
+        <p class="adm-flash warn">
+          Заказов принято без отправки письма: <?= $unconfiguredMail ?> — почта ещё не настроена.
+          Сами заказы сохранены и видны в разделе <a href="<?= e(admin_url('orders')) ?>">«Заказы»</a>.
+          Чтобы письма приходили, заполните <code>api/mail-config.php</code>
+          по образцу <code>api/mail-config.example.php</code>.
+        </p>
+        <?php endif; ?>
 
         <?php if ($failedMail > 0): ?>
         <p class="adm-flash bad">
