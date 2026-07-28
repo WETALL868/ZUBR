@@ -152,6 +152,27 @@ function repo_product_params(int $productId): array
     return $out;
 }
 
+/**
+ * Характеристики для фида: те же значения, но без тех, что помечены
+ * «не выгружать в Яндекс.Маркет».
+ */
+function repo_product_feed_params(int $productId): array
+{
+    $out = [];
+    foreach (cms_all(
+        'SELECT a.name, pav.value
+           FROM product_attribute_values pav
+           JOIN attributes a ON a.id = pav.attribute_id
+          WHERE pav.product_id = ? AND a.in_yml = 1
+          ORDER BY pav.sort_order, a.sort_order',
+        [$productId]
+    ) as $row) {
+        $out[$row['name']] = (string)$row['value'];
+    }
+
+    return $out;
+}
+
 function repo_product_images(int $productId): array
 {
     return cms_all(

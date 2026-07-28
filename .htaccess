@@ -4,25 +4,42 @@ Options -Indexes
 # Routing
 # ---------------------------------------------------------------------------
 
-# Страницы каталога и карточек товаров теперь index.php: они подставляют цены
-# из /data/prices.json. index.php должен идти первым, иначе оставшийся на
-# сервере старый index.html перекрыл бы новую страницу со свежими ценами.
+# Страницы собираются из базы, поэтому index.php должен идти первым: иначе
+# оставшийся на сервере старый index.html перекрыл бы новую страницу.
 DirectoryIndex index.php index.html
 
 RewriteEngine On
 
+# Служебные каталоги закрыты наглухо: в config лежит пароль базы, в storage —
+# сама база и загруженные файлы, в cms — код панели управления. В каждом из
+# них есть свой .htaccess, но правило продублировано здесь: часть хостингов
+# читает только корневой файл, и полагаться на вложенные нельзя.
+RewriteRule ^(config|storage|cms)(/|$) - [F,L]
+RewriteRule ^_backup - [F,L]
+
 # YML feed for Yandex.Market on a clean URL.
 RewriteRule ^yandexmarket\.xml$ yandexmarket/index.php [L,QSA]
+
+# Карта сайта строится из базы. Правило стоит до проверки файлов: если на
+# сервере остался старый sitemap.xml, поисковики всё равно получат свежий.
+RewriteRule ^sitemap\.xml$ sitemap.php [L,QSA]
 
 # Order form endpoint without the .php suffix (the front-end tries /api/order
 # first; without this rule every submit wasted a round-trip on a 404).
 RewriteRule ^api/order/?$ api/order.php [L,QSA]
 
-# Product pages: only fall through to the PHP renderer when no static
-# products/<slug>/index.html exists for that URL.
+# Карточки товаров. Отдельных папок products/<slug>/ больше нет — адрес
+# обслуживает один контроллер, который берёт товар из базы по slug.
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^products/([^/]+)/?$ products/index.php?slug=$1 [L,QSA]
+
+# Категории. Правило последнее и срабатывает, только если такого файла и
+# такой папки на диске нет: новая категория, созданная в CMS, получает
+# адрес /<slug>/ без единой строки кода и без новой папки на сервере.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^([a-z0-9][a-z0-9_-]*)/?$ route.php?slug=$1 [L,QSA]
 
 # ---------------------------------------------------------------------------
 # Compression

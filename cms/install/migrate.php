@@ -256,8 +256,12 @@ function migrate_parse_simple_page(string $file): array
     return array_filter([
         'title'     => $grab('~<title>(.*?)</title>~s'),
         'seo_title' => $grab('~<title>(.*?)</title>~s'),
-        'seo_desc'  => $grab('~<meta name="description" content="(.*?)"~s'),
+        'seo_desc'  => $grab('~<meta\s+name="description"\s+content="(.*?)"~s'),
+        'og_title'  => $grab('~<meta property="og:title" content="(.*?)"~s'),
+        'og_desc'   => $grab('~<meta property="og:description" content="(.*?)"~s'),
         'h1'        => $grab('~<h1[^>]*>(.*?)</h1>~s'),
+        // Каждая правовая страница заранее подгружает свой фон.
+        'preload_image' => $grab('~<link rel="preload" as="image" href="(.*?)"~s'),
         'content'   => $content,
     ], static fn($v) => $v !== null && $v !== '');
 }
@@ -332,8 +336,8 @@ if ($apply) {
 
 $categoryMap = [];   // category_id из products.php -> id в базе
 $categoryDefs = [
-    1 => ['name' => 'Серверные процессоры', 'slug' => 'processors', 'page' => legacy('category-processors.php', 'processors/index.php'), 'yml' => 1],
-    2 => ['name' => 'Диски и накопители',   'slug' => 'drives',     'page' => legacy('category-drives.php', 'drives/index.php'),     'yml' => 2],
+    1 => ['name' => 'Серверные процессоры', 'slug' => 'processors', 'page' => legacy('category-processors.php', 'processors/index.php'), 'yml' => 1, 'yml_name' => 'Процессоры Intel Xeon'],
+    2 => ['name' => 'Диски и накопители',   'slug' => 'drives',     'page' => legacy('category-drives.php', 'drives/index.php'),     'yml' => 2, 'yml_name' => 'Жесткие диски Seagate'],
 ];
 
 // Блок «другая категория» на странице A описывает категорию B — значит,
@@ -388,6 +392,7 @@ foreach ($categoryDefs as $oldId => $def) {
         'og_title'        => $extra['og_title'] ?? null,
         'og_desc'         => $extra['og_desc'] ?? null,
         'yml_category_id' => $def['yml'],
+        'yml_name'        => $def['yml_name'],
         'sort_order'      => $oldId,
         'is_published'    => 1,
         'updated_at'      => cms_now(),
@@ -636,8 +641,8 @@ say();
 /* -------------------------------------------------------------- страницы */
 
 $pageDefs = [
-    ['slug' => 'privacy_policy',            'file' => legacy('page-privacy_policy.html', 'privacy_policy/index.html'),            'title' => 'Политика конфиденциальности'],
-    ['slug' => 'polzovatelskoe-soglashenie', 'file' => legacy('page-polzovatelskoe-soglashenie.html', 'polzovatelskoe-soglashenie/index.html'), 'title' => 'Пользовательское соглашение'],
+    ['slug' => 'privacy_policy',            'file' => legacy('page-privacy_policy.html', 'privacy_policy/index.html'),            'title' => 'Политика конфиденциальности', 'sort' => 10],
+    ['slug' => 'polzovatelskoe-soglashenie', 'file' => legacy('page-polzovatelskoe-soglashenie.html', 'polzovatelskoe-soglashenie/index.html'), 'title' => 'Пользовательское соглашение', 'sort' => 20],
 ];
 
 foreach ($pageDefs as $def) {
@@ -655,10 +660,15 @@ foreach ($pageDefs as $def) {
         'slug'       => $def['slug'],
         'h1'        => $parsed['h1'] ?? $def['title'],
         'content'   => $parsed['content'] ?? null,
+        'template'  => 'legal',
         'seo_title' => $parsed['seo_title'] ?? null,
         'seo_desc'  => $parsed['seo_desc'] ?? null,
+        'og_title'  => $parsed['og_title'] ?? null,
+        'og_desc'   => $parsed['og_desc'] ?? null,
+        'preload_image' => $parsed['preload_image'] ?? null,
         'status'    => 'published',
         'in_footer' => 1,
+        'sort_order' => $def['sort'],
         'updated_at' => cms_now(),
     ];
     $existing = cms_value('SELECT id FROM pages WHERE slug = ?', [$def['slug']]);
@@ -966,6 +976,9 @@ if ($apply) {
         ['yml', 'shop_name', 'Comp-Uter'],
         ['yml', 'utm', 'utm_source=yandexmarket&utm_medium=cpc&utm_campaign=xeon_feed'],
         ['yml', 'currency', 'RUR'],
+        ['yml', 'cache_ttl_seconds', '60'],
+        ['yml', 'default_country', 'Малайзия'],
+        ['yml', 'sales_notes', 'Доставка по России: СДЭК, Яндекс Маркет, Ozon, Wildberries и другими транспортными компаниями; условия уточняются у менеджера.'],
     ];
     foreach ($defaults as [$g, $k, $v]) {
         if (cms_value('SELECT id FROM settings WHERE group_code = ? AND key_code = ?', [$g, $k]) === null) {

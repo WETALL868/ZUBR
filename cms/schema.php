@@ -90,6 +90,9 @@ function cms_schema(): array
             'cross_text     {TEXT}    NULL',   // текст в блоке «другая категория»
             'cross_button   {STR:120} NULL',
             'footer_text    {TEXT}    NULL',   // абзац о компании в подвале
+            // В фиде Яндекс.Маркета у категории своё название — менять его
+            // нельзя, иначе маркетплейс потеряет привязку товаров.
+            'yml_name       {STR:190} NULL',
             'description   {LONGTEXT} NULL',  // SEO-текст, визуальный редактор
             'image         {STR:255} NULL',
             'seo_title     {STR:255} NULL',
@@ -268,6 +271,9 @@ function cms_schema(): array
             'tw_title     {STR:255} NULL',
             'tw_desc      {TEXT}    NULL',
             'keywords     {TEXT}    NULL',
+            // Фоновая картинка страницы, которую браузер грузит заранее:
+            // у правовых страниц она разная.
+            'preload_image {STR:255} NULL',
             'noindex      {BOOL}    NOT NULL DEFAULT 0',
             'status       {STR:20}  NOT NULL DEFAULT \'published\'', // draft|published|hidden
             'in_header    {BOOL}    NOT NULL DEFAULT 0',

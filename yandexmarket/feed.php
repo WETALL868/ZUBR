@@ -1,20 +1,28 @@
 <?php
 
+/**
+ * Фид Яндекс.Маркета.
+ *
+ * Товары, цены, наличие, характеристики и фотографии берутся из базы CMS —
+ * из тех же таблиц, что и страницы сайта. Отдельного файла с каталогом
+ * больше нет, поэтому фид не может разойтись с витриной: цена, изменённая
+ * в административной панели, попадает и на сайт, и в маркетплейс.
+ */
+
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/src/prices.php';
-require_once dirname(__DIR__) . '/src/images.php';
+require_once dirname(__DIR__) . '/cms/repo.php';
 
 function yml_text(string $value): string
 {
     return htmlspecialchars($value, ENT_XML1 | ENT_COMPAT, 'UTF-8');
 }
 
-function yml_base_url(array $config): string
+function yml_base_url(): string
 {
-    $base_url = trim((string)($config['base_url'] ?? ''));
-    if ($base_url !== '') {
-        return rtrim($base_url, '/');
+    $base = trim((string)cms_setting('site', 'base_url', ''));
+    if ($base !== '') {
+        return rtrim($base, '/');
     }
 
     $host = $_SERVER['HTTP_HOST'] ?? '';
@@ -22,28 +30,24 @@ function yml_base_url(array $config): string
         return 'https://comp-uter.ru';
     }
 
-    $forwarded_proto = strtolower((string)($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? ''));
-    $is_https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $forwarded_proto === 'https';
+    $forwarded = strtolower((string)($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? ''));
+    $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $forwarded === 'https';
 
-    return ($is_https ? 'https://' : 'http://') . $host;
+    return ($https ? 'https://' : 'http://') . $host;
 }
 
-function yml_absolute_url(string $base_url, string $path): string
+function yml_absolute_url(string $base, string $path): string
 {
-    // Product images may already be absolute (imported from an external CDN).
-    // Prefixing those again produced https://comp-uter.ru/https://cdn... and
-    // Yandex.Market rejects an offer whose <picture> is not a valid URL.
     if (preg_match('~^(https?:)?//~i', $path)) {
         return $path;
     }
 
-    return rtrim($base_url, '/') . '/' . ltrim($path, '/');
+    return rtrim($base, '/') . '/' . ltrim($path, '/');
 }
 
-function yml_product_url(string $base_url, array $product, string $utm): string
+function yml_product_url(string $base, array $product, string $utm): string
 {
-    $slug = (string)($product['slug'] ?? '');
-    $url = rtrim($base_url, '/') . '/products/' . rawurlencode($slug) . '/';
+    $url = rtrim($base, '/') . '/products/' . rawurlencode((string)$product['slug']) . '/';
     if ($utm !== '') {
         $url .= '?' . ltrim($utm, '?&');
     }
@@ -51,80 +55,80 @@ function yml_product_url(string $base_url, array $product, string $utm): string
     return $url;
 }
 
-function yml_offer(array $config, array $product, string $base_url): string
+function yml_offer(array $product, string $base): string
 {
-    // Цена и наличие приходят из единого файла /data/prices.json.
-    $price = prices_value((string)($product['slug'] ?? '')) ?? prices_value((string)($product['id'] ?? ''));
-    $stock = prices_stock((string)($product['slug'] ?? ''));
-    $available = $stock !== 'out_of_stock' ? 'true' : 'false';
+    $price = repo_price($product);
+    $params = repo_product_feed_params((int)$product['id']);
+    $category = repo_category_by_id($product['category_id'] ? (int)$product['category_id'] : null);
 
-    $currency_id = (string)($config['currency_id'] ?? 'RUR');
-    $category_id = (string)($product['category_id'] ?? ($config['default_category_id'] ?? 1));
-    $vendor = (string)($product['brand'] ?? 'Intel');
-    $country = (string)($product['params']['Страна-изготовитель'] ?? 'Малайзия');
-    $utm = (string)($config['utm'] ?? '');
-    $params = '';
+    $available = $product['availability'] !== 'out_of_stock' ? 'true' : 'false';
+    $categoryId = (string)($category['yml_category_id'] ?? $category['id'] ?? 1);
+    $country = (string)($params['Страна-изготовитель'] ?? cms_setting('yml', 'default_country', 'Малайзия'));
+    $utm = (string)cms_setting('yml', 'utm', '');
 
-    foreach (($product['params'] ?? []) as $name => $value) {
-        $params .= '      <param name="' . yml_text((string)$name) . '">' . yml_text((string)$value) . "</param>\n";
+    $paramsXml = '';
+    foreach ($params as $name => $value) {
+        $paramsXml .= '      <param name="' . yml_text((string)$name) . '">' . yml_text((string)$value) . "</param>\n";
     }
 
-    return '    <offer id="' . yml_text((string)$product['id']) . '" available="' . $available . "\">\n"
-        . '      <url>' . yml_text(yml_product_url($base_url, $product, $utm)) . "</url>\n"
-        . '      <price>' . yml_text(prices_machine($price)) . "</price>\n"
-        . '      <currencyId>' . yml_text($currency_id) . "</currencyId>\n"
-        . '      <categoryId>' . yml_text($category_id) . "</categoryId>\n"
-        . '      <picture>' . yml_text(product_image_absolute((string)($product['slug'] ?? ''), $base_url)) . "</picture>\n"
+    return '    <offer id="' . yml_text((string)$product['sku']) . '" available="' . $available . "\">\n"
+        . '      <url>' . yml_text(yml_product_url($base, $product, $utm)) . "</url>\n"
+        . '      <price>' . yml_text(cms_money_machine($price)) . "</price>\n"
+        . '      <currencyId>' . yml_text((string)cms_setting('yml', 'currency', 'RUR')) . "</currencyId>\n"
+        . '      <categoryId>' . yml_text($categoryId) . "</categoryId>\n"
+        . '      <picture>' . yml_text(yml_absolute_url($base, repo_image_original($product))) . "</picture>\n"
         . "      <store>true</store>\n"
         . "      <pickup>true</pickup>\n"
         . "      <delivery>true</delivery>\n"
         . '      <name>' . yml_text((string)$product['name']) . "</name>\n"
-        . '      <vendor>' . yml_text($vendor) . "</vendor>\n"
-        . '      <vendorCode>' . yml_text((string)$product['id']) . "</vendorCode>\n"
+        . '      <vendor>' . yml_text((string)($product['brand'] ?: 'Intel')) . "</vendor>\n"
+        . '      <vendorCode>' . yml_text((string)$product['sku']) . "</vendorCode>\n"
         . '      <description>' . yml_text((string)$product['description']) . "</description>\n"
-        . "      <sales_notes>Доставка по России: СДЭК, Яндекс Маркет, Ozon, Wildberries и другими транспортными компаниями; условия уточняются у менеджера.</sales_notes>\n"
+        . '      <sales_notes>' . yml_text((string)cms_setting('yml', 'sales_notes', '')) . "</sales_notes>\n"
         . '      <country_of_origin>' . yml_text($country) . "</country_of_origin>\n"
-        . $params
+        . $paramsXml
         . "    </offer>\n";
 }
 
-function yml_generate_catalog(array $config, array $products): string
+function yml_generate_catalog(): string
 {
-    $base_url = yml_base_url($config);
-    $shop_name = (string)($config['shop_name'] ?? 'Comp-Uter');
-    $company = (string)($config['company'] ?? $shop_name);
-    $currency_id = (string)($config['currency_id'] ?? 'RUR');
-    $categories = (array)($config['categories'] ?? [1 => 'Процессоры Intel Xeon']);
+    $base = yml_base_url();
+    $shopName = (string)cms_setting('yml', 'shop_name', 'Comp-Uter');
+    $company = (string)cms_setting('site', 'legal_name', $shopName);
+    $currency = (string)cms_setting('yml', 'currency', 'RUR');
 
     $categoriesXml = '';
-    foreach ($categories as $id => $name) {
-        $categoriesXml .= '      <category id="' . yml_text((string)$id) . '">' . yml_text((string)$name) . "</category>\n";
+    foreach (repo_categories() as $category) {
+        $id = (string)($category['yml_category_id'] ?: $category['id']);
+        $name = (string)($category['yml_name'] ?: $category['name']);
+        $categoriesXml .= '      <category id="' . yml_text($id) . '">' . yml_text($name) . "</category>\n";
     }
 
-    // Позиция без цены в /data/prices.json в фид не попадает: Яндекс.Маркет
-    // отклоняет предложение без <price>, а пустой тег сломал бы весь фид.
+    // Позиция без цены в фид не попадает: Яндекс.Маркет отклоняет предложение
+    // без <price>, а пустой тег сломал бы весь фид.
     //
     // Позиция без настоящей фотографии — тоже: отдавать в маркетплейс картинку
     // «Фото товара готовится» хуже, чем на день не показать позицию. Как только
-    // файл появится в /public/images/products/, товар вернётся в фид сам.
+    // фотография появится в карточке товара, он вернётся в фид сам.
     $offers = '';
-    foreach ($products as $product) {
-        $slug = (string)($product['slug'] ?? '');
-        $price = prices_value($slug) ?? prices_value((string)($product['id'] ?? ''));
-        if ($price === null || product_image_is_placeholder($slug)) {
+    foreach (repo_products() as $product) {
+        if ((int)$product['in_yml'] !== 1) {
             continue;
         }
-        $offers .= yml_offer($config, $product, $base_url);
+        if (repo_price($product) === null || repo_image_is_placeholder($product)) {
+            continue;
+        }
+        $offers .= yml_offer($product, $base);
     }
 
     return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
         . '<yml_catalog date="' . date('Y-m-d H:i') . "\">\n"
         . "  <shop>\n"
-        . '    <name>' . yml_text($shop_name) . "</name>\n"
+        . '    <name>' . yml_text($shopName) . "</name>\n"
         . '    <company>' . yml_text($company) . "</company>\n"
-        . '    <url>' . yml_text($base_url) . "</url>\n"
+        . '    <url>' . yml_text($base) . "</url>\n"
         . "    <currencies>\n"
-        . '      <currency id="' . yml_text($currency_id) . "\" rate=\"1\" />\n"
+        . '      <currency id="' . yml_text($currency) . "\" rate=\"1\" />\n"
         . "    </currencies>\n"
         . "    <categories>\n"
         . $categoriesXml
@@ -136,36 +140,35 @@ function yml_generate_catalog(array $config, array $products): string
         . "</yml_catalog>\n";
 }
 
-function yml_cached_catalog(array $config, array $products): array
+/**
+ * Фид с кэшем на диске.
+ *
+ * Кэш сбрасывается и по времени, и как только в базе меняется товар: иначе
+ * после правки цены маркетплейс ещё минуту получал бы старую.
+ */
+function yml_cached_catalog(): array
 {
-    $ttl = max(60, (int)($config['cache_ttl_seconds'] ?? 60));
-    $cache_dir = __DIR__ . '/cache';
-    $cache_file = $cache_dir . '/yandexmarket.xml';
+    $ttl = max(60, (int)cms_setting('yml', 'cache_ttl_seconds', 60));
+    $cacheDir = CMS_ROOT . '/storage/cache';
+    $cacheFile = $cacheDir . '/yandexmarket.xml';
 
-    // Кэш сбрасывается и по TTL, и как только стали новее исходные данные:
-    // файл цен, каталог товаров или папка с фотографиями. Иначе после замены
-    // цены или загрузки фото фид ещё минуту отдавал бы старые данные.
-    $source_mtime = 0;
-    foreach ([PRICES_FILE, __DIR__ . '/products.php', product_image_root() . PRODUCT_IMAGES_DIR] as $source) {
-        if (file_exists($source)) {
-            $source_mtime = max($source_mtime, (int)filemtime($source));
+    $touched = (string)cms_value('SELECT MAX(updated_at) FROM products');
+    $stamp = $touched !== '' ? (int)strtotime($touched) : 0;
+
+    if (is_file($cacheFile) && is_readable($cacheFile)) {
+        $age = (int)filemtime($cacheFile);
+        if ((time() - $age < $ttl) && $age >= $stamp) {
+            return [(string)file_get_contents($cacheFile), 'hit'];
         }
     }
 
-    if (is_file($cache_file) && is_readable($cache_file)) {
-        $cache_mtime = (int)filemtime($cache_file);
-        if ((time() - $cache_mtime < $ttl) && $cache_mtime >= $source_mtime) {
-            return [file_get_contents($cache_file), 'hit'];
-        }
-    }
+    $xml = yml_generate_catalog();
 
-    $xml = yml_generate_catalog($config, $products);
-
-    if (!is_dir($cache_dir)) {
-        @mkdir($cache_dir, 0755, true);
+    if (!is_dir($cacheDir)) {
+        @mkdir($cacheDir, 0775, true);
     }
-    if (is_dir($cache_dir) && is_writable($cache_dir)) {
-        @file_put_contents($cache_file, $xml, LOCK_EX);
+    if (is_dir($cacheDir) && is_writable($cacheDir)) {
+        @file_put_contents($cacheFile, $xml, LOCK_EX);
     }
 
     return [$xml, 'miss'];

@@ -10,6 +10,9 @@
 $bodyScripts     = $bodyScripts     ?? [];
 $footerBrandHref = $footerBrandHref ?? '/';
 $footerAnchor    = $footerAnchor    ?? '/';
+// Страница не ссылается сама на себя: на правовых страницах в подвале
+// оставалась только ссылка на соседнюю.
+$footerSkipPage  = $footerSkipPage  ?? null;
 ?>
     <footer class="site-footer">
       <div class="footer-brand">
@@ -24,7 +27,8 @@ $footerAnchor    = $footerAnchor    ?? '/';
 <?php if (!empty($footerCategories)): foreach (repo_categories() as $footerCategory): ?>
         <a href="<?= e(repo_category_url($footerCategory)) ?>"><?= e($footerCategory['name']) ?></a>
         <?php endforeach; endif; ?>
-        <?php foreach (cms_all('SELECT slug, title, menu_title FROM pages WHERE status = ? AND in_footer = 1 ORDER BY sort_order, id', ['published']) as $footerPage): ?>
+        <?php foreach (cms_all('SELECT slug, title, menu_title FROM pages WHERE status = ? AND in_footer = 1 ORDER BY sort_order, id', ['published']) as $footerPage):
+            if ($footerSkipPage !== null && $footerPage['slug'] === $footerSkipPage) { continue; } ?>
         <a href="/<?= e($footerPage['slug']) ?>/"><?= e((string)($footerPage['menu_title'] ?: $footerPage['title'])) ?></a>
         <?php endforeach; ?>
         <a href="<?= e($footerAnchor) ?>#requisites">Реквизиты для счета</a>

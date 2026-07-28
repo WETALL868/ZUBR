@@ -27,6 +27,11 @@ $ogImage         = $ogImage         ?? cms_absolute_url('/public/assets/xeon-her
 $jsonLd          = $jsonLd          ?? [];
 $headerBrandHref = $headerBrandHref ?? '/';
 $headerAnchor    = $headerAnchor    ?? '/';
+$headerVariant   = $headerVariant   ?? 'full';
+// Подтверждение прав в Яндекс.Вебмастере стояло не на всех страницах —
+// оставляем как было, чтобы разметка не менялась.
+$showVerification = $showVerification ?? true;
+$bodyClass       = $bodyClass       ?? '';
 $headAssets      = $headAssets      ?? "    <link rel=\"preconnect\" href=\"https://mc.yandex.ru\" />\n    <link rel=\"stylesheet\" href=\"/src/styles.css?v=3\" />\n";
 $headTail        = $headTail        ?? '';
 ?><!doctype html>
@@ -35,7 +40,9 @@ $headTail        = $headTail        ?? '';
     <meta charset="UTF-8" />
     <script src="/src/scroll-restore.js?v=1"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <?php if ($showVerification): ?>
     <meta name="yandex-verification" content="<?= e((string)cms_setting('seo', 'yandex_verification', '624ceca67ba02e2a')) ?>" />
+    <?php endif; ?>
     <meta name="description" content="<?= e((string)$pageDescription) ?>" />
     <?php if (!empty($noindex)): ?>
     <meta name="robots" content="noindex, nofollow" />
@@ -64,7 +71,7 @@ $headTail        = $headTail        ?? '';
     <script type="application/ld+json"><?= json_encode($block, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
     <?php endforeach; ?>
   </head>
-  <body>
+  <body<?= $bodyClass !== '' ? ' class="' . e($bodyClass) . '"' : '' ?>>
 
     <!-- Yandex.Metrika counter -->
     <script type="text/javascript">
@@ -80,6 +87,22 @@ $headTail        = $headTail        ?? '';
     <noscript><div><img src="https://mc.yandex.ru/watch/<?= e((string)cms_setting('seo','metrika_id','110948351')) ?>" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
     <!-- /Yandex.Metrika counter -->
 
+    <?php if ($headerVariant === 'legal'):
+      /* Правовые страницы носят упрощённую шапку: без каталога и корзины. */ ?>
+    <header class="legal-header">
+      <a class="brand" href="/#top" aria-label="Comp-Uter">
+        <span class="brand-image brand-image-wordmark">
+          <img src="/public/assets/comp-uter-logo-wordmark.webp" alt="" />
+        </span>
+      </a>
+      <div class="header-contacts" aria-label="Контакты отдела продаж">
+        <span>Отдел продаж</span>
+        <a class="header-phone" href="tel:<?= e((string)cms_setting('contacts','phone_raw','+74993221311')) ?>"><?= e((string)cms_setting('contacts','phone','+7 (499) 322-13-11')) ?></a>
+        <a class="header-mail" href="mailto:<?= e((string)cms_setting('contacts','email','info@comp-uter.ru')) ?>"><?= e((string)cms_setting('contacts','email','info@comp-uter.ru')) ?></a>
+      </div>
+      <a class="header-action" href="/#order">Оформить заказ</a>
+    </header>
+    <?php else: ?>
     <header class="site-header">
       <a class="brand" href="<?= e($headerBrandHref) ?>" aria-label="Comp-Uter">
         <span class="brand-image brand-image-wordmark">
@@ -135,3 +158,4 @@ $headTail        = $headTail        ?? '';
         <span></span>
       </button>
     </header>
+    <?php endif; ?>
