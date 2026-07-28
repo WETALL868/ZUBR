@@ -4,3 +4,6 @@ storage/
 
 # Служебные файлы проверок
 cook.txt
+
+# Пароль почты и токен Telegram — не в Git и не в архивы
+api/mail-config.php
