@@ -10,10 +10,10 @@
 # бы запросить напрямую.
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteRule ^(bootstrap\.php|layout/|screens/) - [F,L]
+  RewriteRule ^(bootstrap\.php|uploads\.php|layout/|screens/) - [F,L]
 </IfModule>
 
-<FilesMatch "^bootstrap\.php$">
+<FilesMatch "^(bootstrap|uploads)\.php$">
   <IfModule mod_authz_core.c>
     Require all denied
   </IfModule>
