@@ -514,6 +514,42 @@ function cms_schema_sql(string $driver): array
     return $sql;
 }
 
+/**
+ * Создаёт недостающие таблицы и индексы.
+ *
+ * Выполнять можно сколько угодно раз. У MySQL нет «CREATE INDEX IF NOT
+ * EXISTS», поэтому повторный запуск падал бы на «Duplicate key name» — а
+ * повторный запуск здесь обычное дело: владелец сначала заливает
+ * schema.mysql.sql через phpMyAdmin, а потом всё равно запускает перенос
+ * данных, который создаёт схему сам.
+ *
+ * @return array{created:int,skipped:int}
+ */
+function cms_schema_apply(PDO $pdo, string $driver): array
+{
+    $created = 0;
+    $skipped = 0;
+
+    foreach (cms_schema_sql($driver) as $query) {
+        try {
+            $pdo->exec($query);
+            $created++;
+        } catch (PDOException $e) {
+            $message = $e->getMessage();
+            // «уже есть» — не ошибка. Всё остальное — ошибка.
+            if (str_contains($message, 'Duplicate key name')
+                || str_contains($message, 'already exists')
+                || str_contains($message, 'Duplicate entry')) {
+                $skipped++;
+                continue;
+            }
+            throw $e;
+        }
+    }
+
+    return ['created' => $created, 'skipped' => $skipped];
+}
+
 // Запуск из консоли: php cms/schema.php --dump-mysql > cms/schema.mysql.sql
 if (PHP_SAPI === 'cli' && isset($argv[1]) && $argv[1] === '--dump-mysql') {
     echo "-- Схема базы данных Comp-Uter CMS для MySQL / MariaDB.\n";

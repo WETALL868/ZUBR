@@ -325,10 +325,9 @@ if ($apply) {
         }
     }
 
-    foreach (cms_schema_sql($driver) as $query) {
-        cms_db()->exec($query);
-    }
-    say('Схема создана: ' . count(cms_schema()) . ' таблиц.');
+    $applied = cms_schema_apply(cms_db(), $driver);
+    say('Схема готова: ' . count(cms_schema()) . ' таблиц'
+        . ($applied['skipped'] > 0 ? ' (уже существовало объектов: ' . $applied['skipped'] . ')' : '') . '.');
     say();
 }
 
