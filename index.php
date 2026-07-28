@@ -2241,6 +2241,8 @@ button:disabled {
     </footer>
 
     <script src="/src/nav.js?v=2"></script>
-    <script src="/src/main.js?v=2"></script>
+    <script src="/src/scroll-lock.js?v=3"></script>
+    <script src="/src/gallery.js?v=3"></script>
+    <script src="/src/main.js?v=3"></script>
   </body>
 </html>

@@ -98,7 +98,7 @@
       </nav>
       <article class="product-page-card product-dialog">
         <div class="product-dialog-media">
-          <?= product_image_tag('st6000nm0115', 'Жесткий диск Seagate Exos 7E8 6TB ST6000NM0115') ?>
+          <?= product_image_tag('st6000nm0115', 'Жесткий диск Seagate Exos 7E8 6TB ST6000NM0115', false, '(max-width: 900px) 92vw, 520px') ?>
         </div>
         <div class="product-dialog-copy">
           <p class="section-label">Карточка товара</p>
@@ -310,6 +310,8 @@
     </footer>
     <script src="/src/nav.js?v=2"></script>
     <script src="/src/cpu-article.js?v=2"></script>
-    <script src="/src/product-page.js?v=2"></script>
+    <script src="/src/scroll-lock.js?v=3"></script>
+    <script src="/src/gallery.js?v=3"></script>
+    <script src="/src/product-page.js?v=3"></script>
   </body>
 </html>

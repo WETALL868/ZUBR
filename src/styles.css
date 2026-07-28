@@ -851,7 +851,10 @@ h3 {
 
 .model-photo {
   width: 100%;
-  aspect-ratio: 1.2;
+  /* Вертикальный формат карточки товара, как на маркетплейсах.
+     object-fit: contain ниже гарантирует, что товар виден целиком:
+     ничего не обрезается и не растягивается. */
+  aspect-ratio: 3 / 4;
   display: grid;
   place-items: center;
   margin: 0 0 16px;
@@ -1218,7 +1221,6 @@ h3 {
 
 .product-dialog-media img {
   width: 100%;
-  max-height: min(680px, 78vh);
   object-fit: contain;
   border-radius: 6px;
   filter: drop-shadow(0 26px 34px rgba(0, 0, 0, 0.42));
@@ -1775,10 +1777,15 @@ h3 {
 
 .photo-viewer-close {
   position: fixed;
-  top: 20px;
-  right: 20px;
-  width: 46px;
-  height: 46px;
+  /* env(safe-area-inset-*) — вырез и системные элементы телефона: без них
+     кнопка на iPhone попадала под браузерную панель и не нажималась. */
+  top: calc(env(safe-area-inset-top, 0px) + 14px);
+  right: calc(env(safe-area-inset-right, 0px) + 14px);
+  z-index: 2;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
   border: 1px solid rgba(82, 214, 195, 0.42);
   border-radius: 50%;
   background: rgba(7, 9, 7, 0.86);
@@ -1795,9 +1802,7 @@ h3 {
   outline: none;
 }
 
-body.viewer-open {
-  overflow: hidden;
-}
+/* body.viewer-open: прокрутку блокирует ScrollLock (src/scroll-lock.js) */
 
 .cart-backdrop {
   position: fixed;
@@ -2083,9 +2088,7 @@ body.viewer-open {
   line-height: 1.45;
 }
 
-body.cart-open {
-  overflow: hidden;
-}
+/* body.cart-open: прокрутку блокирует ScrollLock (src/scroll-lock.js) */
 
 .order-success {
   position: fixed;
@@ -2174,9 +2177,7 @@ body.cart-open {
   line-height: 1;
 }
 
-body.success-open {
-  overflow: hidden;
-}
+/* body.success-open: прокрутку блокирует ScrollLock (src/scroll-lock.js) */
 
 .seo-panel {
   display: grid;
@@ -3358,12 +3359,20 @@ button:disabled {
   }
 
   .photo-viewer {
-    padding: 18px;
+    /* Сверху оставляем полосу под кнопку закрытия, чтобы крестик не лежал
+       поверх фотографии товара. Заодно увеличивается область фона, по
+       которой окно закрывается тапом. */
+    padding: calc(env(safe-area-inset-top, 0px) + 74px) 18px
+             calc(env(safe-area-inset-bottom, 0px) + 18px);
+    align-content: start;
   }
 
   .photo-viewer-frame {
     grid-template-columns: 1fr;
-    max-height: 90vh;
+    /* dvh учитывает реальную видимую высоту с учётом панелей браузера;
+       vh оставлен запасным вариантом для старых движков. */
+    max-height: 78vh;
+    max-height: 78dvh;
   }
 
   .product-page {
@@ -3392,7 +3401,8 @@ button:disabled {
   }
 
   .product-dialog-media img {
-    max-height: 48vh;
+    /* Высоту теперь задаёт пропорция 3:4, жёсткий потолок её ломал. */
+    max-height: none;
   }
 
   .footer-bottom {
@@ -3514,7 +3524,8 @@ button:disabled {
   }
 
   .photo-viewer {
-    padding: 12px;
+    padding: calc(env(safe-area-inset-top, 0px) + 74px) 12px
+             calc(env(safe-area-inset-bottom, 0px) + 14px);
   }
 
   .photo-viewer-frame {
@@ -3608,4 +3619,214 @@ button:disabled {
 .model-card > span.stock-out_of_stock {
   border-color: rgba(255, 255, 255, 0.2);
   color: var(--muted);
+}
+
+/* ---------------------------------------------------------------------------
+ * МОБИЛЬНАЯ ПРОКРУТКА ПОД МОДАЛЬНЫМИ ОКНАМИ
+ *
+ * Раньше окна вешали на body `overflow: hidden`. На телефоне это не работает:
+ * прокручивается корневой элемент, а на iOS Safari body с overflow: hidden
+ * прокручивается всё равно. Палец листал невидимую страницу под окном, и после
+ * закрытия пользователь оказывался в другом месте каталога — выглядело как
+ * зависание. Теперь body переводится в position: fixed со сдвигом на текущую
+ * позицию (см. src/scroll-lock.js) — прокрутка невозможна физически, а после
+ * закрытия страница возвращается ровно на прежнее место.
+ * --------------------------------------------------------------------------- */
+body.scroll-locked {
+  position: fixed;
+  left: 0;
+  right: 0;
+  width: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+/* Прокрутка внутри окна не должна «перетекать» на страницу под ним. */
+.photo-viewer-frame,
+.cart-drawer,
+.nav-panel,
+.pgallery {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ---------------------------------------------------------------------------
+ * ProductGallery — просмотр фотографии товара с увеличением (src/gallery.js)
+ * --------------------------------------------------------------------------- */
+.pgallery {
+  position: fixed;
+  z-index: 60;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  padding:
+    calc(env(safe-area-inset-top, 0px) + 8px)
+    calc(env(safe-area-inset-right, 0px) + 8px)
+    calc(env(safe-area-inset-bottom, 0px) + 8px)
+    calc(env(safe-area-inset-left, 0px) + 8px);
+  background: rgba(2, 4, 4, 0.94);
+  backdrop-filter: blur(12px);
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.pgallery[hidden] {
+  display: none;
+}
+
+.pgallery.is-open {
+  opacity: 1;
+}
+
+/* Верхняя полоса с крестиком — НАД фотографией, а не поверх неё. */
+.pgallery-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 48px;
+  padding: 0 4px;
+}
+
+.pgallery-counter {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+/* 48×48 — с запасом к рекомендованным 44×44 для пальца. */
+.pgallery-close {
+  width: 48px;
+  height: 48px;
+  margin-left: auto;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(82, 214, 195, 0.45);
+  border-radius: 50%;
+  background: rgba(7, 9, 7, 0.92);
+  color: var(--ink);
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
+}
+
+.pgallery-close:focus-visible {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.pgallery-stage {
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  /* Щипком можно увеличить фотографию, но одним пальцем — не прокрутить
+     страницу под окном. */
+  touch-action: pinch-zoom;
+}
+
+.pgallery-image {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.pgallery-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(82, 214, 195, 0.32);
+  border-radius: 50%;
+  background: rgba(7, 9, 7, 0.8);
+  color: var(--ink);
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.pgallery-nav[hidden] {
+  display: none;
+}
+
+.pgallery-prev {
+  left: calc(env(safe-area-inset-left, 0px) + 10px);
+}
+
+.pgallery-next {
+  right: calc(env(safe-area-inset-right, 0px) + 10px);
+}
+
+.pgallery-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  min-height: 26px;
+  padding-top: 8px;
+}
+
+.pgallery-dots[hidden] {
+  display: none;
+}
+
+.pgallery-dot {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.28);
+  cursor: pointer;
+}
+
+.pgallery-dot.is-active {
+  background: var(--accent);
+}
+
+/* На телефоне стрелки мешают свайпу — там листаем пальцем. */
+@media (max-width: 720px) {
+  .pgallery-nav {
+    display: none;
+  }
+}
+
+/* Фотография товара кликабельна — показываем это курсором. */
+.product-dialog-media {
+  cursor: zoom-in;
+}
+
+/* ---------------------------------------------------------------------------
+ * Вертикальный формат 3:4 на странице товара — та же логика пропорций, что и
+ * в карточках каталога. object-fit: contain: товар всегда виден целиком.
+ * --------------------------------------------------------------------------- */
+.product-dialog-media img {
+  /* Задаём высоту, ширину выводим из пропорции — так рамка изображения сама
+     остаётся вертикальной 3:4 на любом экране. max-width не даёт ей вылезти
+     за контейнер на узких телефонах. */
+  width: auto;
+  height: min(62dvh, 620px);
+  max-width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: contain;
+}
+
+@media (max-width: 720px) {
+  .product-dialog-media img {
+    height: auto;
+    width: min(100%, 68dvh);
+  }
+}
+
+/* Блок «Похожие товары» — те же пропорции, если там появится фотография. */
+.related-product-card img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: contain;
 }

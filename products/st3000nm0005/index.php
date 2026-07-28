@@ -98,7 +98,7 @@
       </nav>
       <article class="product-page-card product-dialog">
         <div class="product-dialog-media">
-          <?= product_image_tag('st3000nm0005', 'Жесткий диск Seagate Enterprise Capacity 3.5 HDD v5 3TB ST3000NM0005') ?>
+          <?= product_image_tag('st3000nm0005', 'Жесткий диск Seagate Enterprise Capacity 3.5 HDD v5 3TB ST3000NM0005', false, '(max-width: 900px) 92vw, 520px') ?>
         </div>
         <div class="product-dialog-copy">
           <p class="section-label">Карточка товара</p>
@@ -309,6 +309,8 @@
     </footer>
     <script src="/src/nav.js?v=2"></script>
     <script src="/src/cpu-article.js?v=2"></script>
-    <script src="/src/product-page.js?v=2"></script>
+    <script src="/src/scroll-lock.js?v=3"></script>
+    <script src="/src/gallery.js?v=3"></script>
+    <script src="/src/product-page.js?v=3"></script>
   </body>
 </html>

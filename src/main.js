@@ -100,7 +100,8 @@ function showOrderSuccess(orderId) {
   successDialog.classList.add("is-open");
   successDialog.setAttribute("aria-hidden", "false");
   document.body.classList.add("success-open");
-  successOk?.focus();
+  window.ScrollLock?.lock("success");
+  successOk?.focus({ preventScroll: true });
 }
 
 function closeOrderSuccess() {
@@ -111,6 +112,7 @@ function closeOrderSuccess() {
   successDialog.classList.remove("is-open");
   successDialog.setAttribute("aria-hidden", "true");
   document.body.classList.remove("success-open");
+  window.ScrollLock?.unlock("success");
 }
 
 function trackMetrikaGoal(goalName, params = {}) {
@@ -288,6 +290,11 @@ function closeViewer({ restoreFocus = true } = {}) {
   viewer.classList.remove("is-open");
   viewer.setAttribute("aria-hidden", "true");
   document.body.classList.remove("viewer-open");
+  window.ScrollLock?.unlock("viewer");
+  // Адрес страницы возвращается к чистому виду. Иначе после закрытия в URL
+  // оставался #e5-2699-v4, и любое событие hashchange (кнопка «назад»,
+  // перезагрузка, поделиться ссылкой) снова открывало это же окно.
+  clearProductHash();
   if (viewerImage) {
     viewerImage.removeAttribute("src");
     viewerImage.alt = "";
@@ -306,7 +313,7 @@ function closeViewer({ restoreFocus = true } = {}) {
   activeProductTitle = "";
 
   if (restoreFocus) {
-    lastFocusedTrigger?.focus?.();
+    lastFocusedTrigger?.focus?.({ preventScroll: true });
   }
 }
 
@@ -352,6 +359,19 @@ function updateProductHash(productId) {
   }
 }
 
+function clearProductHash() {
+  if (!window.location.hash) {
+    return;
+  }
+
+  try {
+    window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+  } catch {
+    // replaceState может быть недоступен — тогда просто оставляем адрес как есть,
+    // это не мешает работе окна.
+  }
+}
+
 function openProductViewer(card, trigger, { updateHash = true } = {}) {
   const image = card.querySelector(".model-photo img");
   const title = card.querySelector("h3")?.textContent?.trim() || image?.alt || "Процессор Xeon";
@@ -392,10 +412,11 @@ function openProductViewer(card, trigger, { updateHash = true } = {}) {
   viewer.classList.add("is-open");
   viewer.setAttribute("aria-hidden", "false");
   document.body.classList.add("viewer-open");
+  window.ScrollLock?.lock("viewer");
   if (updateHash) {
     updateProductHash(card.id);
   }
-  viewerClose?.focus();
+  viewerClose?.focus({ preventScroll: true });
 }
 
 function openProductFromHash({ closeStaleViewer = false } = {}) {
@@ -662,7 +683,8 @@ function openCart() {
     cartBackdrop.hidden = false;
   }
   document.body.classList.add("cart-open");
-  cartCheckout?.focus();
+  window.ScrollLock?.lock("cart");
+  cartCheckout?.focus({ preventScroll: true });
 }
 
 function closeCart() {
@@ -676,6 +698,7 @@ function closeCart() {
     cartBackdrop.hidden = true;
   }
   document.body.classList.remove("cart-open");
+  window.ScrollLock?.unlock("cart");
 }
 
 function buildCartSummaryLines() {
@@ -924,6 +947,16 @@ renderCart();
 openProductFromHash();
 window.addEventListener("hashchange", () => {
   openProductFromHash({ closeStaleViewer: true });
+});
+
+// Фотография в быстром просмотре открывается на весь экран поверх окна.
+// Галерея лежит выше по z-index, а блокировка прокрутки считает открытые окна,
+// поэтому закрытие галереи не разблокирует страницу под ещё открытым окном.
+viewerImage?.addEventListener("click", () => {
+  const src = viewerImage.currentSrc || viewerImage.getAttribute("src");
+  if (src && window.ProductGallery) {
+    window.ProductGallery.open([{ src, alt: viewerImage.alt || activeProductTitle }]);
+  }
 });
 
 viewerClose?.addEventListener("click", closeViewer);

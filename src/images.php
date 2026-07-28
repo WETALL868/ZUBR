@@ -137,24 +137,64 @@ function product_image_escape(string $value): string
     return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
+/** Уменьшенные копии для телефонов: <slug>-600.webp и <slug>-900.webp. */
+const PRODUCT_IMAGE_WIDTHS = [600, 900];
+
+/**
+ * srcset из подготовленных копий. Телефон скачивает вариант на 600 точек
+ * (около 45 КБ) вместо полного файла на 1200 точек — страница каталога из
+ * двенадцати карточек становится легче в несколько раз.
+ */
+function product_image_srcset(string $web): string
+{
+    $parts = [];
+    foreach (PRODUCT_IMAGE_WIDTHS as $width) {
+        $variant = preg_replace('~\.(webp|jpe?g|png)$~i', '-' . $width . '.webp', $web);
+        if (is_string($variant) && product_image_exists($variant)) {
+            $parts[] = $variant . ' ' . $width . 'w';
+        }
+    }
+
+    if (!$parts) {
+        return '';
+    }
+
+    $size = @getimagesize(product_image_root() . '/' . ltrim($web, '/'));
+    if (is_array($size) && !empty($size[0])) {
+        $parts[] = $web . ' ' . (int)$size[0] . 'w';
+    }
+
+    return implode(', ', $parts);
+}
+
 /**
  * Готовый тег <img>. Размеры проставляются из самого файла, чтобы браузер не
  * дёргал вёрстку при загрузке; если размеры прочитать не удалось, атрибуты
  * просто не выводятся и разметка остаётся прежней.
+ *
+ * data-full — путь к полноразмерному файлу: его открывает галерея увеличения,
+ * чтобы на весь экран показывалась качественная версия, а не маленькая копия.
  */
-function product_image_tag(?string $key, string $alt, bool $lazy = false): string
+function product_image_tag(?string $key, string $alt, bool $lazy = false, string $sizes = ''): string
 {
     $src  = product_image_web($key);
     $html = '<img src="' . product_image_escape($src) . '" alt="' . product_image_escape($alt) . '"';
+
+    $srcset = product_image_srcset($src);
+    if ($srcset !== '') {
+        $html .= ' srcset="' . product_image_escape($srcset) . '"';
+        $html .= ' sizes="' . product_image_escape($sizes !== '' ? $sizes : '(max-width: 720px) 92vw, 320px') . '"';
+    }
+
+    $html .= ' data-full="' . product_image_escape(product_image_web($key)) . '"';
 
     $size = @getimagesize(product_image_root() . '/' . ltrim($src, '/'));
     if (is_array($size) && !empty($size[0]) && !empty($size[1])) {
         $html .= ' width="' . (int)$size[0] . '" height="' . (int)$size[1] . '"';
     }
 
-    if ($lazy) {
-        $html .= ' loading="lazy"';
-    }
+    // Главное фото первого экрана грузится сразу; всё, что ниже — лениво.
+    $html .= $lazy ? ' loading="lazy" decoding="async"' : ' fetchpriority="high" decoding="async"';
 
     return $html . ' />';
 }
@@ -220,7 +260,12 @@ function product_images_diagnostics(): array
     $dir = product_image_root() . PRODUCT_IMAGES_DIR;
     foreach (glob($dir . '/*.{jpg,jpeg,png,webp}', GLOB_BRACE) ?: [] as $file) {
         $name = basename($file);
-        if (str_starts_with($name, 'placeholder.') || isset($expected[$name])) {
+        // Уменьшенные копии (-600.webp, -900.webp) — часть комплекта, не мусор.
+        $base = preg_replace('~-(\d+)\.webp$~i', '', $name);
+        if (str_starts_with($name, 'placeholder.')
+            || isset($expected[$name])
+            || isset($expected[$base . '.webp'])
+            || isset($expected[$base . '.jpg'])) {
             continue;
         }
         $report['orphans'][] = $name;
