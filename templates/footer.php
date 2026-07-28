@@ -14,10 +14,13 @@ $bodyScripts = $bodyScripts ?? [];
             <img src="/public/assets/comp-uter-logo-full.webp" alt="" />
           </span>
         </a>
-        <p>Процессоры Intel Xeon и жесткие диски Seagate для серверных платформ, X99, рабочих станций, домашних сборок и корпоративных закупок.</p>
+        <p><?= e((string)($footerText ?? cms_setting('site', 'footer_text', ''))) ?></p>
       </div>
       <div class="footer-links">
-<?php foreach (cms_all('SELECT slug, title, menu_title FROM pages WHERE status = ? AND in_footer = 1 ORDER BY sort_order, id', ['published']) as $footerPage): ?>
+<?php if (!empty($footerCategories)): foreach (repo_categories() as $footerCategory): ?>
+        <a href="<?= e(repo_category_url($footerCategory)) ?>"><?= e($footerCategory['name']) ?></a>
+        <?php endforeach; endif; ?>
+        <?php foreach (cms_all('SELECT slug, title, menu_title FROM pages WHERE status = ? AND in_footer = 1 ORDER BY sort_order, id', ['published']) as $footerPage): ?>
         <a href="/<?= e($footerPage['slug']) ?>/"><?= e((string)($footerPage['menu_title'] ?: $footerPage['title'])) ?></a>
         <?php endforeach; ?>
         <a href="/#requisites">Реквизиты для счета</a>
@@ -29,6 +32,7 @@ $bodyScripts = $bodyScripts ?? [];
       </div>
     </footer>
 
+<?php if (!empty($showOverlays)) { require __DIR__ . '/partials/overlays.php'; } ?>
 <?php foreach ($bodyScripts as $script): ?>
     <script src="<?= e($script) ?>"></script>
     <?php endforeach; ?>

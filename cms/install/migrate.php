@@ -219,6 +219,20 @@ function migrate_parse_category_page(string $file): array
         // не совпадающие с названием категории.
         'list_name'   => $grab('~"@type":"ItemList","name":"(.*?)"~s'),
         'list_desc'   => $grab('~"@type":"ItemList","name":".*?","description":"(.*?)"~s'),
+        // Второй абзац вступления — про подбор оборудования.
+        'selection_text' => preg_match('~<h1[^>]*>.*?</h1>\\s*<p>.*?</p>\\s*<p>(.*?)</p>~s', $html, $m2)
+            ? html_entity_decode($m2[1], ENT_QUOTES, 'UTF-8') : null,
+        'request_goal'   => $grab('~request-link[^>]*data-goal="([^"]*)"~'),
+        'grid_anchor'    => $grab('~<section class="section inventory" id="([^"]*)"~'),
+        'request_badge'  => $grab('~<article class="model-card request-card">\\s*<div class="chip-sketch[^"]*"[^>]*><span>(.*?)</span>~s'),
+        'request_status' => $grab('~<article class="model-card request-card">.*?</div>\\s*<span>(.*?)</span>~s'),
+        'request_tags'   => preg_match('~<article class="model-card request-card">.*?<ul class="model-tags">(.*?)</ul>~s', $html, $rt)
+            && preg_match_all('~<li>(.*?)</li>~s', $rt[1], $rl)
+            ? implode(', ', array_map(static fn($t) => trim(strip_tags($t)), $rl[1])) : null,
+        'request_title'  => $grab('~<article class="model-card request-card">.*?<h3>(.*?)</h3>~s'),
+        'request_text'   => $grab('~<article class="model-card request-card">.*?<h3>.*?</h3>\\s*<p>(.*?)</p>~s'),
+        'request_button' => $grab('~<a class="model-detail-button request-link"[^>]*>(.*?)</a>~s'),
+        'footer_text'    => $grab('~<div class="footer-brand">.*?</a>\\s*<p>(.*?)</p>~s'),
     ], static fn($v) => $v !== null && $v !== '');
 }
 
@@ -322,6 +336,21 @@ $categoryDefs = [
     2 => ['name' => 'Диски и накопители',   'slug' => 'drives',     'page' => legacy('category-drives.php', 'drives/index.php'),     'yml' => 2],
 ];
 
+// Блок «другая категория» на странице A описывает категорию B — значит,
+// текст для B нужно брать со страницы A.
+$crossTexts = [];
+foreach ($categoryDefs as $def) {
+    $html = (string)@file_get_contents($def['page']);
+    if (preg_match_all('~<article class="category-card">\s*<p class="section-label">Другая категория</p>\s*<h2>(.*?)</h2>\s*<p>(.*?)</p>\s*<a[^>]*href="/([^/"]+)/"[^>]*>(.*?)</a>~s', $html, $cm, PREG_SET_ORDER)) {
+        foreach ($cm as $c) {
+            $crossTexts[$c[3]] = [
+                'text'   => trim(html_entity_decode(strip_tags($c[2]), ENT_QUOTES, 'UTF-8')),
+                'button' => trim(html_entity_decode(strip_tags($c[4]), ENT_QUOTES, 'UTF-8')),
+            ];
+        }
+    }
+}
+
 foreach ($categoryDefs as $oldId => $def) {
     $extra = migrate_parse_category_page($def['page']);
     say(sprintf('Категория: %-22s slug=%-11s %s', $def['name'], $def['slug'],
@@ -342,6 +371,18 @@ foreach ($categoryDefs as $oldId => $def) {
         'stock_title'     => $extra['stock_title'] ?? null,
         'list_name'       => $extra['list_name'] ?? null,
         'list_desc'       => $extra['list_desc'] ?? null,
+        'selection_text'  => $extra['selection_text'] ?? null,
+        'request_goal'    => $extra['request_goal'] ?? null,
+        'grid_anchor'     => $extra['grid_anchor'] ?? 'stock',
+        'request_badge'   => $extra['request_badge'] ?? null,
+        'request_status'  => $extra['request_status'] ?? null,
+        'request_tags'    => $extra['request_tags'] ?? null,
+        'request_title'   => $extra['request_title'] ?? null,
+        'request_text'    => $extra['request_text'] ?? null,
+        'request_button'  => $extra['request_button'] ?? null,
+        'footer_text'     => $extra['footer_text'] ?? null,
+        'cross_text'      => $crossTexts[$def['slug']]['text'] ?? null,
+        'cross_button'    => $crossTexts[$def['slug']]['button'] ?? null,
         'seo_title'       => $extra['seo_title'] ?? null,
         'seo_desc'        => $extra['seo_desc'] ?? null,
         'og_title'        => $extra['og_title'] ?? null,
@@ -711,6 +752,8 @@ if ($apply) {
         ['site', 'base_url', 'https://comp-uter.ru'],
         ['site', 'name', 'Comp-Uter'],
         ['site', 'legal_name', 'ИП Михайловский Виталий Геннадьевич'],
+        ['site', 'legal_short', 'ИП Михайловский В.Г.'],
+        ['site', 'footer_text', 'Процессоры Intel Xeon и жесткие диски Seagate для серверных платформ, X99, рабочих станций, домашних сборок и корпоративных закупок.'],
         ['contacts', 'phone', '+7 (499) 322-13-11'],
         ['contacts', 'phone_raw', '+74993221311'],
         ['contacts', 'email', 'info@comp-uter.ru'],

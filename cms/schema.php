@@ -76,6 +76,20 @@ function cms_schema(): array
             'stock_title   {STR:190} NULL',   // заголовок секции с товарами
             'list_name     {STR:255} NULL',   // name в микроразметке ItemList
             'list_desc     {TEXT}    NULL',   // description там же
+            // Тексты, которые на прежних страницах были разными у каждой
+            // категории и не выводятся из названия.
+            'selection_text {TEXT}    NULL',   // второй абзац вступления
+            'request_goal   {STR:190} NULL',   // data-goal у кнопок подбора
+            'grid_anchor    {STR:60}  NULL',   // id секции с товарами
+            'request_badge  {STR:60}  NULL',   // «Xeon» / «HDD» в карточке «нужен другой»
+            'request_status {STR:60}  NULL',   // «Под заказ» там же
+            'request_tags   {TEXT}    NULL',   // список меток через запятую
+            'request_title  {STR:190} NULL',
+            'request_text   {TEXT}    NULL',
+            'request_button {STR:120} NULL',
+            'cross_text     {TEXT}    NULL',   // текст в блоке «другая категория»
+            'cross_button   {STR:120} NULL',
+            'footer_text    {TEXT}    NULL',   // абзац о компании в подвале
             'description   {LONGTEXT} NULL',  // SEO-текст, визуальный редактор
             'image         {STR:255} NULL',
             'seo_title     {STR:255} NULL',
