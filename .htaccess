@@ -93,13 +93,6 @@ RewriteRule ^([a-z0-9][a-z0-9_-]*)/?$ route.php?slug=$1 [L,QSA]
     Header set Cache-Control "public, max-age=3600"
   </FilesMatch>
 
-  # Файл цен читает PHP на сервере, поэтому кэш браузера на цены не влияет.
-  # Запрет кэша нужен для другого: чтобы владелец сайта мог открыть
-  # https://comp-uter.ru/data/prices.json и увидеть именно то, что залил.
-  <FilesMatch "^prices\.json$">
-    Header set Cache-Control "no-store, must-revalidate"
-  </FilesMatch>
-
   # -------------------------------------------------------------------------
   # Security headers
   # -------------------------------------------------------------------------

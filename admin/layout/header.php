@@ -17,6 +17,7 @@ $menu = [
     'settings'   => 'Настройки',
 ];
 if (admin_is_owner()) {
+    $menu['maintenance'] = 'Обслуживание';
     $menu['users'] = 'Пользователи';
     $menu['audit'] = 'Журнал';
 }

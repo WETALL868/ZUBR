@@ -66,6 +66,7 @@ $screens = [
     'delivery'   => ['file' => 'delivery.php',   'title' => 'Доставка'],
     'redirects'  => ['file' => 'redirects.php',  'title' => 'Переадресация'],
     'settings'   => ['file' => 'settings.php',   'title' => 'Настройки'],
+    'maintenance' => ['file' => 'maintenance.php', 'title' => 'Обслуживание', 'owner' => true],
     'users'      => ['file' => 'users.php',      'title' => 'Пользователи', 'owner' => true],
     'audit'      => ['file' => 'audit.php',      'title' => 'Журнал действий', 'owner' => true],
 ];
