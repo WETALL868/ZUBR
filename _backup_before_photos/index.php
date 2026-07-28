@@ -1236,7 +1236,7 @@ button:disabled {
         <div class="model-grid">
           <article class="model-card featured" id="e5-2699-v4"<?= prices_card_attrs('e5-2699-v4') ?>>
             <figure class="model-photo" role="button" tabindex="0" aria-label="Увеличить фото Xeon E5-2699 V4">
-              <?= product_image_tag('e5-2699-v4', 'Процессор Xeon E5-2699 V4 LGA 2011-3', true) ?>
+              <?= product_image_tag('e5-2699-v4', 'Процессор Xeon E5-2699 V4 без инфографики', true) ?>
             </figure>
             <?= prices_stock_badge('e5-2699-v4') ?>
 
@@ -1267,7 +1267,7 @@ button:disabled {
           </article>
           <article class="model-card" id="e5-2699-v3"<?= prices_card_attrs('e5-2699-v3') ?>>
             <figure class="model-photo" role="button" tabindex="0" aria-label="Увеличить фото Xeon E5-2699 V3">
-              <?= product_image_tag('e5-2699-v3', 'Процессор Xeon E5-2699 V3 LGA 2011-3', true) ?>
+              <?= product_image_tag('e5-2699-v3', 'Процессор Xeon E5-2699 V3 без инфографики', true) ?>
             </figure>
             <?= prices_stock_badge('e5-2699-v3') ?>
 
@@ -1298,7 +1298,7 @@ button:disabled {
           </article>
           <article class="model-card" id="e5-2697-v4"<?= prices_card_attrs('e5-2697-v4') ?>>
             <figure class="model-photo" role="button" tabindex="0" aria-label="Увеличить фото Xeon E5-2697 V4">
-              <?= product_image_tag('e5-2697-v4', 'Процессор Xeon E5-2697 V4 LGA 2011-3', true) ?>
+              <?= product_image_tag('e5-2697-v4', 'Процессор Xeon E5-2697 V4 без инфографики', true) ?>
             </figure>
             <?= prices_stock_badge('e5-2697-v4') ?>
 
@@ -1329,7 +1329,7 @@ button:disabled {
           </article>
           <article class="model-card" id="e5-2696-v3"<?= prices_card_attrs('e5-2696-v3') ?>>
             <figure class="model-photo" role="button" tabindex="0" aria-label="Увеличить фото Xeon E5-2696 V3">
-              <?= product_image_tag('e5-2696-v3', 'Процессор Xeon E5-2696 V3 LGA 2011-3', true) ?>
+              <?= product_image_tag('e5-2696-v3', 'Процессор Xeon E5-2696 V3 без инфографики', true) ?>
             </figure>
             <?= prices_stock_badge('e5-2696-v3') ?>
 
@@ -1359,7 +1359,7 @@ button:disabled {
           </article>
           <article class="model-card" id="e5-2690-v4"<?= prices_card_attrs('e5-2690-v4') ?>>
             <figure class="model-photo" role="button" tabindex="0" aria-label="Увеличить фото Xeon E5-2690 V4">
-              <?= product_image_tag('e5-2690-v4', 'Процессор Xeon E5-2690 V4 LGA 2011-3', true) ?>
+              <?= product_image_tag('e5-2690-v4', 'Процессор Xeon E5-2690 V4 без инфографики', true) ?>
             </figure>
             <?= prices_stock_badge('e5-2690-v4') ?>
 
@@ -1390,7 +1390,7 @@ button:disabled {
           </article>
           <article class="model-card" id="e5-2673-v3"<?= prices_card_attrs('e5-2673-v3') ?>>
             <figure class="model-photo" role="button" tabindex="0" aria-label="Увеличить фото Xeon E5-2673 V3">
-              <?= product_image_tag('e5-2673-v3', 'Процессор Xeon E5-2673 V3 LGA 2011-3', true) ?>
+              <?= product_image_tag('e5-2673-v3', 'Процессор Xeon E5-2673 V3 без инфографики', true) ?>
             </figure>
             <?= prices_stock_badge('e5-2673-v3') ?>
 
@@ -1421,7 +1421,7 @@ button:disabled {
           </article>
           <article class="model-card" id="e5-2667-v3"<?= prices_card_attrs('e5-2667-v3') ?>>
             <figure class="model-photo" role="button" tabindex="0" aria-label="Увеличить фото Xeon E5-2667 V3">
-              <?= product_image_tag('e5-2667-v3', 'Процессор Xeon E5-2667 V3 LGA 2011-3', true) ?>
+              <?= product_image_tag('e5-2667-v3', 'Процессор Xeon E5-2667 V3 без инфографики', true) ?>
             </figure>
             <?= prices_stock_badge('e5-2667-v3') ?>
 

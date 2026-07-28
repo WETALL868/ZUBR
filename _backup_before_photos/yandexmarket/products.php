@@ -254,6 +254,8 @@ return [
         'category_id' => 2,
         'brand' => 'Seagate',
         'picture' => '/public/images/products/st10000nm0016.jpg',
+        // Источник оригинала для tools/import-product-images.php
+        'picture_source' => 'https://cdn1.ozone.ru/s3/multimedia-1-t/12183483917.jpg',
         'description' => 'Флагманский серверный жесткий диск на 10 ТБ для дата-центров: RAID-массивы, NAS-хранилища, резервное копирование, видеонаблюдение и корпоративные файловые серверы.',
         'params' => [
             'Артикул' => 'ST10000NM0016',
@@ -292,6 +294,8 @@ return [
         'category_id' => 2,
         'brand' => 'Seagate',
         'picture' => '/public/images/products/st6000nm0115.jpg',
+        // Источник оригинала для tools/import-product-images.php
+        'picture_source' => 'https://cdn1.ozone.ru/s3/multimedia-1-n/12245200655.jpg',
         'description' => 'Диск корпоративного класса для непрерывной нагрузки 24/7: серверы, RAID-массивы, NAS-системы, видеонаблюдение и резервное копирование данных.',
         'params' => [
             'Артикул' => 'ST6000NM0115',
@@ -330,6 +334,8 @@ return [
         'category_id' => 2,
         'brand' => 'Seagate',
         'picture' => '/public/images/products/st4000nm0033.jpg',
+        // Источник оригинала для tools/import-product-images.php
+        'picture_source' => 'https://cdn1.ozone.ru/s3/multimedia-1-r/12278044503.jpg',
         'description' => 'Проверенный временем серверный HDD на 4 ТБ для RAID-массивов, NAS и файловых серверов, где важна предсказуемая долгосрочная надежность.',
         'params' => [
             'Артикул' => 'ST4000NM0033',
@@ -368,6 +374,8 @@ return [
         'category_id' => 2,
         'brand' => 'Seagate',
         'picture' => '/public/images/products/st3000nm0005.jpg',
+        // Источник оригинала для tools/import-product-images.php
+        'picture_source' => 'https://cdn1.ozone.ru/s3/multimedia-1-3/12156663171.jpg',
         'description' => 'Диск нового поколения на 3 ТБ с повышенной скоростью и наработкой на отказ: серверы, рабочие станции, RAID и системы хранения данных.',
         'params' => [
             'Артикул' => 'ST3000NM0005',
@@ -406,6 +414,8 @@ return [
         'category_id' => 2,
         'brand' => 'Seagate',
         'picture' => '/public/images/products/st3000nm0033.jpg',
+        // Источник оригинала для tools/import-product-images.php
+        'picture_source' => 'https://cdn1.ozone.ru/s3/multimedia-1-q/12208461578.jpg',
         'description' => 'Надежный корпоративный HDD на 3 ТБ для серверов, NAS, RAID-массивов и резервного копирования, когда важна не игровая скорость, а стабильность хранения.',
         'params' => [
             'Артикул' => 'ST3000NM0033',
