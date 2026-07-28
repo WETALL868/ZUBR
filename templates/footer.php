@@ -3,13 +3,17 @@
  * Общий подвал сайта. Ссылки на правовые страницы берутся из таблицы pages:
  * страница, отмеченная «показывать в подвале», появляется здесь сама.
  *
- * $bodyScripts — список скриптов конкретной страницы.
+ * $bodyScripts     — список скриптов конкретной страницы;
+ * $footerBrandHref — куда ведёт логотип (на главной это якорь наверх);
+ * $footerAnchor    — префикс якорных ссылок ('' на главной, '/' на остальных).
  */
-$bodyScripts = $bodyScripts ?? [];
+$bodyScripts     = $bodyScripts     ?? [];
+$footerBrandHref = $footerBrandHref ?? '/';
+$footerAnchor    = $footerAnchor    ?? '/';
 ?>
     <footer class="site-footer">
       <div class="footer-brand">
-        <a class="brand footer-logo" href="/" aria-label="Comp-Uter">
+        <a class="brand footer-logo" href="<?= e($footerBrandHref) ?>" aria-label="Comp-Uter">
           <span class="brand-image brand-image-full">
             <img src="/public/assets/comp-uter-logo-full.webp" alt="" />
           </span>
@@ -23,8 +27,8 @@ $bodyScripts = $bodyScripts ?? [];
         <?php foreach (cms_all('SELECT slug, title, menu_title FROM pages WHERE status = ? AND in_footer = 1 ORDER BY sort_order, id', ['published']) as $footerPage): ?>
         <a href="/<?= e($footerPage['slug']) ?>/"><?= e((string)($footerPage['menu_title'] ?: $footerPage['title'])) ?></a>
         <?php endforeach; ?>
-        <a href="/#requisites">Реквизиты для счета</a>
-        <a href="/#order">Оформить заказ</a>
+        <a href="<?= e($footerAnchor) ?>#requisites">Реквизиты для счета</a>
+        <a href="<?= e($footerAnchor) ?>#order">Оформить заказ</a>
       </div>
       <div class="footer-bottom">
         <span><?= e((string)cms_setting('site','legal_short','ИП Михайловский В.Г.')) ?> · <?= e((string)cms_setting('contacts','phone','+7 (499) 322-13-11')) ?> · <?= e((string)cms_setting('contacts','email','info@comp-uter.ru')) ?></span>

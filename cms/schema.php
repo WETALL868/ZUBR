@@ -263,6 +263,11 @@ function cms_schema(): array
             'og_title     {STR:255} NULL',
             'og_desc      {TEXT}    NULL',
             'og_image     {STR:255} NULL',
+            // На главной подписи для Twitter отличались от Open Graph —
+            // отдельные поля, чтобы не переписывать проиндексированный текст.
+            'tw_title     {STR:255} NULL',
+            'tw_desc      {TEXT}    NULL',
+            'keywords     {TEXT}    NULL',
             'noindex      {BOOL}    NOT NULL DEFAULT 0',
             'status       {STR:20}  NOT NULL DEFAULT \'published\'', // draft|published|hidden
             'in_header    {BOOL}    NOT NULL DEFAULT 0',
@@ -278,12 +283,19 @@ function cms_schema(): array
         // Управляемые секции главной страницы. Каждая — отдельная строка,
         // чтобы главную можно было собирать из блоков, а не править одним
         // огромным полем HTML.
+        //
+        // kind = 'html'     — секция целиком лежит в body;
+        // kind = 'products' — между body и body_after подставляется витрина
+        //                     товаров из категории, указанной в settings.
         'home_blocks' => [
             'id          {PK}',
-            'code        {STR:60}  NOT NULL',   // hero, catalog, selection, ...
-            'title       {STR:255} NULL',
+            'code        {STR:60}  NOT NULL',   // hero, stock, hdd, selection, ...
+            'kind        {STR:20}  NOT NULL DEFAULT \'html\'',
+            'title       {STR:255} NULL',       // подпись блока в админке
             'subtitle    {TEXT}    NULL',
             'body        {LONGTEXT} NULL',
+            'body_after  {LONGTEXT} NULL',
+            'settings    {TEXT}    NULL',       // JSON: категория витрины и пр.
             'image       {STR:255} NULL',
             'button_text {STR:120} NULL',
             'button_url  {STR:255} NULL',

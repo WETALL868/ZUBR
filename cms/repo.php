@@ -343,6 +343,76 @@ function repo_page(string $slug): ?array
     return cms_one('SELECT * FROM pages WHERE slug = ? AND status = ?', [$slug, 'published']);
 }
 
+/* -------------------------------------------------------------- главная */
+
+/** Включённые секции главной в заданном порядке. */
+function repo_home_blocks(): array
+{
+    return cms_all('SELECT * FROM home_blocks WHERE is_enabled = 1 ORDER BY sort_order, id');
+}
+
+/** Настройки блока (JSON в поле settings) в виде массива. */
+function repo_home_block_settings(array $block): array
+{
+    $decoded = json_decode((string)($block['settings'] ?? ''), true);
+
+    return is_array($decoded) ? $decoded : [];
+}
+
+/** Товары витрины: категория задана в настройках блока. */
+function repo_home_block_products(array $block): array
+{
+    $settings = repo_home_block_settings($block);
+    $filter = [];
+
+    if (!empty($settings['category'])) {
+        $filter['category'] = $settings['category'];
+    }
+    if (!empty($settings['featured'])) {
+        $filter['featured'] = true;
+    }
+    if (!empty($settings['limit'])) {
+        $filter['limit'] = (int)$settings['limit'];
+    }
+
+    return repo_products($filter);
+}
+
+/**
+ * Вопросы и ответы главной — прямо из разметки блока «Частые вопросы».
+ *
+ * Микроразметка FAQPage строится из того же текста, который видит посетитель,
+ * поэтому второй список, способный с ним разойтись, не нужен.
+ */
+function repo_home_faq(array $blocks): array
+{
+    $pairs = [];
+
+    foreach ($blocks as $block) {
+        if (!str_contains((string)$block['body'], 'faq-item')) {
+            continue;
+        }
+        if (!preg_match_all(
+            '~<details class="faq-item">\s*<summary>(.*?)</summary>\s*<p>(.*?)</p>~s',
+            (string)$block['body'],
+            $matches,
+            PREG_SET_ORDER
+        )) {
+            continue;
+        }
+
+        $clean = static fn(string $text): string => trim(
+            preg_replace('~\s+~u', ' ', html_entity_decode(strip_tags($text), ENT_QUOTES, 'UTF-8')) ?? ''
+        );
+
+        foreach ($matches as $m) {
+            $pairs[] = ['question' => $clean($m[1]), 'answer' => $clean($m[2])];
+        }
+    }
+
+    return $pairs;
+}
+
 /* ------------------------------------------------------------- доставка */
 
 function repo_delivery_methods(): array

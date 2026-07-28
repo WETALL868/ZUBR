@@ -25,6 +25,12 @@ $bodyScripts     = [
     '/src/main.js?v=3',
 ];
 
+// На страницах категорий стили подключены после <title>, а не до иконки, —
+// сохраняем прежний порядок тегов, чтобы документ не менялся вовсе.
+$headAssets = '';
+$headTail   = "    <link rel=\"preconnect\" href=\"https://mc.yandex.ru\" />\n"
+    . "    <link rel=\"stylesheet\" href=\"/src/styles.css?v=3\" />\n";
+
 $showCart = true;
 $footerText = $category['footer_text'] ?: null;
 $showOverlays = true;

@@ -745,6 +745,208 @@ foreach ($deliveryDefs as $def) {
 }
 say();
 
+/* ------------------------------------------------------------- главная */
+
+// Главная — не набор товаров, а посадочная страница из семнадцати непохожих
+// друг на друга секций. Втискивать их в общий шаблон «заголовок + текст»
+// значило бы потерять вёрстку, поэтому каждая секция переносится в
+// home_blocks как есть, а витрины процессоров и дисков разрезаются на
+// «до сетки» и «после сетки»: сами карточки собираются из базы.
+
+$homeFile = legacy('home.php', 'index.php');
+$homeHtml = (string)@file_get_contents($homeFile);
+
+if ($homeHtml === '') {
+    say('Главная не найдена: ' . $homeFile);
+} else {
+    $meta = static function (string $pattern) use ($homeHtml): ?string {
+        return preg_match($pattern, $homeHtml, $m)
+            ? trim(html_entity_decode($m[1], ENT_QUOTES, 'UTF-8'))
+            : null;
+    };
+
+    $homePage = [
+        'title'      => 'Главная',
+        'menu_title' => 'Главная',
+        'slug'       => '',
+        'template'   => 'home',
+        'seo_title'  => $meta('~<title>(.*?)</title>~s'),
+        'seo_desc'   => $meta('~<meta\s+name="description"\s+content="(.*?)"~s'),
+        'keywords'   => $meta('~<meta\s+name="keywords"\s+content="(.*?)"~s'),
+        'og_title'   => $meta('~<meta property="og:title" content="(.*?)"~s'),
+        'og_desc'    => $meta('~<meta\s+property="og:description"\s+content="(.*?)"~s'),
+        'og_image'   => $meta('~<meta property="og:image" content="(.*?)"~s'),
+        'tw_title'   => $meta('~<meta name="twitter:title" content="(.*?)"~s'),
+        'tw_desc'    => $meta('~<meta\s+name="twitter:description"\s+content="(.*?)"~s'),
+        'canonical'  => $meta('~<link rel="canonical" href="(.*?)"~s'),
+        'status'     => 'published',
+        'in_footer'  => 0,
+        'sort_order' => 0,
+        'updated_at' => cms_now(),
+    ];
+    say(sprintf('Главная: title «%s», описание %d симв., keywords %d симв.',
+        mb_substr((string)$homePage['seo_title'], 0, 48),
+        mb_strlen((string)$homePage['seo_desc']), mb_strlen((string)$homePage['keywords'])));
+
+    // Секции.
+    $homeBlocks = [];
+    if (preg_match('~<main id="top">(.*)\n    </main>~s', $homeHtml, $m)) {
+        $sections = preg_split('~(?m)^(?=      <section )~', $m[1]);
+        array_shift($sections);   // перевод строки перед первой секцией
+
+        // Человеческие коды и подписи: по ним секция и будет искаться в
+        // административной панели.
+        $names = [
+            'hero'       => 'Первый экран',
+            'trust'      => 'Полоса преимуществ',
+            'categories' => 'Две категории каталога',
+            'stock'      => 'Витрина процессоров',
+            'hdd'        => 'Витрина дисков',
+            'seo'        => 'Текст о каталоге',
+            'selection'  => 'Помощь в подборе',
+            'about'      => 'О компании',
+            'testing'    => 'Проверка совместимости',
+            'kits'       => 'Готовые сценарии',
+            'corporate'  => 'Для организаций',
+            'delivery'   => 'Доставка',
+            'contact'    => 'Адрес и карта',
+            'faq'        => 'Частые вопросы',
+            'order'      => 'Форма заказа',
+            'requisites' => 'Реквизиты',
+            'privacy'    => 'Правовые страницы',
+        ];
+        // Код секции берём из её id; у трёх секций без id — из класса.
+        $byClass = [
+            'hero'           => 'hero',
+            'trust-strip'    => 'trust',
+            'category-split' => 'categories',
+            'seo-panel'      => 'seo',
+            'kits'           => 'kits',
+        ];
+        $codeFor = static function (string $section) use ($byClass): string {
+            if (preg_match('~<section[^>]*\sid="([^"]+)"~', $section, $mm)) {
+                return $mm[1];
+            }
+            if (preg_match('~<section class="(?:section )?([a-z0-9-]+)~', $section, $mm)) {
+                return $byClass[$mm[1]] ?? str_replace('-', '_', $mm[1]);
+            }
+            return 'block';
+        };
+
+        $sortOrder = 0;
+        foreach ($sections as $section) {
+            $code = $codeFor($section);
+            $sortOrder += 10;
+
+            // Витрина: до сетки, карточки из базы, после сетки.
+            $gridOpen = "\n        <div class=\"model-grid\">\n";
+            $requestAt = mb_strpos($section, '          <article class="model-card request-card">');
+            $gridAt = mb_strpos($section, $gridOpen);
+
+            if ($gridAt !== false && $requestAt !== false && ($code === 'stock' || $code === 'hdd')) {
+                $homeBlocks[] = [
+                    'code'       => $code,
+                    'kind'       => 'products',
+                    'title'      => $names[$code] ?? $code,
+                    'body'       => mb_substr($section, 0, $gridAt + mb_strlen($gridOpen)),
+                    'body_after' => mb_substr($section, $requestAt),
+                    'settings'   => json_encode(
+                        ['category' => $code === 'stock' ? 'processors' : 'drives'],
+                        JSON_UNESCAPED_UNICODE
+                    ),
+                    'sort_order' => $sortOrder,
+                ];
+                continue;
+            }
+
+            $homeBlocks[] = [
+                'code'       => $code,
+                'kind'       => 'html',
+                'title'      => $names[$code] ?? $code,
+                'body'       => $section,
+                'body_after' => null,
+                'settings'   => null,
+                'sort_order' => $sortOrder,
+            ];
+        }
+    }
+
+    foreach ($homeBlocks as $block) {
+        say(sprintf('  блок %-12s %-9s %5d симв.%s', $block['code'], $block['kind'],
+            mb_strlen((string)$block['body']),
+            $block['body_after'] !== null ? ' + ' . mb_strlen($block['body_after']) . ' после витрины' : ''));
+    }
+
+    // Данные организации для микроразметки LocalBusiness.
+    $business = [];
+    if (preg_match_all('~<script type="application/ld\+json">(.*?)</script>~s', $homeHtml, $ld)) {
+        foreach ($ld[1] as $raw) {
+            $decoded = json_decode(trim($raw), true);
+            if (!is_array($decoded)) {
+                continue;
+            }
+            if (($decoded['@type'] ?? '') === 'LocalBusiness') {
+                $business = $decoded;
+            }
+            if (($decoded['@type'] ?? '') === 'ItemList') {
+                $homeList = ['name' => $decoded['name'] ?? '', 'description' => $decoded['description'] ?? ''];
+            }
+        }
+    }
+
+    if ($apply) {
+        $existing = cms_value('SELECT id FROM pages WHERE slug = ?', ['']);
+        if ($existing) {
+            cms_update('pages', $homePage, 'id = :id', ['id' => $existing]);
+        } else {
+            $homePage['created_at'] = cms_now();
+            cms_insert('pages', $homePage);
+        }
+
+        foreach ($homeBlocks as $block) {
+            $block['is_enabled'] = 1;
+            $block['updated_at'] = cms_now();
+            $was = cms_value('SELECT id FROM home_blocks WHERE code = ?', [$block['code']]);
+            if ($was) {
+                cms_update('home_blocks', $block, 'id = :id', ['id' => $was]);
+            } else {
+                cms_insert('home_blocks', $block);
+            }
+        }
+
+        if ($business) {
+            $address = $business['address'] ?? [];
+            foreach ([
+                'legal_name'   => $business['legalName'] ?? '',
+                'description'  => $business['description'] ?? '',
+                'tax_id'       => $business['taxID'] ?? '',
+                'street'       => $address['streetAddress'] ?? '',
+                'locality'     => $address['addressLocality'] ?? '',
+                'postal_code'  => $address['postalCode'] ?? '',
+                'country'      => $address['addressCountry'] ?? 'RU',
+                'opening_hours' => $business['openingHours'] ?? '',
+            ] as $key => $value) {
+                if ($value !== '') {
+                    cms_setting_save('business', $key, (string)$value);
+                }
+            }
+        }
+        if (!empty($homeList)) {
+            cms_setting_save('home', 'list_name', (string)$homeList['name']);
+            cms_setting_save('home', 'list_desc', (string)$homeList['description']);
+        }
+
+        // Подпись под логотипом в подвале главной отличается от той, что
+        // стоит на страницах товаров, — сохраняем обе.
+        if (preg_match('~<div class="footer-brand">.*?</a>\s*<p>(.*?)</p>~s', $homeHtml, $fm)) {
+            cms_setting_save('home', 'footer_text',
+                trim(preg_replace('~\s+~u', ' ', html_entity_decode($fm[1], ENT_QUOTES, 'UTF-8')) ?? ''));
+        }
+        say('Главная перенесена: ' . count($homeBlocks) . ' блок(ов), данные организации и список товаров.');
+    }
+}
+say();
+
 /* -------------------------------------------------------------- настройки */
 
 if ($apply) {
