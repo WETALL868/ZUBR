@@ -95,6 +95,7 @@ function cms_schema(): array
             'category_id    {INT}     NULL',
             'name           {STR:255} NOT NULL',   // полное название (для фида)
             'short_name     {STR:190} NULL',       // как в карточке каталога
+            'model          {STR:190} NULL',       // «Xeon E5-2690 V4» — для хлебных крошек
             'slug           {STR:190} NOT NULL',   // = адрес /products/<slug>/
             'sku            {STR:100} NULL',       // артикул
             'mpn            {STR:100} NULL',
@@ -201,6 +202,9 @@ function cms_schema(): array
             'product_id {INT}    NOT NULL',
             'related_id {INT}    NOT NULL',
             'relation   {STR:20} NOT NULL DEFAULT \'similar\'',
+            // Подпись, объясняющая отличие от текущего товара. Была написана
+            // вручную под каждую пару и не выводится из описания товара.
+            'note       {TEXT}   NULL',
             'sort_order {INT}    NOT NULL DEFAULT 0',
             '{UNIQUE} ux_relations (product_id, related_id, relation)',
         ],
@@ -209,6 +213,7 @@ function cms_schema(): array
         'pages' => [
             'id           {PK}',
             'title        {STR:255} NOT NULL',
+            'menu_title   {STR:190} NULL',       // короткая подпись для меню
             'slug         {STR:190} NOT NULL',   // '' = главная
             'h1           {STR:255} NULL',
             'content      {LONGTEXT} NULL',

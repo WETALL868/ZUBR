@@ -55,7 +55,20 @@ function migrate_parse_product_page(string $file): array
     $out['og_title']   = $grab('~<meta property="og:title" content="(.*?)"~s');
     $out['og_desc']    = $grab('~<meta property="og:description" content="(.*?)"~s');
     $out['seo_h1']     = $grab('~<h1>(.*?)</h1>~s');
-    $out['breadcrumb'] = $grab('~<span aria-current="page">(.*?)</span>~s');
+    // Видимая крошка и имя в JSON-LD на прежних страницах различались:
+    // у процессоров в разметке стояла короткая модель, у дисков — полное
+    // название. Берём именно значение из JSON-LD, чтобы не менять то, что
+    // уже проиндексировано.
+    $out['breadcrumb'] = null;
+    if (preg_match_all('~<script type="application/ld\+json">(.*?)</script>~s', $html, $blocks)) {
+        foreach ($blocks[1] as $block) {
+            $data = json_decode($block, true);
+            if (($data['@type'] ?? '') === 'BreadcrumbList') {
+                $last = end($data['itemListElement']);
+                $out['breadcrumb'] = $last['name'] ?? null;
+            }
+        }
+    }
     $out['lead']       = $grab('~<p class="product-dialog-lead">(.*?)</p>~s');
 
     // SEO-статья: сохраняем ВНУТРЕННОСТЬ секции без заголовка и без кнопки
@@ -87,9 +100,14 @@ function migrate_parse_product_page(string $file): array
     }
 
     // Похожие товары — по ссылкам блока.
+    // Подписи в блоке «похожие» написаны вручную под каждую пару товаров
+    // («Тот же Broadwell-E, но 18 ядер вместо 14») и не выводятся из описания
+    // товара — их надо сохранить отдельно, иначе текст потеряется.
     $out['related'] = [];
-    if (preg_match_all('~related-product-card" href="/products/([^/"]+)/~', $html, $m)) {
-        $out['related'] = array_values(array_unique($m[1]));
+    if (preg_match_all('~related-product-card" href="/products/([^/"]+)/">.*?<p>(.*?)</p>~s', $html, $m, PREG_SET_ORDER)) {
+        foreach ($m as $pair) {
+            $out['related'][$pair[1]] = trim(html_entity_decode(strip_tags($pair[2]), ENT_QUOTES, 'UTF-8'));
+        }
     }
 
     return $out;
@@ -317,6 +335,7 @@ foreach ($catalog as $entry) {
         'category_id'    => $categoryMap[(int)($entry['category_id'] ?? 1)] ?? null,
         'name'           => (string)$entry['name'],
         'short_name'     => trim((string)($entry['display_prefix'] ?? '') . ' ' . (string)($entry['model'] ?? '')),
+        'model'          => (string)($entry['model'] ?? ''),
         'slug'           => $slug,
         'sku'            => (string)($entry['id'] ?? ''),
         'mpn'            => (string)($entry['mpn'] ?? ''),
@@ -416,7 +435,7 @@ if ($apply) {
         }
         cms_query('DELETE FROM product_relations WHERE product_id = ? AND relation = ?', [$productMap[$slug], 'similar']);
         $order = 0;
-        foreach ($related as $target) {
+        foreach ($related as $target => $note) {
             if (!isset($productMap[$target])) {
                 continue;
             }
@@ -424,6 +443,7 @@ if ($apply) {
                 'product_id' => $productMap[$slug],
                 'related_id' => $productMap[$target],
                 'relation'   => 'similar',
+                'note'       => $note !== '' ? $note : null,
                 'sort_order' => $order += 10,
             ]);
         }
@@ -470,8 +490,9 @@ foreach ($pageDefs as $def) {
     }
 
     $data = [
-        'title'     => $parsed['title'] ?? $def['title'],
-        'slug'      => $def['slug'],
+        'title'      => $parsed['title'] ?? $def['title'],
+        'menu_title' => $def['title'],
+        'slug'       => $def['slug'],
         'h1'        => $parsed['h1'] ?? $def['title'],
         'content'   => $parsed['content'] ?? null,
         'seo_title' => $parsed['seo_title'] ?? null,

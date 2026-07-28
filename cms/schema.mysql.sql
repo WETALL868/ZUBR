@@ -65,6 +65,7 @@ CREATE TABLE IF NOT EXISTS products (
   category_id    INT     NULL,
   name           VARCHAR(255) NOT NULL,
   short_name     VARCHAR(190) NULL,
+  model          VARCHAR(190) NULL,
   slug           VARCHAR(190) NOT NULL,
   sku            VARCHAR(100) NULL,
   mpn            VARCHAR(100) NULL,
@@ -175,6 +176,7 @@ CREATE TABLE IF NOT EXISTS product_relations (
   product_id INT    NOT NULL,
   related_id INT    NOT NULL,
   relation   VARCHAR(20) NOT NULL DEFAULT 'similar',
+  note       TEXT   NULL,
   sort_order INT    NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -183,6 +185,7 @@ CREATE UNIQUE INDEX ux_relations ON product_relations (product_id, related_id, r
 CREATE TABLE IF NOT EXISTS pages (
   id           INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   title        VARCHAR(255) NOT NULL,
+  menu_title   VARCHAR(190) NULL,
   slug         VARCHAR(190) NOT NULL,
   h1           VARCHAR(255) NULL,
   content      MEDIUMTEXT NULL,
