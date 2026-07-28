@@ -106,6 +106,13 @@ $jsonLd          = $jsonLd          ?? [];
         </div>
         <a class="header-action" href="/#order">Заказать</a>
       </div>
+      <?php if (!empty($showCart)): ?>
+      <button class="header-cart" type="button" data-cart-open aria-label="Открыть корзину">
+        <span>Корзина</span>
+        <strong data-cart-count>0</strong>
+        <em data-cart-header-total>0 ₽</em>
+      </button>
+      <?php endif; ?>
       <button
         class="nav-toggle"
         type="button"

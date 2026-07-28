@@ -71,6 +71,11 @@ function cms_schema(): array
             'slug          {STR:190} NOT NULL',
             'h1            {STR:190} NULL',
             'lead          {TEXT}    NULL',   // короткое описание над каталогом
+            'label         {STR:120} NULL',   // «Каталог · категория 1 из 2»
+            'stock_label   {STR:120} NULL',   // подпись над сеткой товаров
+            'stock_title   {STR:190} NULL',   // заголовок секции с товарами
+            'list_name     {STR:255} NULL',   // name в микроразметке ItemList
+            'list_desc     {TEXT}    NULL',   // description там же
             'description   {LONGTEXT} NULL',  // SEO-текст, визуальный редактор
             'image         {STR:255} NULL',
             'seo_title     {STR:255} NULL',
@@ -115,6 +120,13 @@ function cms_schema(): array
             'country        {STR:100} NULL',
             'is_published   {BOOL}    NOT NULL DEFAULT 1',
             'is_featured    {BOOL}    NOT NULL DEFAULT 0',
+            // Тексты карточки каталога: заголовок, краткий текст, подпись к
+            // фото и список меток. В карточке они короче, чем на странице.
+            'card_title        {STR:255} NULL',
+            'card_lead         {TEXT}    NULL',
+            'card_alt          {STR:255} NULL',
+            'card_figure_label {STR:255} NULL',
+            'card_tags         {TEXT}    NULL',
             'in_yml         {BOOL}    NOT NULL DEFAULT 1',
             'sort_order     {INT}     NOT NULL DEFAULT 0',
             'seo_title      {STR:255} NULL',
@@ -158,6 +170,19 @@ function cms_schema(): array
             'attribute_id {INT} NOT NULL',
             'sort_order   {INT} NOT NULL DEFAULT 0',
             '{UNIQUE} ux_catattr (category_id, attribute_id)',
+        ],
+
+        // Сокращённый список для карточки каталога. Отличается от полного:
+        // в карточке «Ядра / потоки: 22 / 44» одной строкой, а на странице
+        // товара это две отдельные характеристики. Списки составлены вручную,
+        // вывести один из другого нельзя.
+        'product_card_specs' => [
+            'id         {PK}',
+            'product_id {INT}     NOT NULL',
+            'name       {STR:120} NOT NULL',
+            'value      {STR:255} NULL',
+            'sort_order {INT}     NOT NULL DEFAULT 0',
+            '{INDEX} ix_card_specs (product_id, sort_order)',
         ],
 
         'product_attribute_values' => [
@@ -314,8 +339,9 @@ function cms_schema(): array
             'id            {PK}',
             'code          {STR:60}  NOT NULL',
             'title         {STR:190} NOT NULL',
-            'description   {TEXT}    NULL',
-            'price         {DEC}     NULL',      // NULL = «по тарифам службы»
+            'description   {TEXT}    NULL',    // подпись; {цена} заменяется стоимостью
+            'option_title  {STR:255} NULL',    // подсказка, уходит в заказ
+            'price         {DEC}     NULL',    // NULL = «по тарифам службы»
             'free_from     {DEC}     NULL',      // бесплатно от суммы
             'needs_city    {BOOL}    NOT NULL DEFAULT 0',
             'needs_address {BOOL}    NOT NULL DEFAULT 0',

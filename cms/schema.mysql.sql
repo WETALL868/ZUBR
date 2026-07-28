@@ -40,6 +40,11 @@ CREATE TABLE IF NOT EXISTS categories (
   slug          VARCHAR(190) NOT NULL,
   h1            VARCHAR(190) NULL,
   lead          TEXT    NULL,
+  label         VARCHAR(120) NULL,
+  stock_label   VARCHAR(120) NULL,
+  stock_title   VARCHAR(190) NULL,
+  list_name     VARCHAR(255) NULL,
+  list_desc     TEXT    NULL,
   description   MEDIUMTEXT NULL,
   image         VARCHAR(255) NULL,
   seo_title     VARCHAR(255) NULL,
@@ -85,6 +90,11 @@ CREATE TABLE IF NOT EXISTS products (
   country        VARCHAR(100) NULL,
   is_published   TINYINT(1)    NOT NULL DEFAULT 1,
   is_featured    TINYINT(1)    NOT NULL DEFAULT 0,
+  card_title        VARCHAR(255) NULL,
+  card_lead         TEXT    NULL,
+  card_alt          VARCHAR(255) NULL,
+  card_figure_label VARCHAR(255) NULL,
+  card_tags         TEXT    NULL,
   in_yml         TINYINT(1)    NOT NULL DEFAULT 1,
   sort_order     INT     NOT NULL DEFAULT 0,
   seo_title      VARCHAR(255) NULL,
@@ -132,6 +142,16 @@ CREATE TABLE IF NOT EXISTS category_attributes (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE UNIQUE INDEX ux_catattr ON category_attributes (category_id, attribute_id);
+
+CREATE TABLE IF NOT EXISTS product_card_specs (
+  id         INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  product_id INT     NOT NULL,
+  name       VARCHAR(120) NOT NULL,
+  value      VARCHAR(255) NULL,
+  sort_order INT     NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE INDEX ix_card_specs ON product_card_specs (product_id, sort_order);
 
 CREATE TABLE IF NOT EXISTS product_attribute_values (
   id           INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -288,6 +308,7 @@ CREATE TABLE IF NOT EXISTS delivery_methods (
   code          VARCHAR(60)  NOT NULL,
   title         VARCHAR(190) NOT NULL,
   description   TEXT    NULL,
+  option_title  VARCHAR(255) NULL,
   price         DECIMAL(12,2)     NULL,
   free_from     DECIMAL(12,2)     NULL,
   needs_city    TINYINT(1)    NOT NULL DEFAULT 0,

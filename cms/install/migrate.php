@@ -26,6 +26,19 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/bootstrap.php';
 
+/**
+ * Путь к исходному файлу.
+ *
+ * Сначала ищем в снимке cms/install/legacy — он не меняется при установке
+ * CMS. Если снимка нет, берём файл с сайта: так миграцию можно запустить и
+ * до перехода, пока прежние страницы ещё на месте.
+ */
+function legacy(string $snapshot, string $live): string
+{
+    $path = __DIR__ . '/legacy/' . $snapshot;
+    return is_file($path) ? $path : CMS_ROOT . '/' . ltrim($live, '/');
+}
+
 $apply = in_array('--apply', $argv ?? [], true);
 $fresh = in_array('--fresh', $argv ?? [], true);
 
@@ -113,6 +126,66 @@ function migrate_parse_product_page(string $file): array
     return $out;
 }
 
+/**
+ * Сокращённые характеристики карточек каталога и подписи к фото — они есть
+ * только в разметке главной и страниц категорий.
+ *
+ * @return array<string,array{specs:array<string,string>,alt:string,figure:string,
+ *                            tags:string[],lead:string,title:string,featured:bool}>
+ */
+function migrate_parse_cards(array $files): array
+{
+    $cards = [];
+
+    foreach ($files as $file) {
+        if (!is_file($file)) {
+            continue;
+        }
+        $html = (string)file_get_contents($file);
+        if (!preg_match_all('~<article class="model-card([^"]*)" id="([^"]+)"(.*?)</article>~s', $html, $matches, PREG_SET_ORDER)) {
+            continue;
+        }
+
+        foreach ($matches as $card) {
+            $slug = $card[2];
+            if (isset($cards[$slug])) {
+                continue;   // одна и та же карточка есть и на главной, и в категории
+            }
+            $body = $card[3];
+
+            $specs = [];
+            if (preg_match_all('~<div><dt>(.*?)</dt><dd>(.*?)</dd></div>~s', $body, $rows, PREG_SET_ORDER)) {
+                foreach ($rows as $row) {
+                    $specs[trim(html_entity_decode(strip_tags($row[1]), ENT_QUOTES, 'UTF-8'))]
+                        = trim(html_entity_decode(strip_tags($row[2]), ENT_QUOTES, 'UTF-8'));
+                }
+            }
+
+            $tags = [];
+            if (preg_match('~<ul class="model-tags"[^>]*>(.*?)</ul>~s', $body, $ul)
+                && preg_match_all('~<li>(.*?)</li>~s', $ul[1], $li)) {
+                $tags = array_map(static fn($t) => trim(html_entity_decode(strip_tags($t), ENT_QUOTES, 'UTF-8')), $li[1]);
+            }
+
+            $cards[$slug] = [
+                'specs'    => $specs,
+                'tags'     => $tags,
+                'featured' => str_contains($card[1], 'featured'),
+                'figure'   => preg_match('~<figure class="model-photo"[^>]*aria-label="([^"]*)"~', $body, $f) ? $f[1] : '',
+                'alt'      => preg_match("~product_image_tag\\('[^']*', '([^']*)'~", $body, $a) ? $a[1] : '',
+                'title'    => preg_match('~<h3>(.*?)</h3>~s', $body, $h) ? trim(strip_tags($h[1])) : '',
+                'lead'     => preg_match('~</dl>|<p>(?!<)(.*?)</p>~s', $body, $p) ? '' : '',
+            ];
+            // Краткий текст карточки — абзац между ценой и списком характеристик.
+            if (preg_match('~<\\?= prices_card_html\\([^)]*\\) \\?>\\s*<p>(.*?)</p>~s', $body, $lead)) {
+                $cards[$slug]['lead'] = trim(html_entity_decode(strip_tags($lead[1]), ENT_QUOTES, 'UTF-8'));
+            }
+        }
+    }
+
+    return $cards;
+}
+
 /** Тексты категории из processors/index.php или drives/index.php. */
 function migrate_parse_category_page(string $file): array
 {
@@ -125,12 +198,27 @@ function migrate_parse_category_page(string $file): array
         return preg_match($pattern, $html, $m) ? trim(html_entity_decode($m[1], ENT_QUOTES, 'UTF-8')) : null;
     };
 
+    // Вводный текст под H1 и подписи секций — их видно только в разметке.
+    $lead = null;
+    if (preg_match('~<h1[^>]*>.*?</h1>\\s*<p>(.*?)</p>~s', $html, $m)) {
+        // Пробелы не трогаем: абзац в разметке разбит на строки, и схлопывание
+        // дало бы расхождение с прежней страницей.
+        $lead = html_entity_decode($m[1], ENT_QUOTES, 'UTF-8');
+    }
+
     return array_filter([
-        'seo_title' => $grab('~<title>(.*?)</title>~s'),
-        'seo_desc'  => $grab('~<meta name="description" content="(.*?)"~s'),
-        'og_title'  => $grab('~<meta property="og:title" content="(.*?)"~s'),
-        'og_desc'   => $grab('~<meta property="og:description" content="(.*?)"~s'),
-        'h1'        => $grab('~<h1[^>]*>(.*?)</h1>~s'),
+        'seo_title'   => $grab('~<title>(.*?)</title>~s'),
+        'seo_desc'    => $grab('~<meta name="description" content="(.*?)"~s'),
+        'og_title'    => $grab('~<meta property="og:title" content="(.*?)"~s'),
+        'og_desc'     => $grab('~<meta property="og:description" content="(.*?)"~s'),
+        'h1'          => $grab('~<h1[^>]*>(.*?)</h1>~s'),
+        'lead'        => $lead,
+        'label'       => $grab('~<section class="section category-intro">\\s*<p class="section-label">(.*?)</p>~s'),
+        'stock_title' => $grab('~<h2 id="cat-grid-title">(.*?)</h2>~s'),
+        // ItemList в микроразметке категории имел свои name и description,
+        // не совпадающие с названием категории.
+        'list_name'   => $grab('~"@type":"ItemList","name":"(.*?)"~s'),
+        'list_desc'   => $grab('~"@type":"ItemList","name":".*?","description":"(.*?)"~s'),
     ], static fn($v) => $v !== null && $v !== '');
 }
 
@@ -162,12 +250,18 @@ function migrate_parse_simple_page(string $file): array
 
 /* ------------------------------------------------------------- подготовка */
 
-$catalog = require CMS_ROOT . '/yandexmarket/products.php';
+$cards = migrate_parse_cards([
+    legacy('home.php', 'index.php'),
+    legacy('category-processors.php', 'processors/index.php'),
+    legacy('category-drives.php', 'drives/index.php'),
+]);
+
+$catalog = require legacy('products.php', 'yandexmarket/products.php');
 if (!is_array($catalog) || !$catalog) {
     exit("Не удалось прочитать yandexmarket/products.php\n");
 }
 
-$pricesRaw = json_decode((string)@file_get_contents(CMS_ROOT . '/data/prices.json'), true);
+$pricesRaw = json_decode((string)@file_get_contents(legacy('prices.json', 'data/prices.json')), true);
 $prices = [];
 foreach (($pricesRaw['товары'] ?? []) as $row) {
     $prices[mb_strtolower((string)($row['id'] ?? ''))] = $row;
@@ -224,8 +318,8 @@ if ($apply) {
 
 $categoryMap = [];   // category_id из products.php -> id в базе
 $categoryDefs = [
-    1 => ['name' => 'Серверные процессоры', 'slug' => 'processors', 'page' => CMS_ROOT . '/processors/index.php', 'yml' => 1],
-    2 => ['name' => 'Диски и накопители',   'slug' => 'drives',     'page' => CMS_ROOT . '/drives/index.php',     'yml' => 2],
+    1 => ['name' => 'Серверные процессоры', 'slug' => 'processors', 'page' => legacy('category-processors.php', 'processors/index.php'), 'yml' => 1],
+    2 => ['name' => 'Диски и накопители',   'slug' => 'drives',     'page' => legacy('category-drives.php', 'drives/index.php'),     'yml' => 2],
 ];
 
 foreach ($categoryDefs as $oldId => $def) {
@@ -242,6 +336,12 @@ foreach ($categoryDefs as $oldId => $def) {
         'name'            => $def['name'],
         'slug'            => $def['slug'],
         'h1'              => $extra['h1'] ?? $def['name'],
+        'lead'            => $extra['lead'] ?? null,
+        'label'           => $extra['label'] ?? null,
+        'stock_label'     => $extra['stock_label'] ?? null,
+        'stock_title'     => $extra['stock_title'] ?? null,
+        'list_name'       => $extra['list_name'] ?? null,
+        'list_desc'       => $extra['list_desc'] ?? null,
         'seo_title'       => $extra['seo_title'] ?? null,
         'seo_desc'        => $extra['seo_desc'] ?? null,
         'og_title'        => $extra['og_title'] ?? null,
@@ -306,7 +406,8 @@ foreach ($catalog as $entry) {
         continue;
     }
 
-    $page = migrate_parse_product_page(CMS_ROOT . '/products/' . $slug . '/index.php');
+    $page = migrate_parse_product_page(legacy('products/' . $slug . '.php', 'products/' . $slug . '/index.php'));
+    $card = $cards[$slug] ?? ['specs' => [], 'tags' => [], 'featured' => false, 'figure' => '', 'alt' => '', 'title' => '', 'lead' => ''];
     $price = $prices[mb_strtolower($slug)] ?? [];
     $params = (array)($entry['params'] ?? []);
 
@@ -352,6 +453,12 @@ foreach ($catalog as $entry) {
         'condition_note' => (string)($params['Комплектация'] ?? ''),
         'country'        => (string)($params['Страна-изготовитель'] ?? ''),
         'is_published'   => 1,
+        'is_featured'    => $card['featured'] ? 1 : 0,
+        'card_title'     => $card['title'] ?: null,
+        'card_lead'      => $card['lead'] ?: null,
+        'card_alt'       => $card['alt'] ?: null,
+        'card_figure_label' => $card['figure'] ?: null,
+        'card_tags'      => $card['tags'] ? implode(', ', $card['tags']) : null,
         'in_yml'         => 1,
         'seo_title'      => $page['seo_title'] ?? null,
         'seo_desc'       => $page['seo_desc'] ?? null,
@@ -386,6 +493,18 @@ foreach ($catalog as $entry) {
             'attribute_id' => $attributeMap[(string)$name],
             'value'        => (string)$value,
             'sort_order'   => $order += 10,
+        ]);
+    }
+
+    // Сокращённые характеристики карточки каталога
+    cms_query('DELETE FROM product_card_specs WHERE product_id = ?', [$productId]);
+    $order = 0;
+    foreach ($card['specs'] as $name => $value) {
+        cms_insert('product_card_specs', [
+            'product_id' => $productId,
+            'name'       => (string)$name,
+            'value'      => (string)$value,
+            'sort_order' => $order += 10,
         ]);
     }
 
@@ -476,8 +595,8 @@ say();
 /* -------------------------------------------------------------- страницы */
 
 $pageDefs = [
-    ['slug' => 'privacy_policy',            'file' => CMS_ROOT . '/privacy_policy/index.html',            'title' => 'Политика конфиденциальности'],
-    ['slug' => 'polzovatelskoe-soglashenie', 'file' => CMS_ROOT . '/polzovatelskoe-soglashenie/index.html', 'title' => 'Пользовательское соглашение'],
+    ['slug' => 'privacy_policy',            'file' => legacy('page-privacy_policy.html', 'privacy_policy/index.html'),            'title' => 'Политика конфиденциальности'],
+    ['slug' => 'polzovatelskoe-soglashenie', 'file' => legacy('page-polzovatelskoe-soglashenie.html', 'polzovatelskoe-soglashenie/index.html'), 'title' => 'Пользовательское соглашение'],
 ];
 
 foreach ($pageDefs as $def) {
@@ -513,22 +632,58 @@ say();
 
 /* -------------------------------------------------------------- доставка */
 
-$deliveryDefs = [
-    ['code' => 'pickup',  'title' => 'Самовывоз',                      'key' => 'самовывоз',          'city' => 0, 'addr' => 0,
-     'desc' => 'Москва, м. Варшавская, Болотниковская ул., д.5к3 · бесплатно'],
-    ['code' => 'moscow',  'title' => 'Доставка по Москве',             'key' => 'москва',             'city' => 1, 'addr' => 1,
-     'desc' => 'Курьерская доставка по адресу'],
-    ['code' => 'mo',      'title' => 'Доставка по Московской области', 'key' => 'московская_область', 'city' => 1, 'addr' => 1,
-     'desc' => 'Курьер или транспортная компания'],
-    ['code' => 'russia',  'title' => 'Доставка по России',             'key' => 'россия',             'city' => 1, 'addr' => 1,
-     'desc' => 'СДЭК, транспортная компания, Яндекс Маркет, Ozon или Wildberries'],
-];
+// Способы доставки: названия и подписи берём из разметки корзины, цены — из
+// prices.json. В исходном файле цена подставлялась PHP-вставкой, поэтому из
+// разметки достаём только неизменяемый текст («Курьер или транспортная
+// компания · от»), а число подставляем отдельно.
+$deliveryDefs = [];
+$cartHtml = (string)@file_get_contents(legacy('category-processors.php', 'processors/index.php'));
+if (preg_match_all(
+    '~<input type="radio" name="cartDelivery" value="([^"]*)"[^>]*?data-delivery-price="([^"]*)"'
+    . '[^>]*?data-delivery-title="([^"]*)"([^>]*)>\s*<span>\s*<strong>(.*?)</strong>\s*<em>(.*?)</em>~s',
+    $cartHtml, $matches, PREG_SET_ORDER
+)) {
+    $codes = ['Самовывоз' => 'pickup', 'Доставка по Москве' => 'moscow',
+              'Доставка по Московской области' => 'mo', 'Доставка по России' => 'russia'];
+    $priceKeys = ['pickup' => 'самовывоз', 'moscow' => 'москва',
+                  'mo' => 'московская_область', 'russia' => 'россия'];
+
+    // Убирает PHP-вставки и приводит пробелы в порядок.
+    $plain = static function (string $value): string {
+        $value = preg_replace('~<\?.*?\?>~s', '', $value) ?? '';
+        return trim(preg_replace('~\s+~u', ' ', html_entity_decode(strip_tags($value), ENT_QUOTES, 'UTF-8')) ?? '');
+    };
+
+    // То же, но вставка с ценой превращается в метку {цена}. Строка
+    // «Курьер или транспортная компания · от {цена}» сохраняет и слово «от»,
+    // и место для стоимости — иначе при сборке из кусков терялось то одно,
+    // то другое.
+    $withPrice = static function (string $value): string {
+        $value = preg_replace('~<\?[^?]*prices_delivery_money[^?]*\?>~s', '{цена}', $value) ?? '';
+        $value = preg_replace('~<\?.*?\?>~s', '', $value) ?? '';
+        return trim(preg_replace('~\s+~u', ' ', html_entity_decode(strip_tags($value), ENT_QUOTES, 'UTF-8')) ?? '');
+    };
+
+    foreach ($matches as $m) {
+        $code = $codes[$m[1]] ?? mb_substr(preg_replace('~[^a-z0-9]+~', '_', mb_strtolower($m[1])), 0, 50);
+        $raw = $pricesRaw['доставка'][$priceKeys[$code] ?? ''] ?? null;
+
+        $deliveryDefs[] = [
+            'code'  => $code,
+            'title' => $plain($m[5]),
+            'desc'  => $withPrice($m[6]),
+            'opt'   => $plain($m[3]),
+            'price' => ($raw === '' || $raw === null) ? null : (float)$raw,
+            'addr'  => str_contains($m[4], 'data-delivery-details') ? 1 : 0,
+        ];
+    }
+}
 
 $order = 0;
 foreach ($deliveryDefs as $def) {
-    $raw = $pricesRaw['доставка'][$def['key']] ?? null;
-    $price = ($raw === '' || $raw === null) ? null : (float)$raw;
-    say(sprintf('Доставка: %-32s %s', $def['title'], $price === null ? 'по тарифам службы' : cms_money($price)));
+    $price = $def['price'];
+    say(sprintf('Доставка: %-32s %-18s «%s»', $def['title'],
+        $price === null ? 'по тарифам службы' : cms_money($price), $def['desc']));
 
     if (!$apply) {
         continue;
@@ -536,7 +691,8 @@ foreach ($deliveryDefs as $def) {
 
     $data = [
         'code' => $def['code'], 'title' => $def['title'], 'description' => $def['desc'],
-        'price' => $price, 'needs_city' => $def['city'], 'needs_address' => $def['addr'],
+        'option_title' => $def['opt'],
+        'price' => $price, 'needs_city' => $def['addr'], 'needs_address' => $def['addr'],
         'is_active' => 1, 'sort_order' => $order += 10,
     ];
     $existing = cms_value('SELECT id FROM delivery_methods WHERE code = ?', [$def['code']]);
