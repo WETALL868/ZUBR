@@ -107,14 +107,14 @@ $headTail   = "    <link rel=\"preconnect\" href=\"https://mc.yandex.ru\" />\n"
     . "    <link rel=\"dns-prefetch\" href=\"https://mc.yandex.ru\" />\n"
     . "    <link rel=\"preload\" as=\"image\" href=\"/public/assets/xeon-hero.webp\" fetchpriority=\"high\" />\n"
     . "    <style>\n" . $criticalCss . "    </style>\n"
-    . "    <link rel=\"preload\" href=\"/src/styles.css?v=2\" as=\"style\" onload=\"this.onload=null;this.rel='stylesheet'\" />\n"
-    . "    <noscript><link rel=\"stylesheet\" href=\"/src/styles.css?v=2\" /></noscript>\n";
+    . "    <link rel=\"preload\" href=\"/src/styles.css?v=4\" as=\"style\" onload=\"this.onload=null;this.rel='stylesheet'\" />\n"
+    . "    <noscript><link rel=\"stylesheet\" href=\"/src/styles.css?v=4\" /></noscript>\n";
 
 $bodyScripts = [
     '/src/nav.js?v=2',
     '/src/scroll-lock.js?v=3',
     '/src/gallery.js?v=3',
-    '/src/main.js?v=3',
+    '/src/main.js?v=4',
 ];
 
 // На главной логотипы ведут наверх, а якоря указываются без слэша: ссылка

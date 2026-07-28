@@ -28,15 +28,24 @@
       </article>
     </div>
 
+    <?php
+      /*
+       * Текст согласия — из настроек, а не из разметки. Баннер висит поверх
+       * страницы, и на телефоне его высота целиком зависит от длины этого
+       * текста: короче текст — меньше закрыто. Раз это юридическая
+       * формулировка, менять её должен владелец сайта, а не программист.
+       */
+    ?>
     <div class="cookie-banner" role="dialog" aria-live="polite" aria-label="Согласие на использование cookie">
       <div>
-        <strong>Cookie и персональные данные</strong>
+        <strong><?= e((string)cms_setting('cookie', 'title', 'Cookie и персональные данные')) ?></strong>
         <p>
-          Мы используем cookie для работы сайта и обработки заявок. Нажимая «Согласен», вы подтверждаете согласие
-          с использованием cookie и можете ознакомиться с <a href="/privacy_policy/">политикой конфиденциальности</a>.
+          <?= cms_setting('cookie', 'text',
+              'Мы используем cookie для работы сайта и обработки заявок. Нажимая «Согласен», вы подтверждаете согласие'
+              . "\n" . '          с использованием cookie и можете ознакомиться с <a href="/privacy_policy/">политикой конфиденциальности</a>.') ?>
         </p>
       </div>
-      <button class="button primary cookie-accept" type="button">Согласен</button>
+      <button class="button primary cookie-accept" type="button"><?= e((string)cms_setting('cookie', 'button', 'Согласен')) ?></button>
     </div>
 
     <div class="order-success" aria-hidden="true">

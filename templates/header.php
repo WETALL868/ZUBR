@@ -32,7 +32,7 @@ $headerVariant   = $headerVariant   ?? 'full';
 // оставляем как было, чтобы разметка не менялась.
 $showVerification = $showVerification ?? true;
 $bodyClass       = $bodyClass       ?? '';
-$headAssets      = $headAssets      ?? "    <link rel=\"preconnect\" href=\"https://mc.yandex.ru\" />\n    <link rel=\"stylesheet\" href=\"/src/styles.css?v=3\" />\n";
+$headAssets      = $headAssets      ?? "    <link rel=\"preconnect\" href=\"https://mc.yandex.ru\" />\n    <link rel=\"stylesheet\" href=\"/src/styles.css?v=4\" />\n";
 $headTail        = $headTail        ?? '';
 ?><!doctype html>
 <html lang="ru">

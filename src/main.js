@@ -33,8 +33,40 @@ function saveCookieConsent() {
   }
 }
 
+/*
+ * Баннер cookie висит поверх страницы, поэтому он обязан освобождать под себя
+ * место внизу документа. Без этого на телефоне он закрывал весь подвал —
+ * ссылки на политику, соглашение и реквизиты, — а на форме заказа прятал
+ * первые поля: посетитель видел заголовок «Оставьте заявку» и пустоту под ним.
+ *
+ * Высоту меряем, а не задаём числом: она зависит от ширины экрана и от
+ * длины текста, которые владелец может поменять в панели.
+ */
+function updateCookieOffset() {
+  const visible = cookieBanner && !cookieBanner.hidden
+    && getComputedStyle(cookieBanner).display !== "none";
+
+  document.documentElement.classList.toggle("has-cookie-banner", !!visible);
+  document.documentElement.style.setProperty(
+    "--cookie-banner-height",
+    visible ? `${Math.ceil(cookieBanner.getBoundingClientRect().height)}px` : "0px",
+  );
+}
+
 if (cookieBanner && hasCookieConsent()) {
   cookieBanner.hidden = true;
+}
+
+if (cookieBanner) {
+  updateCookieOffset();
+
+  // Текст переносится по-разному при повороте экрана и при смене размера
+  // шрифта в браузере, поэтому высоту пересчитываем, а не запоминаем.
+  if (typeof ResizeObserver === "function") {
+    new ResizeObserver(updateCookieOffset).observe(cookieBanner);
+  } else {
+    window.addEventListener("resize", updateCookieOffset, { passive: true });
+  }
 }
 
 cookieAccept?.addEventListener("click", () => {
@@ -42,6 +74,7 @@ cookieAccept?.addEventListener("click", () => {
   if (cookieBanner) {
     cookieBanner.hidden = true;
   }
+  updateCookieOffset();
 });
 
 function formatPhone(value) {
