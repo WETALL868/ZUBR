@@ -25,7 +25,11 @@ if (($_GET['export'] ?? '') === 'csv') {
     fwrite($out, "\xEF\xBB\xBF");
     // Точка с запятой — разделитель, который Excel с русской локалью
     // понимает без «мастера импорта».
-    fputcsv($out, ['Артикул', 'Адрес', 'Название', 'Цена', 'Старая цена', 'Наличие', 'Остаток'], ';');
+    // Четвёртый параметр обязателен: в PHP 8.4 без него сыплется
+    // предупреждение, а его текст попадает прямо внутрь выгружаемого файла и
+    // ломает таблицу. Пустая строка отключает нестандартное экранирование
+    // обратным слэшем — получается обычный CSV, который Excel понимает.
+    fputcsv($out, ['Артикул', 'Адрес', 'Название', 'Цена', 'Старая цена', 'Наличие', 'Остаток'], ';', '"', '');
 
     foreach ($rows as $row) {
         fputcsv($out, [
@@ -36,7 +40,7 @@ if (($_GET['export'] ?? '') === 'csv') {
             cms_money_machine($row['old_price'] === null ? null : (float)$row['old_price']),
             REPO_STOCK_LABELS[$row['availability']] ?? '',
             (string)$row['stock_qty'],
-        ], ';');
+        ], ';', '"', '');
     }
     fclose($out);
     exit;
@@ -161,7 +165,7 @@ function admin_import_prices(array $file, int $adminId, bool $dryRun): array
     fgets($handle);   // пропускаем строку заголовков
 
     $line = 1;
-    while (($row = fgetcsv($handle, 0, $delimiter)) !== false) {
+    while (($row = fgetcsv($handle, 0, $delimiter, '"', '')) !== false) {
         $line++;
         if ($row === [null] || count($row) < 4) {
             continue;

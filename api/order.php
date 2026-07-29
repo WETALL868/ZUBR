@@ -487,13 +487,28 @@ function smtp_send(array $config, string $to_email, string $to_name, string $rep
         throw new RuntimeException('SMTP-настройки не заполнены.');
     }
 
+    /*
+     * Сколько ждать почтовый сервер.
+     *
+     * Пока идёт отправка, покупатель смотрит на крутящийся индикатор. При
+     * недоступном SMTP прежние двадцать секунд ожидания выглядели как
+     * зависший сайт: человек жал «Отправить» второй раз и получался
+     * задвоенный заказ. Заказ к этому моменту уже записан в базу, поэтому
+     * ждать долго незачем — потерять его нельзя.
+     *
+     * Если почта у вас отвечает медленно, поднимите значения в
+     * api/mail-config.php.
+     */
+    $connect_timeout = max(2, min(30, (int)($config['smtp_connect_timeout'] ?? 8)));
+    $read_timeout = max(2, min(30, (int)($config['smtp_timeout'] ?? 10)));
+
     $target = ($secure === 'ssl' ? 'ssl://' : 'tcp://') . $host . ':' . $port;
-    $socket = @stream_socket_client($target, $errno, $errstr, 20, STREAM_CLIENT_CONNECT);
+    $socket = @stream_socket_client($target, $errno, $errstr, $connect_timeout, STREAM_CLIENT_CONNECT);
     if (!$socket) {
         throw new RuntimeException('Не удалось подключиться к SMTP: ' . $errstr);
     }
 
-    stream_set_timeout($socket, 20);
+    stream_set_timeout($socket, $read_timeout);
     smtp_command($socket, null, [220]);
     smtp_command($socket, 'EHLO ' . ($_SERVER['SERVER_NAME'] ?? 'localhost'), [250]);
 

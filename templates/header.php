@@ -68,7 +68,19 @@ $headTail        = $headTail        ?? '';
 <?= $headAssets ?>    <link rel="icon" href="/favicon.ico" sizes="any" />
     <title><?= e((string)$pageTitle) ?></title>
 <?= $headTail ?>    <?php foreach ($jsonLd as $block): ?>
-    <script type="application/ld+json"><?= json_encode($block, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
+    <?php
+      /*
+       * JSON_HEX_TAG обязателен. Микроразметка лежит внутри <script>, а
+       * json_encode экранирует кавычки, но не угловые скобки. Название товара
+       * или категории, в котором окажется «</script>», закрыло бы тег раньше
+       * времени — и всё, что после, браузер выполнил бы как разметку. Флаг
+       * превращает < и > в \u003C и \u003E: для поисковых систем это тот же
+       * текст, а вырваться из тега уже нельзя.
+       *
+       * На обычных значениях вывод не меняется: угловых скобок в них нет.
+       */
+    ?>
+    <script type="application/ld+json"><?= json_encode($block, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) ?></script>
     <?php endforeach; ?>
   </head>
   <body<?= $bodyClass !== '' ? ' class="' . e($bodyClass) . '"' : '' ?>>
