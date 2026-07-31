@@ -156,6 +156,45 @@ $checks[] = check($noPrice === 0, 'Цены товаров', 'у всех опу
 $checks[] = check($noPhoto === 0, 'Фотографии товаров', 'у всех опубликованных товаров есть фотография',
     "без фотографии товаров: $noPhoto — вместо снимка показывается заглушка", true);
 
+/*
+ * Директивы, которые нельзя писать в .htaccess.
+ *
+ * php_admin_value и php_admin_flag PHP разрешает только в основном конфиге
+ * сервера. На хостинге с mod_php Apache отвечает на такую строку «not allowed
+ * here» — то есть ошибкой 500 на КАЖДЫЙ файл в этой папке. Если строка попала
+ * в .htaccess папки с фотографиями, снимки товаров перестают открываться и на
+ * сайте остаются одни подписи ALT; если в корневой — падает весь сайт.
+ *
+ * Проверка читает файлы, а не делает запрос по сети: часть хостингов
+ * запрещает обращаться к самому себе, и сетевая проверка там показывала бы
+ * вечное предупреждение вместо ответа.
+ */
+$illegal = [];
+foreach (['/.htaccess', '/public/images/products/.htaccess', '/admin/.htaccess',
+          '/config/.htaccess', '/storage/.htaccess', '/cms/.htaccess'] as $file) {
+    $full = CMS_ROOT . $file;
+    if (!is_file($full)) {
+        continue;
+    }
+    foreach (file($full, FILE_IGNORE_NEW_LINES) as $n => $line) {
+        $clean = trim($line);
+        if ($clean === '' || $clean[0] === '#') {
+            continue;   // комментарии Apache не читает
+        }
+        if (preg_match('~^(php_admin_value|php_admin_flag)\s~i', $clean)) {
+            $illegal[] = $file . ', строка ' . ($n + 1) . ': ' . mb_substr($clean, 0, 40);
+        }
+    }
+}
+
+$checks[] = check(
+    $illegal === [],
+    'Директивы в .htaccess',
+    'запрещённых директив нет',
+    'найдены директивы, недопустимые в .htaccess — сервер ответит ошибкой 500 на все файлы '
+    . 'в этой папке: ' . implode('; ', $illegal) . '. Удалите эти строки.'
+);
+
 $mailConfig = CMS_ROOT . '/api/mail-config.php';
 $checks[] = check(is_file($mailConfig), 'Настройки почты',
     'файл api/mail-config.php на месте',
