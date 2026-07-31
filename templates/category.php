@@ -22,7 +22,7 @@ $bodyScripts     = [
     '/src/nav.js?v=2',
     '/src/scroll-lock.js?v=3',
     '/src/gallery.js?v=3',
-    '/src/main.js?v=4',
+    '/src/main.js?v=5',
 ];
 
 // На страницах категорий стили подключены после <title>, а не до иконки, —
