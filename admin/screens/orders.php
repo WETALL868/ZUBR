@@ -30,8 +30,11 @@ if (($_GET['export'] ?? '') === 'csv') {
     // предупреждение, а его текст попадает прямо внутрь выгружаемого файла и
     // ломает таблицу. Пустая строка отключает нестандартное экранирование
     // обратным слэшем — получается обычный CSV, который Excel понимает.
-    fputcsv($out, ['Номер', 'Дата', 'Статус', 'Покупатель', 'Телефон', 'Почта',
-                   'Компания', 'Доставка', 'Стоимость доставки', 'Товары', 'Итого', 'Состав'], ';', '"', '');
+    fputcsv($out, ['Номер', 'Дата', 'Статус', 'Тип покупателя', 'Покупатель', 'Телефон', 'Почта',
+                   'Компания', 'ИНН', 'КПП', 'ОГРН', 'Юр. адрес', 'Банк', 'БИК',
+                   'Расчётный счёт', 'Корр. счёт',
+                   'Доставка', 'Стоимость доставки', 'Регион', 'Город', 'Адрес',
+                   'Оплата', 'Товары', 'Скидка', 'Итого', 'Состав'], ';', '"', '');
 
     foreach ($rows as $row) {
         $items = [];
@@ -39,14 +42,22 @@ if (($_GET['export'] ?? '') === 'csv') {
             $items[] = $item['title'] . ' × ' . (int)$item['qty'];
         }
 
+        $type = (string)($row['customer_type'] ?? 'individual') === 'legal' ? 'legal' : 'individual';
+
         fputcsv($out, [
             $row['number'],
             date('d.m.Y H:i', strtotime((string)$row['created_at'])),
             ORDER_STATUSES[$row['status']] ?? $row['status'],
-            $row['customer_name'], $row['phone'], $row['email'], $row['company'],
+            ORDER_CUSTOMER_TYPES[$type],
+            $row['customer_name'], $row['phone'], $row['email'],
+            $row['company'], $row['inn'], $row['kpp'], $row['ogrn'], $row['legal_address'],
+            $row['bank_name'], $row['bik'], $row['bank_account'], $row['corr_account'],
             $row['delivery_title'],
             $row['delivery_price'] === null ? 'по тарифам' : cms_money_machine((float)$row['delivery_price']),
+            $row['region'], $row['city'], $row['address'],
+            $row['payment'],
             cms_money_machine((float)$row['items_total']),
+            $row['discount'] === null ? '' : cms_money_machine((float)$row['discount']),
             cms_money_machine((float)$row['total']),
             implode('; ', $items),
         ], ';', '"', '');
@@ -186,7 +197,13 @@ require __DIR__ . '/../layout/header.php';
                 <td><?= e(date('d.m.Y H:i', strtotime((string)$row['created_at']))) ?></td>
                 <td>
                   <?= e((string)$row['customer_name']) ?>
-                  <div style="color:var(--muted);font-size:12px"><?= e((string)$row['phone']) ?></div>
+                  <?php if ((string)($row['customer_type'] ?? '') === 'legal'): ?>
+                  <span class="adm-tag">юр. лицо</span>
+                  <?php endif; ?>
+                  <div style="color:var(--muted);font-size:12px">
+                    <?= e((string)$row['phone']) ?>
+                    <?php if (!empty($row['inn'])): ?> · ИНН <?= e((string)$row['inn']) ?><?php endif; ?>
+                  </div>
                 </td>
                 <td style="font-size:13px">
                   <?php if (!$rowItems): ?>
@@ -227,14 +244,18 @@ require __DIR__ . '/../layout/header.php';
             </div>
           </div>
 
+          <?php
+            $customerType = (string)($order['customer_type'] ?? 'individual') === 'legal' ? 'legal' : 'individual';
+            $legalDetails = $customerType === 'legal' ? orders_legal_details($order) : [];
+          ?>
           <div class="adm-cols">
             <div>
               <h3 style="font-size:14px">Покупатель</h3>
               <p>
+                <b>Тип покупателя: <?= e(ORDER_CUSTOMER_TYPES[$customerType]) ?></b><br />
                 <?= e((string)$order['customer_name']) ?><br />
-                <a href="tel:<?= e((string)$order['phone']) ?>"><?= e((string)$order['phone']) ?></a><br />
-                <a href="mailto:<?= e((string)$order['email']) ?>"><?= e((string)$order['email']) ?></a>
-                <?php if ($order['company']): ?><br /><?= e((string)$order['company']) ?><?php endif; ?>
+                <a href="tel:<?= e((string)$order['phone']) ?>"><?= e((string)$order['phone']) ?></a>
+                <?php if ($order['email']): ?><br /><a href="mailto:<?= e((string)$order['email']) ?>"><?= e((string)$order['email']) ?></a><?php endif; ?>
               </p>
             </div>
             <div>
@@ -242,12 +263,34 @@ require __DIR__ . '/../layout/header.php';
               <p>
                 <?= e((string)($order['delivery_title'] ?: '—')) ?>
                 — <?= $order['delivery_price'] === null ? 'по тарифам службы' : e(cms_money((float)$order['delivery_price'])) ?><br />
+                <?php if (!empty($order['delivery_term'])): ?>Срок: <?= e((string)$order['delivery_term']) ?><br /><?php endif; ?>
+                <?php if (!empty($order['region'])): ?><?= e((string)$order['region']) ?><br /><?php endif; ?>
                 <?php if ($order['city']): ?><?= e((string)$order['city']) ?><br /><?php endif; ?>
                 <?php if ($order['address']): ?><?= nl2br(e((string)$order['address'])) ?><br /><?php endif; ?>
                 Оплата: <?= e((string)($order['payment'] ?: '—')) ?>
               </p>
             </div>
           </div>
+
+          <?php if ($legalDetails): ?>
+          <?php /* Реквизиты — отдельным блоком: менеджер выставляет по ним счёт,
+                   и искать их вперемешку с адресом доставки неудобно. */ ?>
+          <div class="adm-card" style="margin:0 0 14px">
+            <h3 style="font-size:14px;margin-top:0">Реквизиты организации</h3>
+            <div class="adm-scroll">
+              <table class="adm-table">
+                <tbody>
+                  <?php foreach ($legalDetails as $label => $value): ?>
+                  <tr>
+                    <th style="text-align:left;width:220px"><?= e($label) ?></th>
+                    <td><?= nl2br(e($value)) ?></td>
+                  </tr>
+                  <?php endforeach; ?>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <?php endif; ?>
 
           <?php if ($order['comment']): ?>
           <p><b>Комментарий покупателя:</b> <?= nl2br(e((string)$order['comment'])) ?></p>

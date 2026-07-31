@@ -7,3 +7,7 @@ cook.txt
 
 # Пароль почты и токен Telegram — не в Git и не в архивы
 api/mail-config.php
+
+# Заявки, сохранённые при недоступной почте, и служебный роутер проверок
+api/orders/
+_router.php

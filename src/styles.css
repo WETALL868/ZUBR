@@ -1968,65 +1968,12 @@ h3 {
   font-size: 13px;
 }
 
-.cart-delivery {
-  display: grid;
-  gap: 10px;
-  padding-top: 4px;
-}
-
-.cart-delivery h3 {
-  margin: 0;
-  font-size: 20px;
-}
-
-.delivery-option {
-  grid-template-columns: 20px minmax(0, 1fr);
-  align-items: start;
-  gap: 12px;
-  padding: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  background: rgba(7, 9, 7, 0.34);
-  cursor: pointer;
-}
-
-.delivery-option:has(input:checked) {
-  border-color: rgba(79, 244, 224, 0.62);
-  background: rgba(79, 244, 224, 0.08);
-}
-
-.delivery-option input {
-  width: 18px;
-  height: 18px;
-  margin: 3px 0 0;
-  accent-color: var(--accent);
-}
-
-.delivery-option span {
-  display: grid;
-  gap: 4px;
-}
-
-.delivery-option strong {
-  color: var(--ink);
-}
-
-.delivery-option em {
-  color: var(--muted);
-  font-size: 13px;
-  font-style: normal;
-  line-height: 1.4;
-}
-
-.cart-delivery-fields {
-  display: none;
-  gap: 10px;
-}
-
-.cart-delivery-fields.is-visible {
-  display: grid;
-}
-
+/*
+ * Здесь были стили выбора доставки внутри корзины. Доставка переехала в
+ * форму оформления заказа: держать её в двух местах означало два независимых
+ * состояния — покупатель выбирал способ в корзине, а на оформлении видел
+ * другой.
+ */
 .cart-totals {
   display: grid;
   gap: 8px;
@@ -3909,5 +3856,455 @@ body.scroll-locked {
      Варшавская — то, ради чего карту и открывают. */
   .location-map {
     aspect-ratio: 3 / 2;
+  }
+}
+
+/* ===========================================================================
+   ОФОРМЛЕНИЕ ЗАКАЗА
+   ===========================================================================
+
+   Форма разбита на понятные разделы: покупатель, доставка, оплата, итог.
+   Внутри разделов — сетка в две колонки, которая на узком экране сама
+   становится одной: не медиазапросом, а auto-fit, поэтому колонки
+   схлопываются ровно тогда, когда полю становится тесно, а не на заранее
+   выбранной ширине.
+
+   Панель формы светлее страницы — так её видно как отдельный лист, на
+   котором работает покупатель. Цвета, шрифты и кнопки — те же, что на всём
+   сайте: выделение активного варианта делает бирюзовый акцент, как и везде.
+   ======================================================================== */
+
+.checkout-form {
+  gap: 22px;
+  background: var(--panel-2);
+}
+
+.co-section {
+  display: grid;
+  gap: 14px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.co-section:last-of-type,
+.co-section.co-summary {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.co-section[hidden] {
+  display: none;
+}
+
+.co-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.co-field-label {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 750;
+}
+
+/* Звёздочка обязательного поля — не украшение, её должно быть видно. */
+.co-req {
+  color: var(--accent-2);
+  font-weight: 900;
+}
+
+/* --------------------------------------------- переключатель типа покупателя */
+
+.co-switch {
+  display: inline-flex;
+  gap: 0;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(7, 9, 7, 0.5);
+}
+
+.co-switch-option {
+  display: block;
+  margin: 0;
+  cursor: pointer;
+}
+
+.co-switch-option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.co-switch-option span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Не меньше 44 пикселей: столько занимает подушечка пальца, и меньшую
+     кнопку на телефоне промахивают. */
+  min-height: 44px;
+  padding: 10px 22px;
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 850;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.co-switch-option.is-active span {
+  background: var(--accent);
+  color: #05201c;
+}
+
+/* Клавиатура: рамка нужна и когда выбор сделан мышью. */
+.co-switch-option input:focus-visible + span {
+  outline: 2px solid var(--accent-2);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------- поля */
+
+.co-fields {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.co-fields[hidden] {
+  display: none;
+}
+
+/*
+ * Две колонки, которые сами становятся одной.
+ *
+ * minmax(240px, 1fr) означает: пока полю хватает 240 пикселей — две колонки,
+ * стало теснее — одна. Поэтому на телефоне от 320 пикселей поля выстраиваются
+ * в столбик без единого медиазапроса и без горизонтальной прокрутки.
+ */
+.co-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px 16px;
+}
+
+.co-field {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-width: 0;
+}
+
+.co-field-full {
+  grid-column: 1 / -1;
+}
+
+/*
+ * Подпись поля — строка, а не сетка.
+ *
+ * Общее правило для label на сайте — display: grid: там подпись и поле лежат
+ * друг под другом внутри одного label. Здесь подпись и поле разделены, и
+ * grid превращал звёздочку обязательного поля в отдельную строку под
+ * названием: «ИНН», а под ним одинокая звёздочка.
+ */
+.co-field label {
+  display: block;
+  gap: 0;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 750;
+  line-height: 1.3;
+}
+
+/* Одинаковая высота у всех полей — иначе строка выглядит рваной. */
+.co-field input,
+.co-field select,
+.co-field textarea {
+  min-height: 50px;
+}
+
+.co-field textarea {
+  min-height: 72px;
+}
+
+.co-field .is-invalid {
+  border-color: #ff8a8a;
+  background: rgba(255, 138, 138, 0.06);
+}
+
+.co-error {
+  margin: 0;
+  color: #ff9b9b;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.co-error:empty {
+  display: none;
+}
+
+/* --------------------------------------------- карточки доставки и оплаты */
+
+.co-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+}
+
+.co-cards-wide {
+  grid-template-columns: 1fr;
+}
+
+.co-card {
+  display: block;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.co-card[hidden] {
+  display: none;
+}
+
+.co-card input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.co-card-body {
+  display: grid;
+  gap: 4px;
+  height: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(7, 9, 7, 0.42);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.co-card-body strong {
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.co-card-body em {
+  color: var(--muted);
+  font-size: 13px;
+  font-style: normal;
+  line-height: 1.35;
+}
+
+.co-card:hover .co-card-body {
+  border-color: rgba(79, 244, 224, 0.4);
+}
+
+.co-card.is-active .co-card-body {
+  border-color: var(--accent);
+  background: rgba(79, 244, 224, 0.12);
+}
+
+.co-card.is-active .co-card-body strong {
+  color: var(--accent);
+}
+
+.co-card input:focus-visible + .co-card-body {
+  outline: 2px solid var(--accent-2);
+  outline-offset: 2px;
+}
+
+.co-card-term {
+  color: var(--accent-3);
+}
+
+/* ---------------------------------------------------------- блок доставки */
+
+.co-delivery-detail[hidden] {
+  display: none;
+}
+
+.co-delivery-option-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.co-delivery-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.co-delivery-note[hidden],
+.co-delivery-note:empty {
+  display: none;
+}
+
+.co-delivery-summary {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+
+.co-delivery-summary > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  justify-content: space-between;
+}
+
+.co-delivery-summary > div[hidden] {
+  display: none;
+}
+
+.co-delivery-summary dt {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.co-delivery-summary dd {
+  margin: 0;
+  color: var(--accent-3);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+/* ----------------------------------------------------------- согласия */
+
+.co-consents {
+  gap: 10px;
+}
+
+/* --------------------------------------------------------- итоговый блок */
+
+.co-comment-toggle {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.co-comment-caret {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-left: 6px;
+  border-right: 2px solid currentcolor;
+  border-bottom: 2px solid currentcolor;
+  transform: rotate(45deg) translate(-2px, -2px);
+}
+
+.co-comment-toggle[aria-expanded="true"] .co-comment-caret {
+  transform: rotate(-135deg) translate(-2px, -2px);
+}
+
+.co-comment-box[hidden] {
+  display: none;
+}
+
+.co-totals {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 16px 0 0;
+  border-top: 1px solid var(--line);
+}
+
+.co-totals > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.co-totals > div[hidden] {
+  display: none;
+}
+
+.co-totals dt {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.co-totals dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+/* Итог — самое важное число на экране, и выглядеть он должен именно так. */
+.co-totals .co-grand {
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.co-totals .co-grand dt {
+  color: var(--ink);
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.co-totals .co-grand dd {
+  color: var(--accent);
+  font-size: 28px;
+  font-weight: 950;
+  line-height: 1.1;
+}
+
+.co-submit {
+  width: 100%;
+  min-height: 60px;
+  font-size: 17px;
+}
+
+/* Служебная подпись для программ чтения с экрана. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .co-title {
+    font-size: 19px;
+  }
+
+  .co-switch {
+    width: 100%;
+  }
+
+  .co-switch-option {
+    flex: 1;
+  }
+
+  .co-switch-option span {
+    padding: 11px 14px;
+    text-align: center;
+  }
+
+  .co-totals .co-grand dd {
+    font-size: 24px;
   }
 }

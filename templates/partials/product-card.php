@@ -19,7 +19,11 @@ $cardTags = array_values(array_filter(array_map('trim', explode(',', (string)$ca
 $cardName = $card['card_title'] ?: ($card['short_name'] ?: $card['name']);
 $stockCode = (string)$card['availability'];
 ?>
-          <article class="model-card<?= (int)$card['is_featured'] === 1 ? ' featured' : '' ?>" id="<?= e($card['slug']) ?>" data-price="<?= e(cms_money_machine($cardPrice)) ?>" data-unit="<?= e((string)$card['unit']) ?>" data-stock="<?= e($stockCode) ?>"<?= repo_is_orderable($card) ? '' : ' data-orderable="false"' ?>>
+          <?php /* data-old-price — та самая зачёркнутая цена. Из неё считается
+                   строка «Скидка» в оформлении заказа: выгода настоящая, взята
+                   из карточки товара, а не придумана к распродаже. Пусто —
+                   строки скидки не будет. */ ?>
+          <article class="model-card<?= (int)$card['is_featured'] === 1 ? ' featured' : '' ?>" id="<?= e($card['slug']) ?>" data-price="<?= e(cms_money_machine($cardPrice)) ?>"<?= $cardOld !== null ? ' data-old-price="' . e(cms_money_machine($cardOld)) . '"' : '' ?> data-unit="<?= e((string)$card['unit']) ?>" data-stock="<?= e($stockCode) ?>"<?= repo_is_orderable($card) ? '' : ' data-orderable="false"' ?>>
             <figure class="model-photo" role="button" tabindex="0" aria-label="<?= e((string)($card['card_figure_label'] ?: 'Увеличить фото ' . $cardName)) ?>">
               <?= repo_image_tag($card, (string)($card['card_alt'] ?: $card['name']), true) ?>
 

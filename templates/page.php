@@ -30,7 +30,7 @@ $headTail   = ($page['preload_image']
         ? '    <link rel="preload" as="image" href="' . e((string)$page['preload_image']) . "\" />\n"
         : '')
     . "    <link rel=\"preconnect\" href=\"https://mc.yandex.ru\" />\n"
-    . "    <link rel=\"stylesheet\" href=\"/src/styles.css?v=4\" />\n";
+    . "    <link rel=\"stylesheet\" href=\"/src/styles.css?v=5\" />\n";
 
 // В подвале страница не ссылается сама на себя.
 $footerSkipPage  = (string)$page['slug'];

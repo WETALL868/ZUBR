@@ -108,14 +108,14 @@ $headTail   = "    <link rel=\"preconnect\" href=\"https://mc.yandex.ru\" />\n"
     . "    <link rel=\"preload\" as=\"image\" href=\"/public/assets/xeon-hero.webp\" fetchpriority=\"high\" />\n"
     . "    <style>\n" . $criticalCss . "    </style>\n"
     . "    <script src=\"/src/anchor-after-css.js?v=1\"></script>\n"
-    . "    <link rel=\"preload\" href=\"/src/styles.css?v=4\" as=\"style\" onload=\"this.onload=null;this.rel='stylesheet';window.compUterAnchorAfterCss&amp;&amp;window.compUterAnchorAfterCss()\" />\n"
-    . "    <noscript><link rel=\"stylesheet\" href=\"/src/styles.css?v=4\" /></noscript>\n";
+    . "    <link rel=\"preload\" href=\"/src/styles.css?v=5\" as=\"style\" onload=\"this.onload=null;this.rel='stylesheet';window.compUterAnchorAfterCss&amp;&amp;window.compUterAnchorAfterCss()\" />\n"
+    . "    <noscript><link rel=\"stylesheet\" href=\"/src/styles.css?v=5\" /></noscript>\n";
 
 $bodyScripts = [
     '/src/nav.js?v=2',
     '/src/scroll-lock.js?v=3',
     '/src/gallery.js?v=3',
-    '/src/main.js?v=5',
+    '/src/main.js?v=6',
 ];
 
 // На главной логотипы ведут наверх, а якоря указываются без слэша: ссылка
@@ -132,12 +132,31 @@ require __DIR__ . '/partials/cart.php';
 ?>
     <main id="top">
 <?php foreach ($blocks as $block): ?>
-<?php if ($block['kind'] !== 'products') { echo $block['body']; continue; } ?>
+<?php
+  /*
+   * Три вида блоков:
+   *   products — текст, витрина товаров из базы, текст;
+   *   form     — текст, форма заказа из файла, текст;
+   *   остальные — просто текст.
+   *
+   * Витрина и форма собираются кодом не из прихоти: разметку, у которой есть
+   * поведение, нельзя держать в текстовом поле панели — одна случайная
+   * правка ломает покупку, а чинить приходится там же, в панели.
+   */
+?>
+<?php if ($block['kind'] === 'products'): ?>
 <?= $block['body'] ?>
 <?php foreach (repo_home_block_products($block) as $card): ?>
 <?php require __DIR__ . '/partials/product-card.php'; ?>
 <?php endforeach; ?>
 <?= $block['body_after'] ?>
+<?php elseif ($block['kind'] === 'form'): ?>
+<?= $block['body'] ?>
+<?php require __DIR__ . '/partials/order-form.php'; ?>
+<?= $block['body_after'] ?>
+<?php else: ?>
+<?= $block['body'] ?>
+<?php endif; ?>
 <?php endforeach; ?>
     </main>
 

@@ -269,17 +269,31 @@ CREATE TABLE IF NOT EXISTS orders (
   id             INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   number         VARCHAR(40)  NOT NULL,
   status         VARCHAR(30)  NOT NULL DEFAULT 'new',
+  customer_type  VARCHAR(20)  NOT NULL DEFAULT 'individual',
   customer_name  VARCHAR(190) NULL,
+  first_name     VARCHAR(120) NULL,
+  last_name      VARCHAR(120) NULL,
   phone          VARCHAR(40)  NULL,
   email          VARCHAR(190) NULL,
   company        VARCHAR(190) NULL,
   inn            VARCHAR(20)  NULL,
+  kpp            VARCHAR(20)  NULL,
+  ogrn           VARCHAR(20)  NULL,
+  legal_address  TEXT    NULL,
+  bank_name      VARCHAR(190) NULL,
+  bik            VARCHAR(20)  NULL,
+  bank_account   VARCHAR(40)  NULL,
+  corr_account   VARCHAR(40)  NULL,
+  region         VARCHAR(190) NULL,
   city           VARCHAR(190) NULL,
   address        TEXT    NULL,
   delivery_code  VARCHAR(60)  NULL,
   delivery_title VARCHAR(190) NULL,
   delivery_price DECIMAL(12,2)     NULL,
+  delivery_term  VARCHAR(120) NULL,
   payment        VARCHAR(60)  NULL,
+  payment_code   VARCHAR(60)  NULL,
+  discount       DECIMAL(12,2)     NULL,
   goal           VARCHAR(190) NULL,
   comment        TEXT    NULL,
   manager_note   TEXT    NULL,
@@ -331,6 +345,7 @@ CREATE TABLE IF NOT EXISTS delivery_methods (
   option_title  VARCHAR(255) NULL,
   price         DECIMAL(12,2)     NULL,
   free_from     DECIMAL(12,2)     NULL,
+  term          VARCHAR(120) NULL,
   needs_city    TINYINT(1)    NOT NULL DEFAULT 0,
   needs_address TINYINT(1)    NOT NULL DEFAULT 0,
   is_active     TINYINT(1)    NOT NULL DEFAULT 1,
@@ -338,6 +353,20 @@ CREATE TABLE IF NOT EXISTS delivery_methods (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE UNIQUE INDEX ux_delivery_code ON delivery_methods (code);
+
+CREATE TABLE IF NOT EXISTS payment_methods (
+  id          INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  code        VARCHAR(60)  NOT NULL,
+  title       VARCHAR(190) NOT NULL,
+  description TEXT    NULL,
+  audience    VARCHAR(20)  NOT NULL DEFAULT 'both',
+  is_default  TINYINT(1)    NOT NULL DEFAULT 0,
+  is_default_legal TINYINT(1) NOT NULL DEFAULT 0,
+  is_active   TINYINT(1)    NOT NULL DEFAULT 1,
+  sort_order  INT     NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE UNIQUE INDEX ux_payment_code ON payment_methods (code);
 
 CREATE TABLE IF NOT EXISTS settings (
   id         INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,

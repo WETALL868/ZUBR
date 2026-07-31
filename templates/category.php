@@ -22,14 +22,14 @@ $bodyScripts     = [
     '/src/nav.js?v=2',
     '/src/scroll-lock.js?v=3',
     '/src/gallery.js?v=3',
-    '/src/main.js?v=5',
+    '/src/main.js?v=6',
 ];
 
 // На страницах категорий стили подключены после <title>, а не до иконки, —
 // сохраняем прежний порядок тегов, чтобы документ не менялся вовсе.
 $headAssets = '';
 $headTail   = "    <link rel=\"preconnect\" href=\"https://mc.yandex.ru\" />\n"
-    . "    <link rel=\"stylesheet\" href=\"/src/styles.css?v=4\" />\n";
+    . "    <link rel=\"stylesheet\" href=\"/src/styles.css?v=5\" />\n";
 
 $showCart = true;
 $footerText = $category['footer_text'] ?: null;

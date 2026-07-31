@@ -1,6 +1,5 @@
 const form = document.querySelector(".lead-form");
 const status = document.querySelector(".form-status");
-const phoneInput = document.querySelector("[data-phone-mask]");
 const submitButton = form?.querySelector('button[type="submit"]');
 const cookieBanner = document.querySelector(".cookie-banner");
 const cookieAccept = document.querySelector(".cookie-accept");
@@ -130,14 +129,46 @@ function formatPhone(value) {
   return formatted;
 }
 
-phoneInput?.addEventListener("focus", () => {
-  if (!phoneInput.value) {
-    phoneInput.value = "+7";
-  }
-});
+/*
+ * Маска телефона вешается на КАЖДОЕ поле телефона, а не на первое найденное.
+ * Полей теперь два: одно у физического лица, другое у юридического. Раньше
+ * маску получало только первое, и юрлицо вводило номер вручную, а потом
+ * получало отказ по формату от сервера.
+ */
+document.querySelectorAll("[data-phone-mask]").forEach((input) => {
+  /*
+   * Курсор всегда уводим в конец строки.
+   *
+   * При переводе в пустое поле мы подставляем «+7». Браузер при этом
+   * оставляет курсор в начале, и первая же набранная цифра встаёт ПЕРЕД
+   * подсказкой: получается «4+7», маска читает это как номер, начинающийся
+   * с четвёрки, и семёрка из подсказки уезжает внутрь номера. Покупатель
+   * набирал 499 322-13-11, а в заказ попадало +7 (479) 932-21-31 — чужой
+   * номер, по которому не перезвонить.
+   *
+   * Маска и так переписывает значение целиком, поэтому держать курсор
+   * где-то в середине всё равно бессмысленно.
+   */
+  const caretToEnd = () => {
+    try {
+      const end = input.value.length;
+      input.setSelectionRange(end, end);
+    } catch {
+      // У некоторых типов полей выделения нет — не беда.
+    }
+  };
 
-phoneInput?.addEventListener("input", () => {
-  phoneInput.value = formatPhone(phoneInput.value);
+  input.addEventListener("focus", () => {
+    if (!input.value) {
+      input.value = "+7";
+    }
+    caretToEnd();
+  });
+
+  input.addEventListener("input", () => {
+    input.value = formatPhone(input.value);
+    caretToEnd();
+  });
 });
 
 function showOrderSuccess(orderId) {
@@ -220,18 +251,44 @@ async function sendOrder(payload) {
 
 form?.addEventListener("submit", async (event) => {
   event.preventDefault();
-  if (!prepareCartForSubmit()) {
-    return;
-  }
-  if (phoneInput) {
-    phoneInput.value = formatPhone(phoneInput.value);
-  }
-  if (!form.reportValidity()) {
+  prepareCartForSubmit();
+
+  // Телефон приводим к единому виду до проверки: покупатель мог вставить
+  // номер из буфера в любом написании.
+  form.querySelectorAll("[data-phone-mask]").forEach((input) => {
+    if (!input.disabled && input.value) {
+      input.value = formatPhone(input.value);
+    }
+  });
+
+  /*
+   * Проверяем сами, а не через reportValidity().
+   *
+   * Встроенная проверка браузера показывает подсказку в маленьком облачке
+   * над полем, по одному за раз, и не умеет ни подсветить поле, ни написать
+   * сообщение рядом с ним. Задача требует именно этого — и ещё прокрутки к
+   * первому незаполненному полю.
+   */
+  const problems = validateCheckout();
+  if (problems.length) {
+    if (status) {
+      status.textContent = problems.length === 1
+        ? problems[0].message
+        : `Проверьте заполнение: ${problems.length} ${problems.length < 5 ? "поля" : "полей"} требуют внимания.`;
+    }
+    focusFirstProblem(problems);
     return;
   }
 
   const data = new FormData(form);
   const payload = Object.fromEntries(data.entries());
+
+  // Название способа оплаты нужно менеджеру в письме: код «invoice» ему
+  // ничего не говорит, а «Безналичный расчет для организации» говорит всё.
+  const paymentChecked = form.querySelector('input[name="payment_code"]:checked');
+  if (paymentChecked) {
+    payload.payment = paymentChecked.dataset.paymentTitle || paymentChecked.value;
+  }
 
   status.textContent = "";
   if (submitButton) {
@@ -242,7 +299,18 @@ form?.addEventListener("submit", async (event) => {
   try {
     const result = await sendOrder(payload);
     const orderId = result.orderId || "XS-NEW";
+
+    /*
+     * Запоминаем введённое ДО очистки формы и после неё уже не трогаем
+     * запись. Иначе постоянный покупатель, оформивший заказ, при следующем
+     * заходе получал бы пустые поля: очищенная форма перезаписывала бы
+     * сохранённое, и весь смысл запоминания пропадал.
+     */
+    rememberCheckout();
     form.reset();
+    // reset() снимает и тип покупателя, и согласия — возвращаем форму в то
+    // состояние, в котором её увидит следующий покупатель.
+    applyCustomerType();
     cart = [];
     saveCart();
     renderCart();
@@ -254,7 +322,7 @@ form?.addEventListener("submit", async (event) => {
   } finally {
     if (submitButton) {
       submitButton.disabled = false;
-      submitButton.textContent = "Оформить заказ";
+      submitButton.textContent = "Подтвердить заказ";
     }
   }
 });
@@ -272,7 +340,7 @@ const viewerClose = viewer?.querySelector(".photo-viewer-close");
 const productCards = document.querySelectorAll(".model-card:not(.request-card)");
 const requestLinks = document.querySelectorAll(".request-link");
 const orderSelect = document.querySelector('select[name="goal"]');
-const quantityInput = form?.querySelector('input[name="quantity"]');
+const quantityInput = document.querySelector("[data-order-quantity]");
 const cartDrawer = document.querySelector(".cart-drawer");
 const cartBackdrop = document.querySelector(".cart-backdrop");
 const cartOpenButtons = document.querySelectorAll("[data-cart-open]");
@@ -281,26 +349,63 @@ const cartList = document.querySelector("[data-cart-list]");
 const cartEmpty = document.querySelector("[data-cart-empty]");
 const cartCount = document.querySelector("[data-cart-count]");
 const cartHeaderTotal = document.querySelector("[data-cart-header-total]");
-const cartSubtotal = document.querySelector("[data-cart-subtotal]");
-const cartDeliveryTotal = document.querySelector("[data-cart-delivery-total]");
-const cartGrandTotal = document.querySelector("[data-cart-grand-total]");
 const cartCheckout = document.querySelector("[data-cart-checkout]");
 const cartError = document.querySelector("[data-cart-error]");
 const deliveryOptions = document.querySelectorAll('input[name="cartDelivery"]');
-const deliveryFields = document.querySelector("[data-delivery-fields]");
+const deliveryRegion = document.querySelector("[data-delivery-region]");
 const deliveryCity = document.querySelector("[data-delivery-city]");
 const deliveryAddress = document.querySelector("[data-delivery-address]");
+const deliveryAddressField = document.querySelector("[data-delivery-address-field]");
 const deliveryComment = document.querySelector("[data-delivery-comment]");
+const deliveryOptionBox = document.querySelector("[data-delivery-option]");
+const deliveryOptionTitle = document.querySelector("[data-delivery-option-title]");
+const deliveryNote = document.querySelector("[data-delivery-note]");
+const deliverySummaryPrice = document.querySelector("[data-delivery-summary-price]");
+const deliverySummaryTermRow = document.querySelector("[data-delivery-summary-term-row]");
+const deliverySummaryTerm = document.querySelector("[data-delivery-summary-term]");
+const cityRequiredMark = document.querySelector("[data-city-req]");
 const orderCartSummary = document.querySelector("[data-order-cart-summary]");
 const orderCartLines = document.querySelector("[data-order-cart-lines]");
 const cartItemsInput = document.querySelector("[data-cart-items]");
 const cartTotalInput = document.querySelector("[data-cart-total]");
+const cartDiscountInput = document.querySelector("[data-cart-discount]");
 const deliveryMethodInput = document.querySelector("[data-delivery-method]");
 const deliveryPriceInput = document.querySelector("[data-delivery-price]");
+const deliveryTermInput = document.querySelector("[data-delivery-term-hidden]");
+const deliveryRegionInput = document.querySelector("[data-delivery-region-hidden]");
 const deliveryCityInput = document.querySelector("[data-delivery-city-hidden]");
 const deliveryAddressInput = document.querySelector("[data-delivery-address-hidden]");
 const deliveryCommentInput = document.querySelector("[data-delivery-comment-hidden]");
 const orderTotalInput = document.querySelector("[data-order-total]");
+
+// ---------------------------------------------------------------- оформление
+const checkoutForm = document.querySelector(".checkout-form");
+const customerTypeInputs = document.querySelectorAll("[data-customer-type]");
+const customerFieldsets = document.querySelectorAll("[data-customer-fields]");
+const paymentCardBoxes = document.querySelectorAll(".co-card-payment");
+const leadOnlySection = document.querySelector("[data-lead-only]");
+const commentToggle = document.querySelector("[data-comment-toggle]");
+const commentBox = document.querySelector("[data-comment-box], #co-comment-box");
+const cartSubtotalNodes = document.querySelectorAll("[data-cart-subtotal]");
+const cartDeliveryTotalNodes = document.querySelectorAll("[data-cart-delivery-total]");
+const cartGrandTotalNodes = document.querySelectorAll("[data-cart-grand-total]");
+const discountRow = document.querySelector("[data-discount-row]");
+const discountValue = document.querySelector("[data-cart-discount-total]");
+const totalLabel = document.querySelector("[data-total-label]");
+
+/*
+ * Правила проверки приезжают с сервера вместе со страницей — тем же
+ * массивом, по которому сервер потом проверяет пришедший заказ. Держать их
+ * ещё и здесь, в коде, значило бы завести вторую копию, которая рано или
+ * поздно разойдётся с первой: сайт принимал бы то, что сервер отвергает.
+ */
+const fieldRules = (() => {
+  try {
+    return JSON.parse(document.querySelector("[data-co-rules]")?.textContent || "{}");
+  } catch {
+    return {};
+  }
+})();
 let lastFocusedTrigger = null;
 let activeProductTitle = "";
 let activeProductCard = null;
@@ -499,6 +604,7 @@ function loadCart() {
         id: String(item.id).replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 64),
         title: String(item.title).slice(0, 200),
         price: Math.max(0, Number(item.price) || 0),
+        oldPrice: Math.max(0, Number(item.oldPrice) || 0),
         priceText: String(item.priceText ?? "").slice(0, 40),
         unit: String(item.unit ?? "шт.").slice(0, 16),
         image: String(item.image ?? "").slice(0, 300),
@@ -540,11 +646,16 @@ function getProductFromCard(card) {
   const image = card.querySelector(".model-photo img");
   const title = card.querySelector("h3")?.textContent?.trim() || image?.alt || "Xeon";
   const price = getCardPrice(card);
+  const oldRaw = Number(String(card.dataset.oldPrice ?? "").replace(",", "."));
+  // Старая цена имеет смысл, только если она выше нынешней. Сервер считает
+  // выгоду так же и по своей базе — здесь это лишь для показа в форме.
+  const oldPrice = Number.isFinite(oldRaw) && oldRaw > price ? oldRaw : 0;
 
   return {
     id: card.id,
     title,
     price,
+    oldPrice,
     priceText: price > 0 ? formatMoney(price) : "",
     unit: card.dataset.unit || "шт.",
     image: image?.getAttribute("src") || image?.currentSrc || "",
@@ -559,15 +670,47 @@ function getCartSubtotal() {
   return cart.reduce((sum, item) => sum + item.price * item.qty, 0);
 }
 
+/** Выгода против зачёркнутой цены. Нет старых цен — нет и строки «Скидка». */
+function getCartDiscount() {
+  return cart.reduce(
+    (sum, item) => sum + (item.oldPrice > item.price ? (item.oldPrice - item.price) * item.qty : 0),
+    0,
+  );
+}
+
+/**
+ * Выбранный способ доставки.
+ *
+ * price === null означает «по тарифам службы» — это не ноль и не бесплатно,
+ * поэтому итог в таком случае показывается как «сумма товаров + доставка».
+ *
+ * Правило «бесплатно от суммы» применяется и здесь, и на сервере. Здесь —
+ * чтобы покупатель видел ноль сразу; там — потому что решает всё равно
+ * сервер, а не браузер.
+ */
 function getDeliverySelection() {
   const selected = Array.from(deliveryOptions).find((option) => option.checked);
-  const rawPrice = selected?.dataset.deliveryPrice ?? "0";
-  const hasFixedPrice = rawPrice !== "";
+
+  if (!selected) {
+    return { chosen: false, name: "", method: "", price: null, needsDetails: false, term: "" };
+  }
+
+  const rawPrice = selected.dataset.deliveryPrice ?? "";
+  const freeFromRaw = selected.dataset.deliveryFreeFrom ?? "";
+  const freeFrom = freeFromRaw === "" ? null : Number(freeFromRaw);
+  let price = rawPrice === "" ? null : Number(rawPrice) || 0;
+
+  if (price !== null && freeFrom !== null && Number.isFinite(freeFrom) && getCartSubtotal() >= freeFrom) {
+    price = 0;
+  }
 
   return {
-    method: selected?.dataset.deliveryTitle || selected?.value || "Самовывоз",
-    price: hasFixedPrice ? Number(rawPrice) || 0 : null,
-    needsDetails: selected?.dataset.deliveryDetails === "true",
+    chosen: true,
+    name: selected.value,
+    method: selected.dataset.deliveryTitle || selected.value,
+    price,
+    needsDetails: selected.dataset.deliveryDetails === "true",
+    term: selected.dataset.deliveryTerm || "",
   };
 }
 
@@ -641,8 +784,6 @@ function buildCartRow(item) {
 
 function renderCart() {
   const subtotal = getCartSubtotal();
-  const delivery = getDeliverySelection();
-  const orderTotal = getOrderTotal();
   const count = getCartQuantity();
 
   if (cartCount) {
@@ -654,25 +795,474 @@ function renderCart() {
   if (cartEmpty) {
     cartEmpty.hidden = cart.length > 0;
   }
-  if (cartSubtotal) {
-    cartSubtotal.textContent = formatMoney(subtotal);
-  }
-  if (cartDeliveryTotal) {
-    cartDeliveryTotal.textContent = delivery.price === null ? "По тарифам службы доставки" : formatMoney(delivery.price);
-  }
-  if (cartGrandTotal) {
-    cartGrandTotal.textContent = orderTotal === null ? `${formatMoney(subtotal)} + доставка` : formatMoney(orderTotal);
-  }
-  if (deliveryFields) {
-    deliveryFields.classList.toggle("is-visible", delivery.needsDetails);
-  }
 
   clearNode(cartList);
   cart.forEach((item) => {
     cartList?.appendChild(buildCartRow(item));
   });
 
+  renderCheckout();
   syncCartFields();
+}
+
+/* ==========================================================================
+   Оформление заказа
+   ========================================================================== */
+
+// Отмечаем, что способ оплаты выбрали руками: дальше подставлять свой
+// вариант при каждом переключении типа покупателя нельзя.
+let paymentTouched = false;
+
+/** Выбранный тип покупателя: individual или legal. */
+function getCustomerType() {
+  const checked = Array.from(customerTypeInputs).find((input) => input.checked);
+  return checked?.value === "legal" ? "legal" : "individual";
+}
+
+/**
+ * Показывает поля выбранного типа покупателя и убирает поля другого.
+ *
+ * Скрытый набор помечается disabled, а не просто прячется. Это важно:
+ * отключённые поля браузер не отправляет и не проверяет, поэтому пустой ИНН
+ * в скрытой форме юрлица не мешает физлицу оформить заказ. Значения при этом
+ * никуда не деваются — переключился обратно и всё на месте.
+ */
+function applyCustomerType() {
+  const type = getCustomerType();
+
+  customerFieldsets.forEach((set) => {
+    const mine = set.dataset.customerFields === type;
+    set.hidden = !mine;
+    set.disabled = !mine;
+    if (!mine) {
+      set.querySelectorAll("[data-co-field]").forEach((field) => clearFieldError(field.name));
+    }
+  });
+
+  document.querySelectorAll(".co-switch-option").forEach((option) => {
+    option.classList.toggle("is-active", option.querySelector("input")?.checked === true);
+  });
+
+  renderPaymentMethods(type);
+}
+
+/**
+ * Оставляет только те способы оплаты, которые доступны этому покупателю.
+ *
+ * Способ «для организаций» физлицу не показывается, и наоборот. Если
+ * выбранный способ пропал из списка, выбирается тот, что помечен как
+ * основной для этого типа покупателя, — чтобы форма никогда не оставалась
+ * без выбранной оплаты.
+ */
+function renderPaymentMethods(type) {
+  if (!paymentCardBoxes.length) {
+    return;
+  }
+
+  let selectedStillVisible = false;
+  const visible = [];
+
+  paymentCardBoxes.forEach((box) => {
+    const audience = box.dataset.paymentAudience || "both";
+    const suits = audience === "both" || audience === type;
+    const input = box.querySelector("input");
+
+    box.hidden = !suits;
+    if (input) {
+      input.disabled = !suits;
+      if (suits) {
+        visible.push(box);
+        if (input.checked) {
+          selectedStillVisible = true;
+        }
+      } else if (input.checked) {
+        input.checked = false;
+      }
+    }
+  });
+
+  /*
+   * Пока покупатель сам не выбрал оплату, ставим ту, что магазин пометил
+   * основной для этого типа: организация чаще всего платит по счёту, и
+   * заставлять её каждый раз это отмечать незачем. Как только выбор сделан
+   * руками, мы его больше не трогаем — даже при переключении типа, если
+   * выбранный способ по-прежнему доступен.
+   */
+  const useDefault = !paymentTouched || !selectedStillVisible;
+
+  if (useDefault && visible.length) {
+    const preferred = visible.find((box) =>
+      type === "legal" ? box.dataset.paymentDefaultLegal === "1" : box.dataset.paymentDefaultIndividual === "1",
+    );
+    visible.forEach((box) => {
+      const input = box.querySelector("input");
+      if (input) {
+        input.checked = false;
+      }
+    });
+    const input = (preferred || visible[0]).querySelector("input");
+    if (input) {
+      input.checked = true;
+    }
+  }
+
+  paymentCardBoxes.forEach((box) => {
+    box.classList.toggle("is-active", box.querySelector("input")?.checked === true);
+  });
+  clearFieldError("payment_code");
+}
+
+/** Пересобирает блок доставки: вариант, стоимость, срок, поле адреса. */
+function renderDeliveryBlock() {
+  const delivery = getDeliverySelection();
+  const subtotal = getCartSubtotal();
+
+  document.querySelectorAll("[data-delivery-cards] .co-card").forEach((card) => {
+    const input = card.querySelector("input");
+    card.classList.toggle("is-active", input?.checked === true);
+
+    // «Бесплатно от суммы» показываем прямо на карточке: покупатель должен
+    // видеть ноль до того, как выберет способ, а не после.
+    const priceNode = card.querySelector("[data-delivery-card-price]");
+    const raw = input?.dataset.deliveryPrice ?? "";
+    const freeFromRaw = input?.dataset.deliveryFreeFrom ?? "";
+    const freeFrom = freeFromRaw === "" ? null : Number(freeFromRaw);
+    if (priceNode && raw !== "") {
+      const base = Number(raw) || 0;
+      const free = freeFrom !== null && Number.isFinite(freeFrom) && subtotal >= freeFrom;
+      priceNode.textContent = free || base === 0 ? "бесплатно" : formatMoney(base);
+    }
+  });
+
+  if (deliveryOptionBox) {
+    deliveryOptionBox.hidden = !delivery.chosen;
+  }
+  if (deliveryOptionTitle) {
+    deliveryOptionTitle.textContent = delivery.method || "";
+  }
+  if (deliveryNote) {
+    deliveryNote.textContent = delivery.needsDetails
+      ? "Доставка производится до подъезда, до шлагбаума или до другого удобного для вас места, куда может доехать транспорт."
+      : "";
+    deliveryNote.hidden = !delivery.needsDetails;
+  }
+  if (deliverySummaryPrice) {
+    deliverySummaryPrice.textContent = !delivery.chosen
+      ? "не выбрано"
+      : delivery.price === null
+        ? "по тарифам службы доставки"
+        : formatMoney(delivery.price);
+  }
+  if (deliverySummaryTermRow) {
+    deliverySummaryTermRow.hidden = !delivery.chosen || delivery.term === "";
+  }
+  if (deliverySummaryTerm) {
+    deliverySummaryTerm.textContent = delivery.term;
+  }
+  if (deliveryAddressField) {
+    deliveryAddressField.hidden = !delivery.needsDetails;
+    if (!delivery.needsDetails) {
+      clearFieldError("address");
+    }
+  }
+  if (cityRequiredMark) {
+    cityRequiredMark.hidden = !delivery.needsDetails;
+  }
+}
+
+/** Суммы внизу формы и в корзине. */
+function renderTotals() {
+  const subtotal = getCartSubtotal();
+  const delivery = getDeliverySelection();
+  const orderTotal = getOrderTotal();
+  const discount = getCartDiscount();
+
+  cartSubtotalNodes.forEach((node) => {
+    node.textContent = formatMoney(subtotal);
+  });
+  cartDeliveryTotalNodes.forEach((node) => {
+    node.textContent = !delivery.chosen
+      ? "не выбрано"
+      : delivery.price === null
+        ? "по тарифам службы доставки"
+        : formatMoney(delivery.price);
+  });
+  cartGrandTotalNodes.forEach((node) => {
+    node.textContent = orderTotal === null ? formatMoney(subtotal) : formatMoney(orderTotal);
+  });
+
+  if (totalLabel) {
+    // Пока стоимость доставки неизвестна, итог честнее назвать неполным,
+    // чем показать сумму товаров как окончательную.
+    totalLabel.textContent = orderTotal === null ? "Итого без учёта доставки" : "Итого";
+  }
+  if (discountRow) {
+    discountRow.hidden = discount <= 0;
+  }
+  if (discountValue) {
+    discountValue.textContent = formatMoney(discount);
+  }
+}
+
+/** Всё оформление разом: доставка, оплата, суммы, режим формы. */
+function renderCheckout() {
+  if (!checkoutForm) {
+    return;
+  }
+
+  // Пустая корзина — это заявка «подберите мне», а не покупка: тогда нужны
+  // поля «что подобрать», и они же становятся обязательными.
+  if (leadOnlySection) {
+    leadOnlySection.hidden = cart.length > 0;
+  }
+  if (orderSelect) {
+    orderSelect.disabled = cart.length > 0;
+    if (cart.length > 0) {
+      orderSelect.value = "Заказ из корзины";
+    }
+  }
+  const categorySelect = document.querySelector("[data-order-category]");
+  if (categorySelect) {
+    categorySelect.disabled = cart.length > 0;
+  }
+
+  renderDeliveryBlock();
+  renderTotals();
+}
+
+/* ----------------------------------------------------------- проверка полей */
+
+function fieldNode(name) {
+  return checkoutForm?.querySelector(`[data-co-field="${name}"]`)
+    || checkoutForm?.querySelector(`[name="${name}"]`)
+    || null;
+}
+
+function setFieldError(name, message) {
+  const box = checkoutForm?.querySelector(`[data-co-error-for="${name}"]`);
+  if (box) {
+    box.textContent = message;
+  }
+  const node = fieldNode(name);
+  node?.classList.toggle("is-invalid", message !== "");
+  if (node && message !== "") {
+    node.setAttribute("aria-invalid", "true");
+  } else {
+    node?.removeAttribute("aria-invalid");
+  }
+}
+
+function clearFieldError(name) {
+  setFieldError(name, "");
+}
+
+/** Проверяет одно поле по правилу с сервера. Возвращает текст ошибки или "". */
+function checkField(name) {
+  const rule = fieldRules[name];
+  const node = fieldNode(name);
+  if (!rule || !node || node.disabled || node.closest("fieldset")?.disabled) {
+    return "";
+  }
+
+  const value = String(node.value || "").trim();
+
+  if (value === "") {
+    return rule.required ? `Заполните поле «${rule.label}».` : "";
+  }
+  if (rule.pattern && !new RegExp(rule.pattern, "u").test(value)) {
+    return rule.message;
+  }
+  return "";
+}
+
+/**
+ * Проверяет форму целиком.
+ *
+ * @returns {{name:string,message:string,node:Element}[]} ошибки по порядку полей
+ */
+function validateCheckout() {
+  const problems = [];
+  const type = getCustomerType();
+
+  Object.keys(fieldRules).forEach((name) => {
+    if (!fieldRules[name].types.includes(type)) {
+      return;
+    }
+    const message = checkField(name);
+    setFieldError(name, message);
+    if (message) {
+      problems.push({ name, message, node: fieldNode(name) });
+    }
+  });
+
+  // Доставка: город и адрес обязательны только там, где без них не доехать.
+  const delivery = getDeliverySelection();
+  const cityValue = deliveryCity?.value.trim() || "";
+  const addressValue = deliveryAddress?.value.trim() || "";
+
+  if (cart.length && delivery.needsDetails && cityValue === "") {
+    setFieldError("city", "Укажите город доставки.");
+    problems.push({ name: "city", message: "Укажите город доставки.", node: deliveryCity });
+  } else {
+    clearFieldError("city");
+  }
+
+  if (cart.length && delivery.needsDetails && addressValue === "") {
+    setFieldError("address", "Укажите улицу, дом и квартиру.");
+    problems.push({ name: "address", message: "Укажите улицу, дом и квартиру.", node: deliveryAddress });
+  } else if (!delivery.needsDetails || addressValue !== "") {
+    clearFieldError("address");
+  }
+
+  // Способ оплаты: если варианты вообще есть, один должен быть выбран.
+  const paymentInputs = Array.from(checkoutForm?.querySelectorAll('input[name="payment_code"]') || [])
+    .filter((input) => !input.disabled);
+  if (paymentInputs.length && !paymentInputs.some((input) => input.checked)) {
+    const message = "Выберите способ оплаты.";
+    setFieldError("payment_code", message);
+    problems.push({ name: "payment_code", message, node: paymentInputs[0] });
+  } else {
+    clearFieldError("payment_code");
+  }
+
+  // Заявка без корзины обязана сказать, о чём она.
+  if (!cart.length && orderSelect && !orderSelect.disabled && orderSelect.value === "") {
+    const message = "Выберите модель или задачу.";
+    setFieldError("goal", message);
+    problems.push({ name: "goal", message, node: orderSelect });
+  } else {
+    clearFieldError("goal");
+  }
+
+  // Согласия.
+  const consents = Array.from(checkoutForm?.querySelectorAll("[data-co-consent]") || []);
+  const missing = consents.filter((box) => !box.checked);
+  if (missing.length) {
+    const message = missing.length === consents.length
+      ? "Подтвердите согласие с пользовательским соглашением и политикой обработки персональных данных."
+      : "Подтвердите оба согласия — без них заказ оформить нельзя.";
+    setFieldError("consents", message);
+    problems.push({ name: "consents", message, node: missing[0] });
+  } else {
+    clearFieldError("consents");
+  }
+
+  return problems;
+}
+
+/** Подводит покупателя к первому незаполненному полю и подсвечивает его. */
+function focusFirstProblem(problems) {
+  const first = problems[0];
+  if (!first?.node) {
+    return;
+  }
+
+  // Поле может лежать в свёрнутом блоке комментария — раскрываем.
+  if (commentBox && commentBox.contains(first.node) && commentBox.hidden) {
+    toggleComment(true);
+  }
+
+  const box = first.node.closest(".co-field, .co-section, .consent-label") || first.node;
+  const top = box.getBoundingClientRect().top + window.scrollY - 120;
+  window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+
+  // Фокус ставим после прокрутки: иначе браузер прокрутит ещё раз, по-своему.
+  window.setTimeout(() => {
+    try {
+      first.node.focus({ preventScroll: true });
+    } catch {
+      // Скрытый или отключённый элемент сфокусировать нельзя — не беда.
+    }
+  }, 350);
+}
+
+/* --------------------------------------------- запоминание введённого */
+
+const CHECKOUT_STORAGE_KEY = "comp-uter-checkout";
+
+/*
+ * Личного кабинета на сайте нет, поэтому подставлять данные «авторизованного
+ * пользователя» неоткуда. Но покупатель, который вернулся за вторым заказом,
+ * не должен снова набирать ИНН и банковские реквизиты — поэтому форма
+ * помнит то, что он ввёл сам, и только в его же браузере. На сервер это
+ * ничего не отправляет.
+ */
+function rememberCheckout() {
+  if (!checkoutForm) {
+    return;
+  }
+
+  const data = { customer_type: getCustomerType() };
+  checkoutForm.querySelectorAll("[data-co-field]").forEach((field) => {
+    if (field.value) {
+      data[field.name] = String(field.value).slice(0, 300);
+    }
+  });
+  [
+    ["region", deliveryRegion],
+    ["city", deliveryCity],
+    ["address", deliveryAddress],
+  ].forEach(([key, node]) => {
+    if (node?.value) {
+      data[key] = String(node.value).slice(0, 300);
+    }
+  });
+
+  try {
+    localStorage.setItem(CHECKOUT_STORAGE_KEY, JSON.stringify(data));
+  } catch {
+    // Заказ оформляется и без запоминания.
+  }
+}
+
+function restoreCheckout() {
+  if (!checkoutForm) {
+    return;
+  }
+
+  let data = {};
+  try {
+    data = JSON.parse(localStorage.getItem(CHECKOUT_STORAGE_KEY) || "{}");
+  } catch {
+    return;
+  }
+  if (!data || typeof data !== "object") {
+    return;
+  }
+
+  if (data.customer_type === "legal") {
+    const legal = Array.from(customerTypeInputs).find((input) => input.value === "legal");
+    if (legal) {
+      legal.checked = true;
+    }
+  }
+
+  checkoutForm.querySelectorAll("[data-co-field]").forEach((field) => {
+    const saved = data[field.name];
+    if (typeof saved === "string" && saved !== "") {
+      field.value = saved;
+    }
+  });
+  if (typeof data.region === "string" && deliveryRegion) {
+    deliveryRegion.value = data.region;
+  }
+  if (typeof data.city === "string" && deliveryCity) {
+    deliveryCity.value = data.city;
+  }
+  if (typeof data.address === "string" && deliveryAddress) {
+    deliveryAddress.value = data.address;
+  }
+}
+
+/* ------------------------------------------------ комментарий к заказу */
+
+function toggleComment(open) {
+  if (!commentBox || !commentToggle) {
+    return;
+  }
+  const next = open === undefined ? commentBox.hidden : open;
+  commentBox.hidden = !next;
+  commentToggle.setAttribute("aria-expanded", String(next));
 }
 
 function addToCart(card, trigger) {
@@ -752,15 +1342,28 @@ function closeCart() {
 
 function buildCartSummaryLines() {
   const delivery = getDeliverySelection();
-  const city = delivery.needsDetails ? deliveryCity?.value.trim() || "" : "";
+  const region = deliveryRegion?.value.trim() || "";
+  const city = deliveryCity?.value.trim() || "";
   const address = delivery.needsDetails ? deliveryAddress?.value.trim() || "" : "";
-  const comment = delivery.needsDetails ? deliveryComment?.value.trim() || "" : "";
+  const comment = deliveryComment?.value.trim() || "";
   const subtotal = getCartSubtotal();
   const orderTotal = getOrderTotal();
+  const discount = getCartDiscount();
   const lines = cart.map((item) => `${item.title}: ${item.qty} шт. × ${formatMoney(item.price)} = ${formatMoney(item.price * item.qty)}`);
 
   lines.push(`Товары: ${formatMoney(subtotal)}`);
-  lines.push(`Доставка: ${delivery.method}${delivery.price === null ? " · по тарифам службы доставки" : ` · ${formatMoney(delivery.price)}`}`);
+  if (discount > 0) {
+    lines.push(`Скидка: ${formatMoney(discount)}`);
+  }
+  if (delivery.chosen) {
+    lines.push(`Доставка: ${delivery.method}${delivery.price === null ? " · по тарифам службы доставки" : ` · ${formatMoney(delivery.price)}`}`);
+  }
+  if (delivery.term) {
+    lines.push(`Срок доставки: ${delivery.term}`);
+  }
+  if (region) {
+    lines.push(`Регион: ${region}`);
+  }
   if (city) {
     lines.push(`Город: ${city}`);
   }
@@ -768,7 +1371,7 @@ function buildCartSummaryLines() {
     lines.push(`Адрес/ПВЗ: ${address}`);
   }
   if (comment) {
-    lines.push(`Комментарий по доставке: ${comment}`);
+    lines.push(`Пожелание по доставке: ${comment}`);
   }
   lines.push(`Итого: ${orderTotal === null ? `${formatMoney(subtotal)} + доставка` : formatMoney(orderTotal)}`);
 
@@ -779,9 +1382,10 @@ function syncCartFields() {
   const delivery = getDeliverySelection();
   const subtotal = getCartSubtotal();
   const orderTotal = getOrderTotal();
-  const city = delivery.needsDetails ? deliveryCity?.value.trim() || "" : "";
+  const region = deliveryRegion?.value.trim() || "";
+  const city = deliveryCity?.value.trim() || "";
   const address = delivery.needsDetails ? deliveryAddress?.value.trim() || "" : "";
-  const comment = delivery.needsDetails ? deliveryComment?.value.trim() || "" : "";
+  const comment = deliveryComment?.value.trim() || "";
 
   if (cartItemsInput) {
     cartItemsInput.value = cart.length ? JSON.stringify(cart) : "";
@@ -789,11 +1393,20 @@ function syncCartFields() {
   if (cartTotalInput) {
     cartTotalInput.value = cart.length ? String(subtotal) : "";
   }
+  if (cartDiscountInput) {
+    cartDiscountInput.value = cart.length ? String(getCartDiscount()) : "";
+  }
   if (deliveryMethodInput) {
-    deliveryMethodInput.value = cart.length ? delivery.method : "";
+    deliveryMethodInput.value = cart.length ? delivery.name || delivery.method : "";
   }
   if (deliveryPriceInput) {
     deliveryPriceInput.value = cart.length && delivery.price !== null ? String(delivery.price) : "";
+  }
+  if (deliveryTermInput) {
+    deliveryTermInput.value = cart.length ? delivery.term : "";
+  }
+  if (deliveryRegionInput) {
+    deliveryRegionInput.value = cart.length ? region : "";
   }
   if (deliveryCityInput) {
     deliveryCityInput.value = cart.length ? city : "";
@@ -806,6 +1419,9 @@ function syncCartFields() {
   }
   if (orderTotalInput) {
     orderTotalInput.value = cart.length && orderTotal !== null ? String(orderTotal) : "";
+  }
+  if (quantityInput) {
+    quantityInput.value = cart.length ? String(getCartQuantity()) : "";
   }
 
   if (orderCartSummary && orderCartLines) {
@@ -821,31 +1437,19 @@ function syncCartFields() {
   }
 }
 
+/*
+ * Проверка перед переходом к оформлению.
+ *
+ * Раньше здесь же спрашивали город и адрес: они были в самой корзине.
+ * Теперь доставка выбирается в форме заказа, и корзине остаётся проверить
+ * единственное, что относится к ней самой, — что в ней что-то есть.
+ */
 function validateCartForCheckout() {
   if (!cart.length) {
     if (cartError) {
       cartError.textContent = "Добавьте хотя бы один товар в корзину.";
     }
     openCart();
-    return false;
-  }
-
-  const delivery = getDeliverySelection();
-  if (delivery.needsDetails && !deliveryCity?.value.trim()) {
-    if (cartError) {
-      cartError.textContent = "Укажите город для доставки.";
-    }
-    openCart();
-    deliveryCity?.focus();
-    return false;
-  }
-
-  if (delivery.needsDetails && !deliveryAddress?.value.trim()) {
-    if (cartError) {
-      cartError.textContent = "Укажите адрес, пункт выдачи или удобный способ получения.";
-    }
-    openCart();
-    deliveryAddress?.focus();
     return false;
   }
 
@@ -856,20 +1460,8 @@ function validateCartForCheckout() {
 }
 
 function prepareCartForSubmit() {
-  if (!cart.length) {
-    syncCartFields();
-    return true;
-  }
-
-  if (!validateCartForCheckout()) {
-    return false;
-  }
-
-  if (orderSelect) {
+  if (cart.length && orderSelect) {
     orderSelect.value = "Заказ из корзины";
-  }
-  if (quantityInput) {
-    quantityInput.value = String(getCartQuantity());
   }
   syncCartFields();
   return true;
@@ -996,14 +1588,71 @@ cartList?.addEventListener("click", (event) => {
 });
 
 deliveryOptions.forEach((option) => {
-  option.addEventListener("change", renderCart);
+  option.addEventListener("change", () => {
+    renderCheckout();
+    syncCartFields();
+    clearFieldError("address");
+    clearFieldError("city");
+  });
 });
 
-[deliveryCity, deliveryAddress, deliveryComment].forEach((field) => {
-  field?.addEventListener("input", syncCartFields);
+[deliveryRegion, deliveryCity, deliveryAddress, deliveryComment].forEach((field) => {
+  field?.addEventListener("input", () => {
+    syncCartFields();
+    rememberCheckout();
+  });
 });
 
 cartCheckout?.addEventListener("click", moveCartToOrderForm);
+
+/* ------------------------------------------------- события формы заказа */
+
+customerTypeInputs.forEach((input) => {
+  input.addEventListener("change", () => {
+    applyCustomerType();
+    rememberCheckout();
+    if (status) {
+      status.textContent = "";
+    }
+  });
+});
+
+paymentCardBoxes.forEach((box) => {
+  box.querySelector("input")?.addEventListener("change", () => {
+    paymentTouched = true;
+    paymentCardBoxes.forEach((other) => {
+      other.classList.toggle("is-active", other.querySelector("input")?.checked === true);
+    });
+    clearFieldError("payment_code");
+  });
+});
+
+// Ошибку у поля убираем, как только покупатель его поправил: держать
+// красную подпись под уже исправленным полем — значит спорить с человеком.
+checkoutForm?.querySelectorAll("[data-co-field]").forEach((field) => {
+  field.addEventListener("input", () => {
+    if (field.classList.contains("is-invalid")) {
+      setFieldError(field.name, checkField(field.name));
+    }
+  });
+  field.addEventListener("change", rememberCheckout);
+  field.addEventListener("blur", () => {
+    if (field.value.trim() !== "") {
+      setFieldError(field.name, checkField(field.name));
+    }
+  });
+});
+
+checkoutForm?.querySelectorAll("[data-co-consent]").forEach((box) => {
+  box.addEventListener("change", () => clearFieldError("consents"));
+});
+
+commentToggle?.addEventListener("click", () => toggleComment());
+
+if (checkoutForm) {
+  restoreCheckout();
+  applyCustomerType();
+}
 
 renderCart();
 openProductFromHash();

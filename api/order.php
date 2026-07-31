@@ -80,12 +80,12 @@ function normalize_cart_items($value): array
     }
 
     if (!is_array($value)) {
-        return [[], []];
+        return [[], [], 0.0];
     }
 
     $priced = orders_price_cart($value);
 
-    return [$priced['items'], $priced['problems']];
+    return [$priced['items'], $priced['problems'], $priced['discount']];
 }
 
 function cart_summary_text(array $items): string
@@ -173,16 +173,34 @@ function rate_limit_reason(array $config): string
 
 function normalize_order(array $raw): array
 {
-    [$cart_items, $cart_problems] = normalize_cart_items($raw['cart_items'] ?? []);
+    [$cart_items, $cart_problems, $cart_discount] = normalize_cart_items($raw['cart_items'] ?? []);
     $order_total_raw = clean_value($raw['order_total'] ?? '');
-    $order = [
+
+    /*
+     * Тип покупателя и его поля.
+     *
+     * Форма присылает два разных набора: у физического лица имя и фамилия,
+     * у юридического — реквизиты организации. Скрытый набор браузер не
+     * отправляет вовсе (он отключён), но полагаться на это нельзя: запрос
+     * может прийти откуда угодно. Поэтому берём поля строго того типа,
+     * который указан, а чужие игнорируем.
+     */
+    $customer_type = clean_value($raw['customer_type'] ?? 'individual');
+    $customer_type = isset(ORDER_CUSTOMER_TYPES[$customer_type]) ? $customer_type : 'individual';
+
+    $customer_input = [];
+    foreach (array_keys(orders_field_rules()) as $field) {
+        $customer_input[$field] = clean_value($raw[$field] ?? '');
+    }
+    $customer_errors = orders_validate_customer($customer_type, $customer_input);
+    $customer = orders_customer_from_form($customer_type, $customer_input);
+
+    $order = array_merge($customer, [
         'id' => create_order_id(),
         'created_at' => gmdate('c'),
-        'name' => clean_value($raw['name'] ?? ''),
-        'email' => strtolower(clean_value($raw['email'] ?? '')),
-        'phone' => clean_value($raw['phone'] ?? ''),
-        'company' => clean_value($raw['company'] ?? ''),
+        'email' => strtolower($customer['email']),
         'quantity' => clean_value($raw['quantity'] ?? ''),
+        'payment_code' => clean_value($raw['payment_code'] ?? ''),
         'payment' => clean_value($raw['payment'] ?? ''),
         'goal' => clean_value($raw['goal'] ?? ''),
         'category' => clean_value($raw['category'] ?? ''),
@@ -194,59 +212,93 @@ function normalize_order(array $raw): array
         'cart_total' => $cart_items
             ? round(array_sum(array_column($cart_items, 'total')), 2)
             : money_value($raw['cart_total'] ?? 0),
+        // Выгода — тоже с сервера: браузер прислать её не может.
+        'discount' => $cart_items ? $cart_discount : 0.0,
         'delivery_method' => clean_value($raw['delivery_method'] ?? ''),
         'delivery_code' => null,
         'delivery_price' => null,
+        'delivery_term' => '',
+        'delivery_region' => clean_value($raw['delivery_region'] ?? $raw['region'] ?? ''),
         'delivery_city' => clean_value($raw['delivery_city'] ?? ''),
         'delivery_address' => clean_value($raw['delivery_address'] ?? ''),
         'delivery_comment' => clean_value($raw['delivery_comment'] ?? ''),
         'order_total' => $order_total_raw === '' ? null : money_value($order_total_raw),
-    ];
+    ]);
+
+    /*
+     * Способ оплаты сверяется со списком в базе.
+     *
+     * Название приходит из формы только ради письма; решает код. Если кода
+     * нет или он выключен, название из запроса не принимается — иначе в
+     * заказе оказалось бы что угодно, вплоть до «Оплачено».
+     */
+    $payment_method = orders_payment_method($order['payment_code']);
+    if ($payment_method) {
+        $order['payment'] = (string)$payment_method['title'];
+        $order['payment_code'] = (string)$payment_method['code'];
+    } else {
+        $order['payment_code'] = '';
+    }
+
+    $delivery_method_row = null;
 
     // Доставка тоже берётся из базы, а не из формы: способ определяется по
     // названию, а цену, скидку «бесплатно от суммы» и «по тарифам службы»
     // решает магазин.
     if ($order['cart_items']) {
         $delivery = orders_delivery($order['delivery_method'], $order['cart_total']);
+        $delivery_method_row = $delivery['method'] ?? null;
         $order['delivery_method'] = $delivery['title'];
         $order['delivery_code'] = $delivery['method']['code'] ?? null;
         $order['delivery_price'] = $delivery['price'];
+        $order['delivery_term'] = $delivery['term'];
 
         $order['order_total'] = $order['delivery_price'] === null
             ? null
             : round($order['cart_total'] + $order['delivery_price'], 2);
     }
 
-    $errors = $cart_problems;
-    if ($order['name'] === '') {
-        $errors[] = 'Укажите имя.';
-    }
-    if (!filter_var($order['email'], FILTER_VALIDATE_EMAIL)) {
-        $errors[] = 'Укажите корректный email.';
-    }
-    if (!preg_match('/^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/', $order['phone'])) {
-        $errors[] = 'Укажите телефон в формате +7 (999) 999-99-99.';
-    }
-    if ($order['payment'] === '') {
+    /*
+     * Поля покупателя проверяются теми же правилами, что показала форма, —
+     * orders_field_rules(). Правил ровно один экземпляр, поэтому сайт не
+     * может принять то, что сервер потом отвергнет, и наоборот.
+     */
+    $errors = array_merge($cart_problems, array_values($customer_errors));
+
+    // Способ оплаты обязателен, только если магазин их вообще настроил.
+    if ($order['payment_code'] === '' && orders_payment_methods($customer_type)) {
         $errors[] = 'Выберите способ оплаты.';
     }
-    if ($order['goal'] === '') {
+
+    // Заявка без корзины обязана сказать, о чём она; заказ из корзины
+    // говорит сам за себя своим составом.
+    if (!$order['cart_items'] && $order['goal'] === '') {
         $errors[] = 'Выберите модель или задачу.';
     }
-    if ($order['goal'] === 'Заказ из корзины' && !$order['cart_items']) {
-        $errors[] = 'Добавьте товары в корзину.';
+
+    if ($order['cart_items']) {
+        if ($order['delivery_method'] === '') {
+            $errors[] = 'Выберите способ получения заказа.';
+        }
+
+        /*
+         * Нужен ли адрес, решает сам способ доставки в базе, а не поиск
+         * слова «Самовывоз» в его названии. Стоило владельцу переименовать
+         * способ в «Забрать в магазине» — и адрес переставал требоваться у
+         * курьера тоже.
+         */
+        $needs_address = ($delivery_method_row['needs_address'] ?? 0) == 1;
+
+        if ($needs_address && $order['delivery_city'] === '') {
+            $errors[] = 'Укажите город доставки.';
+        }
+        if ($needs_address && $order['delivery_address'] === '') {
+            $errors[] = 'Укажите улицу, дом и квартиру.';
+        }
     }
-    if ($order['cart_items'] && $order['delivery_method'] === '') {
-        $errors[] = 'Выберите способ получения заказа.';
-    }
-    if ($order['cart_items'] && strpos($order['delivery_method'], 'Самовывоз') === false && $order['delivery_city'] === '') {
-        $errors[] = 'Укажите город доставки.';
-    }
-    if ($order['cart_items'] && strpos($order['delivery_method'], 'Самовывоз') === false && $order['delivery_address'] === '') {
-        $errors[] = 'Укажите адрес, пункт выдачи или удобный способ доставки.';
-    }
+
     if (!$order['privacy']) {
-        $errors[] = 'Подтвердите согласие с политикой конфиденциальности.';
+        $errors[] = 'Подтвердите согласие с политикой обработки персональных данных.';
     }
     if (!$order['terms']) {
         $errors[] = 'Подтвердите согласие с пользовательским соглашением.';
@@ -257,19 +309,35 @@ function normalize_order(array $raw): array
 
 function order_rows(array $order): array
 {
+    $type = $order['customer_type'] ?? 'individual';
+
     $rows = [
         ['Номер заявки', $order['id']],
         ['Дата', $order['created_at']],
-        ['Имя', $order['name']],
-        ['Email', $order['email']],
-        ['Телефон', $order['phone']],
-        ['Компания или ИНН', $order['company'] !== '' ? $order['company'] : 'не указано'],
-        ['Количество', $order['quantity'] !== '' ? $order['quantity'] : 'не указано'],
-        ['Оплата', $order['payment']],
-        ['Что подобрать', $order['category'] !== '' ? $order['category'] : 'не указано'],
-        ['Модель или задача', $order['goal']],
-        ['Комментарий', $order['message'] !== '' ? $order['message'] : 'без комментария'],
+        // Тип покупателя стоит первой строкой не случайно: от него зависит,
+        // как менеджер отвечает — счётом или разговором.
+        ['Тип покупателя', ORDER_CUSTOMER_TYPES[$type] ?? 'Физическое лицо'],
     ];
+
+    if ($type === 'legal') {
+        foreach (orders_legal_details($order) as $label => $value) {
+            $rows[] = [$label, $value];
+        }
+    } else {
+        $rows[] = ['Имя', $order['name'] !== '' ? $order['name'] : 'не указано'];
+    }
+
+    $rows[] = ['Телефон', $order['phone']];
+    $rows[] = ['Электронная почта', $order['email'] !== '' ? $order['email'] : 'не указана'];
+    $rows[] = ['Оплата', $order['payment'] !== '' ? $order['payment'] : 'не выбрана'];
+
+    if (!$order['cart_items']) {
+        $rows[] = ['Что подобрать', $order['category'] !== '' ? $order['category'] : 'не указано'];
+        $rows[] = ['Модель или задача', $order['goal']];
+        $rows[] = ['Количество', $order['quantity'] !== '' ? $order['quantity'] : 'не указано'];
+    }
+
+    $rows[] = ['Комментарий', $order['message'] !== '' ? $order['message'] : 'без комментария'];
 
     if ($order['cart_items']) {
         $delivery_price = $order['delivery_price'] === null ? 'по тарифам службы доставки' : format_money_value($order['delivery_price']);
@@ -277,11 +345,20 @@ function order_rows(array $order): array
 
         $rows[] = ['Состав корзины', cart_summary_text($order['cart_items'])];
         $rows[] = ['Сумма товаров', format_money_value($order['cart_total'])];
+        if (($order['discount'] ?? 0) > 0) {
+            $rows[] = ['Скидка', format_money_value($order['discount'])];
+        }
         $rows[] = ['Способ получения', $order['delivery_method']];
         $rows[] = ['Стоимость доставки', $delivery_price];
+        if (($order['delivery_term'] ?? '') !== '') {
+            $rows[] = ['Срок доставки', $order['delivery_term']];
+        }
+        if (($order['delivery_region'] ?? '') !== '') {
+            $rows[] = ['Регион', $order['delivery_region']];
+        }
         $rows[] = ['Город доставки', $order['delivery_city'] !== '' ? $order['delivery_city'] : 'самовывоз'];
         $rows[] = ['Адрес или пункт выдачи', $order['delivery_address'] !== '' ? $order['delivery_address'] : 'самовывоз'];
-        $rows[] = ['Комментарий по доставке', $order['delivery_comment'] !== '' ? $order['delivery_comment'] : 'без комментария'];
+        $rows[] = ['Пожелание по доставке', $order['delivery_comment'] !== '' ? $order['delivery_comment'] : 'без пожеланий'];
         $rows[] = ['Итого по заказу', $order_total];
     }
 
@@ -564,22 +641,32 @@ function php_mail_send(array $config, string $to_email, string $to_name, string 
 
 function telegram_order_text(array $order, string $site_name): string
 {
+    $type = $order['customer_type'] ?? 'individual';
+
     $lines = [
         'Новый заказ ' . $site_name,
         'Номер: ' . $order['id'],
-        'Клиент: ' . $order['name'],
+        'Тип покупателя: ' . (ORDER_CUSTOMER_TYPES[$type] ?? 'Физическое лицо'),
+        'Клиент: ' . ($order['name'] !== '' ? $order['name'] : 'не указан'),
         'Телефон: ' . $order['phone'],
-        'Email: ' . $order['email'],
-        'Оплата: ' . $order['payment'],
-        'Модель/задача: ' . $order['goal'],
+        'Email: ' . ($order['email'] !== '' ? $order['email'] : 'не указана'),
+        'Оплата: ' . ($order['payment'] !== '' ? $order['payment'] : 'не выбрана'),
     ];
 
-    if ($order['category'] !== '') {
-        $lines[] = 'Что подобрать: ' . $order['category'];
+    if ($type === 'legal') {
+        $lines[] = '';
+        $lines[] = 'Реквизиты:';
+        foreach (orders_legal_details($order) as $label => $value) {
+            $lines[] = '- ' . $label . ': ' . $value;
+        }
+        $lines[] = '';
     }
 
-    if ($order['company'] !== '') {
-        $lines[] = 'Компания/ИНН: ' . $order['company'];
+    if (!$order['cart_items']) {
+        $lines[] = 'Модель/задача: ' . $order['goal'];
+        if ($order['category'] !== '') {
+            $lines[] = 'Что подобрать: ' . $order['category'];
+        }
     }
 
     if ($order['cart_items']) {
@@ -589,8 +676,17 @@ function telegram_order_text(array $order, string $site_name): string
             $lines[] = '- ' . $item['title'] . ': ' . $item['qty'] . ' шт. x ' . format_money_value($item['price']) . ' = ' . format_money_value($item['total']);
         }
         $lines[] = 'Товары: ' . format_money_value($order['cart_total']);
+        if (($order['discount'] ?? 0) > 0) {
+            $lines[] = 'Скидка: ' . format_money_value($order['discount']);
+        }
         $lines[] = 'Доставка: ' . $order['delivery_method'];
         $lines[] = 'Стоимость доставки: ' . ($order['delivery_price'] === null ? 'по тарифам службы доставки' : format_money_value($order['delivery_price']));
+        if (($order['delivery_term'] ?? '') !== '') {
+            $lines[] = 'Срок: ' . $order['delivery_term'];
+        }
+        if (($order['delivery_region'] ?? '') !== '') {
+            $lines[] = 'Регион: ' . $order['delivery_region'];
+        }
         $lines[] = 'Город: ' . ($order['delivery_city'] !== '' ? $order['delivery_city'] : 'самовывоз');
         $lines[] = 'Адрес/ПВЗ: ' . ($order['delivery_address'] !== '' ? $order['delivery_address'] : 'самовывоз');
         $lines[] = 'Итого: ' . ($order['order_total'] === null ? format_money_value($order['cart_total']) . ' + доставка' : format_money_value($order['order_total']));
@@ -762,19 +858,34 @@ if ($errors) {
  */
 $db_order_id = orders_store([
     'number'         => $order['id'],
+    'customer_type'  => $order['customer_type'],
     'name'           => $order['name'],
+    'first_name'     => $order['first_name'],
+    'last_name'      => $order['last_name'],
     'phone'          => $order['phone'],
     'email'          => $order['email'],
     'company'        => $order['company'],
+    'inn'            => $order['inn'],
+    'kpp'            => $order['kpp'],
+    'ogrn'           => $order['ogrn'],
+    'legal_address'  => $order['legal_address'],
+    'bank_name'      => $order['bank_name'],
+    'bik'            => $order['bik'],
+    'bank_account'   => $order['bank_account'],
+    'corr_account'   => $order['corr_account'],
+    'region'         => $order['delivery_region'],
     'city'           => $order['delivery_city'],
     'address'        => trim($order['delivery_address'] . "\n" . $order['delivery_comment']),
     'delivery_code'  => $order['delivery_code'],
     'delivery_title' => $order['delivery_method'],
     'delivery_price' => $order['delivery_price'],
+    'delivery_term'  => $order['delivery_term'],
     'payment'        => $order['payment'],
+    'payment_code'   => $order['payment_code'],
     'goal'           => $order['goal'],
     'comment'        => $order['message'],
     'items_total'    => $order['cart_total'],
+    'discount'       => $order['discount'],
     'total'          => $order['order_total'] ?? $order['cart_total'],
     'source'         => $order['cart_items'] ? 'cart' : 'form',
 ], $order['cart_items']);
@@ -810,15 +921,24 @@ try {
         build_html($order, 'Новая заявка с сайта ' . $site_name)
     );
 
-    smtp_send(
-        $config,
-        $order['email'],
-        $order['name'],
-        $to_email,
-        'Ваша заявка ' . $order['id'] . ' принята — ' . $site_name,
-        $client_text,
-        build_html($order, 'ЗАЯВКА ПРИНЯТА')
-    );
+    /*
+     * Письмо покупателю — только если он оставил почту.
+     *
+     * Почта теперь необязательна: обязателен телефон, по нему менеджер и
+     * перезвонит. Отправлять письмо в пустоту нельзя — SMTP ответит отказом,
+     * и заказ, который на самом деле принят, был бы помечен как неудачный.
+     */
+    if (filter_var($order['email'], FILTER_VALIDATE_EMAIL)) {
+        smtp_send(
+            $config,
+            $order['email'],
+            $order['name'],
+            $to_email,
+            'Ваша заявка ' . $order['id'] . ' принята — ' . $site_name,
+            $client_text,
+            build_html($order, 'ЗАЯВКА ПРИНЯТА')
+        );
+    }
 
     $telegram_error = telegram_notify_safely($config, $order, $site_name);
     $mail_status = $telegram_error === '' ? 'mail_sent' : 'mail_sent_telegram_failed';
@@ -838,14 +958,16 @@ try {
                 'Новая заявка ' . $order['id'] . ' — ' . $site_name,
                 $owner_text
             );
-            php_mail_send(
-                $config,
-                $order['email'],
-                $order['name'],
-                $to_email,
-                'Ваша заявка ' . $order['id'] . ' принята — ' . $site_name,
-                $client_text
-            );
+            if (filter_var($order['email'], FILTER_VALIDATE_EMAIL)) {
+                php_mail_send(
+                    $config,
+                    $order['email'],
+                    $order['name'],
+                    $to_email,
+                    'Ваша заявка ' . $order['id'] . ' принята — ' . $site_name,
+                    $client_text
+                );
+            }
             $telegram_error = telegram_notify_safely($config, $order, $site_name);
             $mail_status = $telegram_error === '' ? 'mail_sent_via_php_mail' : 'mail_sent_via_php_mail_telegram_failed';
             orders_set_mail_status($db_order_id, $mail_status);

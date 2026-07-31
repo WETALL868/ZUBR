@@ -316,17 +316,36 @@ function cms_schema(): array
             'id             {PK}',
             'number         {STR:40}  NOT NULL',
             'status         {STR:30}  NOT NULL DEFAULT \'new\'',
+            // individual — физическое лицо, legal — юридическое.
+            // У заказов, оформленных до появления переключателя, здесь
+            // остаётся individual: так они и оформлялись.
+            'customer_type  {STR:20}  NOT NULL DEFAULT \'individual\'',
             'customer_name  {STR:190} NULL',
+            'first_name     {STR:120} NULL',
+            'last_name      {STR:120} NULL',
             'phone          {STR:40}  NULL',
             'email          {STR:190} NULL',
+            // ---- реквизиты юридического лица -------------------------------
             'company        {STR:190} NULL',
             'inn            {STR:20}  NULL',
+            'kpp            {STR:20}  NULL',
+            'ogrn           {STR:20}  NULL',
+            'legal_address  {TEXT}    NULL',
+            'bank_name      {STR:190} NULL',
+            'bik            {STR:20}  NULL',
+            'bank_account   {STR:40}  NULL',   // расчётный счёт
+            'corr_account   {STR:40}  NULL',   // корреспондентский счёт
+            // ---- доставка --------------------------------------------------
+            'region         {STR:190} NULL',
             'city           {STR:190} NULL',
             'address        {TEXT}    NULL',
             'delivery_code  {STR:60}  NULL',
             'delivery_title {STR:190} NULL',
             'delivery_price {DEC}     NULL',
+            'delivery_term  {STR:120} NULL',   // срок, как он был показан покупателю
             'payment        {STR:60}  NULL',
+            'payment_code   {STR:60}  NULL',
+            'discount       {DEC}     NULL',   // выгода против старой цены
             'goal           {STR:190} NULL',
             'comment        {TEXT}    NULL',
             'manager_note   {TEXT}    NULL',
@@ -375,11 +394,38 @@ function cms_schema(): array
             'option_title  {STR:255} NULL',    // подсказка, уходит в заказ
             'price         {DEC}     NULL',    // NULL = «по тарифам службы»
             'free_from     {DEC}     NULL',      // бесплатно от суммы
+            'term          {STR:120} NULL',    // срок: «1-2 рабочих дня». Пусто — не показываем
             'needs_city    {BOOL}    NOT NULL DEFAULT 0',
             'needs_address {BOOL}    NOT NULL DEFAULT 0',
             'is_active     {BOOL}    NOT NULL DEFAULT 1',
             'sort_order    {INT}     NOT NULL DEFAULT 0',
             '{UNIQUE} ux_delivery_code (code)',
+        ],
+
+        /*
+         * Способы оплаты.
+         *
+         * Здесь не платёжные шлюзы, а то, о чём покупатель договаривается с
+         * магазином: наличные при получении, счёт для организации, что-то
+         * ещё. Заказ запоминает выбранный способ, менеджер видит его в
+         * панели. Никакого списания денег на сайте не происходит — если
+         * когда-нибудь подключат приём карт, способ добавится сюда же.
+         *
+         * Список правится в панели, поэтому магазин не обязан звать
+         * программиста, чтобы убрать наличные или добавить рассрочку.
+         */
+        'payment_methods' => [
+            'id          {PK}',
+            'code        {STR:60}  NOT NULL',
+            'title       {STR:190} NOT NULL',
+            'description {TEXT}    NULL',
+            // Кому показывать: both | individual | legal.
+            'audience    {STR:20}  NOT NULL DEFAULT \'both\'',
+            'is_default  {BOOL}    NOT NULL DEFAULT 0',   // выбран по умолчанию у физлица
+            'is_default_legal {BOOL} NOT NULL DEFAULT 0', // выбран по умолчанию у юрлица
+            'is_active   {BOOL}    NOT NULL DEFAULT 1',
+            'sort_order  {INT}     NOT NULL DEFAULT 0',
+            '{UNIQUE} ux_payment_code (code)',
         ],
 
         // ---------------------------------------------------------- настройки
@@ -548,6 +594,96 @@ function cms_schema_apply(PDO $pdo, string $driver): array
     }
 
     return ['created' => $created, 'skipped' => $skipped];
+}
+
+/**
+ * Столбцы таблицы, как их видит база сейчас.
+ *
+ * @return string[] имена столбцов в нижнем регистре
+ */
+function cms_schema_existing_columns(PDO $pdo, string $driver, string $table): array
+{
+    try {
+        $rows = $driver === 'sqlite'
+            ? $pdo->query('PRAGMA table_info(' . $table . ')')->fetchAll(PDO::FETCH_ASSOC)
+            : $pdo->query('SHOW COLUMNS FROM ' . $table)->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException) {
+        return [];   // таблицы ещё нет — её создаст cms_schema_apply()
+    }
+
+    $names = [];
+    foreach ($rows as $row) {
+        $name = $row['name'] ?? $row['Field'] ?? null;
+        if ($name !== null) {
+            $names[] = mb_strtolower((string)$name);
+        }
+    }
+
+    return $names;
+}
+
+/**
+ * Добавляет столбцы, которые появились в схеме позже, чем была создана база.
+ *
+ * CREATE TABLE IF NOT EXISTS обновлению не помогает: таблица уже есть, и
+ * новый столбец в неё не попадёт. Раньше это означало, что любое расширение
+ * заказа требовало от владельца ручного ALTER TABLE в phpMyAdmin — а на
+ * практике означало, что обновление просто ломалось на боевом сайте.
+ *
+ * Функция ТОЛЬКО ДОБАВЛЯЕТ. Она никогда не удаляет и не меняет существующие
+ * столбцы: если столбец есть, он пропускается, каким бы ни был его тип.
+ * Поэтому её безопасно выполнять сколько угодно раз и на базе с заказами.
+ *
+ * @return string[] список добавленного, в виде «таблица.столбец»
+ */
+function cms_schema_sync_columns(PDO $pdo, string $driver): array
+{
+    $types = cms_schema_types($driver);
+    $added = [];
+
+    foreach (cms_schema() as $table => $lines) {
+        $existing = cms_schema_existing_columns($pdo, $driver, $table);
+        if (!$existing) {
+            continue;   // таблицы нет — не наше дело
+        }
+
+        foreach ($lines as $line) {
+            if (str_starts_with($line, '{UNIQUE}') || str_starts_with($line, '{INDEX}')) {
+                continue;
+            }
+            if (!preg_match('~^\s*(\w+)\s~', $line, $m)) {
+                continue;
+            }
+
+            $column = $m[1];
+            if (in_array(mb_strtolower($column), $existing, true)) {
+                continue;
+            }
+            if (str_contains($line, '{PK}')) {
+                continue;   // первичный ключ задаётся только при создании таблицы
+            }
+
+            $definition = preg_replace_callback('~\{STR:(\d+)\}~', static function ($mm) use ($driver) {
+                return $driver === 'sqlite' ? 'TEXT' : 'VARCHAR(' . $mm[1] . ')';
+            }, $line);
+            $definition = trim(strtr($definition, $types));
+
+            /*
+             * NOT NULL без DEFAULT на непустой таблице не пройдёт: у уже
+             * существующих строк значения нет. Такие столбцы добавляем
+             * как NULL — данные важнее строгости, а строгость всё равно
+             * обеспечивает код, который в этот столбец пишет.
+             */
+            if (str_contains($definition, 'NOT NULL') && !str_contains($definition, 'DEFAULT')) {
+                $definition = str_replace('NOT NULL', 'NULL', $definition);
+            }
+
+            $pdo->exec('ALTER TABLE ' . $table . ' ADD COLUMN ' . $definition);
+            $added[] = $table . '.' . $column;
+        }
+    }
+
+    return $added;
 }
 
 // Запуск из консоли: php cms/schema.php --dump-mysql > cms/schema.mysql.sql

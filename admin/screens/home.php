@@ -51,6 +51,12 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
             'updated_at' => cms_now(),
         ];
 
+        // У витрины товаров и у формы заказа разметка разрезана надвое:
+        // до собираемой части и после неё.
+        if ($block['kind'] === 'form') {
+            $data['body_after'] = (string)($_POST['body_after'] ?? '');
+        }
+
         if ($block['kind'] === 'products') {
             $data['body_after'] = (string)($_POST['body_after'] ?? '');
             $data['settings'] = json_encode(
@@ -101,6 +107,8 @@ require __DIR__ . '/../layout/header.php';
                   <?php if ($block['kind'] === 'products'): ?>
                   <span class="adm-tag ok">витрина товаров</span>
                   <?= e((string)($settings['category'] ?? '')) ?>
+                  <?php elseif ($block['kind'] === 'form'): ?>
+                  <span class="adm-tag ok">форма заказа</span>
                   <?php else: ?>
                   <span class="adm-tag">разметка</span> <?= number_format(mb_strlen((string)$block['body']), 0, ',', ' ') ?> симв.
                   <?php endif; ?>
@@ -167,6 +175,29 @@ require __DIR__ . '/../layout/header.php';
               <label for="body_after">Разметка после сетки товаров</label>
               <textarea id="body_after" name="body_after" class="tall"><?= e((string)$current['body_after']) ?></textarea>
               <p class="note">Здесь лежит карточка «нужен другой товар» и закрывающие теги секции.</p>
+            </div>
+            <?php elseif ($current['kind'] === 'form'): ?>
+            <div class="adm-card" style="margin:0 0 14px">
+              <p class="hint">
+                Это секция оформления заказа. Сама форма — поля покупателя, доставка,
+                оплата и итоговая сумма — собирается кодом сайта, а не хранится здесь:
+                у неё есть проверки, и одна случайная правка в текстовом поле сломала бы
+                оформление заказа для всех покупателей.
+              </p>
+              <p class="hint">
+                Здесь правится только текст <b>над</b> формой — заголовок, абзац и контакты.
+                Способы доставки настраиваются в разделе «Доставка», способы оплаты — в разделе «Оплата».
+              </p>
+            </div>
+            <div class="adm-field">
+              <label for="body">Текст над формой</label>
+              <textarea id="body" name="body" class="tall"><?= e((string)$current['body']) ?></textarea>
+              <p class="note">Открывающий тег секции трогать не нужно — форма встаёт сразу за этим текстом.</p>
+            </div>
+            <div class="adm-field">
+              <label for="body_after">Разметка после формы</label>
+              <textarea id="body_after" name="body_after"><?= e((string)$current['body_after']) ?></textarea>
+              <p class="note">Обычно здесь только закрывающий тег секции.</p>
             </div>
             <?php else: ?>
             <div class="adm-field">

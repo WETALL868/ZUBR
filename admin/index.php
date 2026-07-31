@@ -64,6 +64,7 @@ $screens = [
     'home'       => ['file' => 'home.php',       'title' => 'Главная страница'],
     'media'      => ['file' => 'media.php',      'title' => 'Фотографии'],
     'delivery'   => ['file' => 'delivery.php',   'title' => 'Доставка'],
+    'payments'   => ['file' => 'payments.php',   'title' => 'Оплата'],
     'redirects'  => ['file' => 'redirects.php',  'title' => 'Переадресация'],
     'settings'   => ['file' => 'settings.php',   'title' => 'Настройки'],
     'maintenance' => ['file' => 'maintenance.php', 'title' => 'Обслуживание', 'owner' => true],

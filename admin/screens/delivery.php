@@ -25,6 +25,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
                 'description' => trim((string)($_POST['description'][$methodId] ?? '')),
                 'price'       => admin_price_from_delivery((string)($_POST['price'][$methodId] ?? '')),
                 'free_from'   => admin_price_from_delivery((string)($_POST['free_from'][$methodId] ?? '')),
+                'term'        => trim((string)($_POST['term'][$methodId] ?? '')) ?: null,
                 'is_active'   => !empty($_POST['is_active'][$methodId]) ? 1 : 0,
                 'sort_order'  => (int)($_POST['sort_order'][$methodId] ?? 0),
             ], 'id = :id', ['id' => $methodId]);
@@ -74,7 +75,7 @@ require __DIR__ . '/../layout/header.php';
         <div class="adm-head">
           <div>
             <h1>Доставка</h1>
-            <p>Эти способы покупатель видит в корзине. По ним же сервер считает итог заказа.</p>
+            <p>Эти способы покупатель видит при оформлении заказа. По ним же сервер считает итог.</p>
           </div>
         </div>
 
@@ -89,6 +90,7 @@ require __DIR__ . '/../layout/header.php';
                   <th>Подпись под названием</th>
                   <th class="num" style="width:120px">Цена, ₽</th>
                   <th class="num" style="width:130px">Бесплатно от, ₽</th>
+                  <th style="width:150px">Срок</th>
                   <th class="num" style="width:90px">Порядок</th>
                   <th style="width:90px">Активен</th>
                 </tr>
@@ -106,6 +108,10 @@ require __DIR__ . '/../layout/header.php';
                     <p class="note">Пусто — по тарифам службы.</p>
                   </td>
                   <td class="num"><input name="free_from[<?= $mid ?>]" type="text" inputmode="decimal" value="<?= e(cms_money_machine($method['free_from'] === null ? null : (float)$method['free_from'])) ?>" /></td>
+                  <td>
+                    <input name="term[<?= $mid ?>]" type="text" value="<?= e((string)($method['term'] ?? '')) ?>" placeholder="1-2 рабочих дня" />
+                    <p class="note">Пусто — срок не показываем.</p>
+                  </td>
                   <td class="num"><input name="sort_order[<?= $mid ?>]" type="number" value="<?= (int)$method['sort_order'] ?>" /></td>
                   <td><input name="is_active[<?= $mid ?>]" type="checkbox" value="1"<?= (int)$method['is_active'] === 1 ? ' checked' : '' ?> /></td>
                 </tr>

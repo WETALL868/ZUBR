@@ -25,6 +25,7 @@
 declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/bootstrap.php';
+require_once __DIR__ . '/defaults.php';
 
 /**
  * Путь к исходному файлу.
@@ -326,8 +327,16 @@ if ($apply) {
     }
 
     $applied = cms_schema_apply(cms_db(), $driver);
+
+    // Столбцы, появившиеся в схеме после того, как база была создана.
+    // CREATE TABLE IF NOT EXISTS их не добавит: таблица-то уже есть.
+    $addedColumns = cms_schema_sync_columns(cms_db(), $driver);
+
     say('Схема готова: ' . count(cms_schema()) . ' таблиц'
         . ($applied['skipped'] > 0 ? ' (уже существовало объектов: ' . $applied['skipped'] . ')' : '') . '.');
+    if ($addedColumns) {
+        say('Добавлены столбцы: ' . implode(', ', $addedColumns) . '.');
+    }
     say();
 }
 
@@ -754,6 +763,20 @@ foreach ($deliveryDefs as $def) {
 }
 say();
 
+/* ---------------------------------------------------------------- оплата */
+
+if ($apply) {
+    $addedPayments = cms_seed_payment_methods();
+    say($addedPayments
+        ? 'Способы оплаты добавлены: ' . implode(', ', $addedPayments) . '.'
+        : 'Способы оплаты уже настроены — не трогаем.');
+} else {
+    foreach (cms_default_payment_methods() as $method) {
+        say(sprintf('Оплата: %-38s (%s)', $method['title'], $method['audience']));
+    }
+}
+say();
+
 /* ------------------------------------------------------------- главная */
 
 // Главная — не набор товаров, а посадочная страница из семнадцати непохожих
@@ -863,6 +886,32 @@ if ($homeHtml === '') {
                         ['category' => $code === 'stock' ? 'processors' : 'drives'],
                         JSON_UNESCAPED_UNICODE
                     ),
+                    'sort_order' => $sortOrder,
+                ];
+                continue;
+            }
+
+            /*
+             * Секция заказа: текст до формы, форма из файла, закрывающий тег.
+             *
+             * Форма разбита на поля с проверками и переключателем «физическое
+             * лицо / юридическое лицо», её собирает templates/partials/
+             * order-form.php. В базе остаётся только текст вокруг неё —
+             * заголовок и абзац, которые владелец правит в панели.
+             */
+            if ($code === 'order') {
+                $intro = preg_match('~<div class="order-copy">.*?</div>\s*</div>~s', $section, $im)
+                    ? $im[0]
+                    : '';
+                $markup = cms_order_block_markup($intro);
+
+                $homeBlocks[] = [
+                    'code'       => 'order',
+                    'kind'       => 'form',
+                    'title'      => $names['order'] ?? 'Оформление заказа',
+                    'body'       => $markup['body'],
+                    'body_after' => $markup['body_after'],
+                    'settings'   => null,
                     'sort_order' => $sortOrder,
                 ];
                 continue;

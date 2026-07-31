@@ -195,6 +195,24 @@ $checks[] = check(
     . 'в этой папке: ' . implode('; ', $illegal) . '. Удалите эти строки.'
 );
 
+/*
+ * Способы оплаты.
+ *
+ * Пустой список — не поломка: форма просто не спросит про оплату, и заказ
+ * оформится. Но менеджер тогда не узнает, как покупатель собирался платить,
+ * поэтому предупредить стоит.
+ */
+$paymentCount = 0;
+try {
+    $paymentCount = (int)(cms_value('SELECT COUNT(*) FROM payment_methods WHERE is_active = 1') ?? 0);
+} catch (Throwable) {
+    $paymentCount = 0;
+}
+$checks[] = check($paymentCount > 0, 'Способы оплаты',
+    'настроено: ' . $paymentCount,
+    'ни одного активного способа оплаты — покупатель не сможет выбрать, как платить. '
+    . 'Добавьте их в разделе «Оплата».', true);
+
 $mailConfig = CMS_ROOT . '/api/mail-config.php';
 $checks[] = check(is_file($mailConfig), 'Настройки почты',
     'файл api/mail-config.php на месте',

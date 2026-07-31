@@ -37,19 +37,25 @@ declare(strict_types=1);
     </p>
 
     <div class="two">
+      <?php
+        $printType = (string)($order['customer_type'] ?? 'individual') === 'legal' ? 'legal' : 'individual';
+        $printLegal = $printType === 'legal' ? orders_legal_details($order) : [];
+      ?>
       <div>
         <h2 style="font-size:15px">Покупатель</h2>
         <p>
+          <b><?= e(ORDER_CUSTOMER_TYPES[$printType]) ?></b><br />
           <?= e((string)$order['customer_name']) ?><br />
-          <?= e((string)$order['phone']) ?><br />
-          <?= e((string)$order['email']) ?>
-          <?php if ($order['company']): ?><br /><?= e((string)$order['company']) ?><?php endif; ?>
+          <?= e((string)$order['phone']) ?>
+          <?php if ($order['email']): ?><br /><?= e((string)$order['email']) ?><?php endif; ?>
         </p>
       </div>
       <div>
         <h2 style="font-size:15px">Доставка</h2>
         <p>
           <?= e((string)($order['delivery_title'] ?: '—')) ?><br />
+          <?php if (!empty($order['delivery_term'])): ?>Срок: <?= e((string)$order['delivery_term']) ?><br /><?php endif; ?>
+          <?php if (!empty($order['region'])): ?><?= e((string)$order['region']) ?><br /><?php endif; ?>
           <?php if ($order['city']): ?><?= e((string)$order['city']) ?><br /><?php endif; ?>
           <?php if ($order['address']): ?><?= nl2br(e((string)$order['address'])) ?><br /><?php endif; ?>
           Оплата: <?= e((string)($order['payment'] ?: '—')) ?>
@@ -65,6 +71,17 @@ declare(strict_types=1);
         </p>
       </div>
     </div>
+
+    <?php if ($printLegal): ?>
+    <h2 style="font-size:15px">Реквизиты организации</h2>
+    <table>
+      <tbody>
+        <?php foreach ($printLegal as $label => $value): ?>
+        <tr><th style="text-align:left;width:220px"><?= e($label) ?></th><td><?= nl2br(e($value)) ?></td></tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+    <?php endif; ?>
 
     <?php if ($items): ?>
     <table>
