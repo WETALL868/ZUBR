@@ -109,9 +109,10 @@ RewriteRule ^([a-z0-9][a-z0-9_-]*)/?$ route.php?slug=$1 [L,QSA]
   Header unset X-Powered-By
 </IfModule>
 
-<IfModule mod_php.c>
-  php_flag expose_php Off
-</IfModule>
+# Директив php_flag / php_admin_flag здесь намеренно нет: expose_php задаётся
+# только в php.ini, а в .htaccess такая строка на части хостингов приводит к
+# ошибке 500 на всём сайте. Заголовок с версией PHP уже снят выше
+# правилом «Header always unset X-Powered-By».
 
 # ---------------------------------------------------------------------------
 # MIME types / charset

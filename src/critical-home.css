@@ -912,3 +912,70 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 }}
+
+/* ---------------------------------------------------------------------------
+ * ЗАКРЫТОЕ состояние всплывающих окон.
+ *
+ * Эти правила обязаны быть здесь, а не только в styles.css. На главной общий
+ * файл стилей подключён асинхронно, и до его применения браузер рисует
+ * документ голым. Корзина, быстрый просмотр и окно «заявка принята» — это
+ * обычные блоки в конце страницы: без стилей они превращаются в видимый
+ * текст поверх начала главной. Посетитель видит это как «корзина открылась
+ * сама после F5», а при переходе на /#order — как вспышку боковой панели.
+ *
+ * Правила ровно те же, что в styles.css, — только состояние «закрыто».
+ * Открывает окна класс is-open, который ставит JavaScript.
+ * --------------------------------------------------------------------------- */
+
+.cart-backdrop {
+  position: fixed;
+  z-index: 41;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.58);
+}
+
+.cart-backdrop[hidden] {
+  display: none;
+}
+
+.cart-drawer {
+  position: fixed;
+  z-index: 42;
+  top: 0;
+  right: 0;
+  width: min(520px, 100%);
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 22px;
+  overflow: auto;
+  background: #111916;
+  /* Ровно то же значение, что в styles.css: панель уезжает за правый край. */
+  transform: translateX(105%);
+}
+
+.cart-drawer.is-open {
+  transform: translateX(0);
+}
+
+.photo-viewer,
+.order-success {
+  position: fixed;
+  inset: 0;
+  display: none;
+  place-items: center;
+}
+
+.photo-viewer {
+  z-index: 40;
+}
+
+.order-success {
+  z-index: 45;
+}
+
+.photo-viewer.is-open,
+.order-success.is-open {
+  display: grid;
+}
