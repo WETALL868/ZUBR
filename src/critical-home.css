@@ -587,6 +587,34 @@ a {
   margin: 4px 0 0;
   color: var(--muted);
 }
+
+/*
+ * Заголовок первого экрана и полоса преимуществ под ним.
+ *
+ * Эти два правила есть в styles.css, но их не было здесь — а styles.css
+ * на главной приезжает позже. До его прихода браузер рисовал заголовок
+ * обычным размером h1 (32 пикселя вместо 78) и ставил три блока полосы
+ * в столбик, а не в ряд. Когда файл применялся, первый экран
+ * перестраивался целиком: заголовок вырастал, кнопки уезжали почти на
+ * триста пикселей вниз. Google меряет это как сдвиг вёрстки CLS, и на
+ * компьютере он доходил до 0.576 при допустимых 0.1.
+ *
+ * Вид страницы эти строки не меняют: они в точности повторяют то, что
+ * через долю секунды приходит из styles.css. Меняется только момент —
+ * теперь всё встаёт на свои места сразу.
+ */
+h1 {
+  margin-bottom: 22px;
+  font-size: clamp(42px, 6.4vw, 78px);
+  line-height: 0.95;
+  letter-spacing: 0;
+}
+.trust-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  padding-top: 34px;
+}
 @media (min-width: 1061px) and (max-width: 1700px) {
   .site-header {
     gap: 10px;
@@ -633,7 +661,7 @@ a {
       inset 0 2px 0 rgba(255, 255, 255, 0.42);
     transform: translateY(-3px);
   }
-}}
+}
 @media (min-width: 1061px) and (max-width: 1300px) {
   .header-mail,
   .header-contacts span {
@@ -656,7 +684,7 @@ a {
   .header-action {
     padding: 10px 11px;
   }
-}}
+}
 body.viewer-open {
   overflow: hidden;
 }
@@ -824,6 +852,9 @@ button:disabled {
   .header-action {
     width: 100%;
   }
+  h1 {
+    font-size: 48px;
+  }
   .hero {
     min-height: 900px;
     align-items: end;
@@ -855,7 +886,7 @@ button:disabled {
   textarea {
     font-size: 16px;
   }
-}}
+}
 @media (max-width: 560px) {
   .site-header {
     padding: 12px 14px;
@@ -911,7 +942,7 @@ button:disabled {
   .cookie-banner {
     grid-template-columns: 1fr;
   }
-}}
+}
 
 /* ---------------------------------------------------------------------------
  * ЗАКРЫТОЕ состояние всплывающих окон.
