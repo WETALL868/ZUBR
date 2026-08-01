@@ -77,12 +77,26 @@ function check(bool $ok, string $what, string $good, string $bad, bool $warnOnly
 $driver = cms_config()['driver'] ?? 'mysql';
 $checks = [];
 
-$checks[] = check(
-    version_compare(PHP_VERSION, '8.1', '>='),
-    'Версия PHP',
-    PHP_VERSION,
-    PHP_VERSION . ' — нужна 8.1 или новее, переключите версию в панели хостинга'
-);
+/*
+ * Версия PHP: три состояния, а не два.
+ *
+ * Сайту хватает 8.0 — ниже он просто не запустится, там другой синтаксис
+ * языка. Но 8.0 и 8.1 уже не получают обновлений безопасности, и держать
+ * магазин с приёмом заказов на такой версии не стоит. Поэтому «работает,
+ * но пора обновиться» — предупреждение, а не ошибка: красная строка при
+ * работающем сайте только сбивает с толку.
+ */
+if (version_compare(PHP_VERSION, '8.2', '>=')) {
+    $checks[] = check(true, 'Версия PHP', PHP_VERSION, '');
+} elseif (version_compare(PHP_VERSION, '8.0', '>=')) {
+    $checks[] = check(false, 'Версия PHP', '',
+        PHP_VERSION . ' — сайт работает, но эта версия больше не получает обновлений '
+        . 'безопасности. Переключите на 8.2 или новее в панели хостинга.', true);
+} else {
+    $checks[] = check(false, 'Версия PHP', '',
+        PHP_VERSION . ' — нужна 8.0 или новее, иначе сайт не запустится. '
+        . 'Переключите версию в панели хостинга.');
+}
 
 foreach (['pdo_mysql' => 'MySQL', 'pdo_sqlite' => 'SQLite', 'mbstring' => 'русский текст', 'gd' => 'размеры фотографий', 'openssl' => 'отправка почты'] as $ext => $why) {
     $needed = !($ext === 'pdo_mysql' && $driver === 'sqlite') && !($ext === 'pdo_sqlite' && $driver !== 'sqlite');
