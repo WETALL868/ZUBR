@@ -69,6 +69,35 @@ function out(string $line = ''): void
     echo $line, "\n";
 }
 
+/**
+ * Оставляет только те ключи, для которых в таблице есть столбцы.
+ *
+ * В описании категории есть поля, которых в базе нет и быть не должно:
+ * например «meta» — подпись под текстом карточки на главной, она живёт
+ * прямо в разметке блока. Без этой отсечки первая же установка на чистую
+ * базу падала бы с «Unknown column», и падала бы только там, где ошибку
+ * тяжелее всего заметить — на сервере владельца.
+ */
+function import_only_columns(string $table, array $row): array
+{
+    static $cache = [];
+
+    if (!isset($cache[$table])) {
+        $cache[$table] = array_flip(
+            cms_schema_existing_columns(cms_db(), (string)cms_config()['driver'], $table)
+        );
+    }
+
+    $out = [];
+    foreach ($row as $key => $value) {
+        if (isset($cache[$table][mb_strtolower((string)$key)])) {
+            $out[$key] = $value;
+        }
+    }
+
+    return $out;
+}
+
 out('=== Загрузка товаров: ' . basename($path) . ' ===');
 out($apply ? 'Режим: записываю в базу.' : 'Режим: только показываю, ничего не меняю.');
 out();
@@ -112,7 +141,7 @@ if (!empty($data['category'])) {
             $row['created_at']      = cms_now();
             $row['updated_at']      = cms_now();
 
-            $categoryId = cms_insert('categories', $row);
+            $categoryId = cms_insert('categories', import_only_columns('categories', $row));
             out('  создана, номер в фиде Яндекс.Маркета: ' . $nextYml);
         }
     }
@@ -320,6 +349,8 @@ foreach ($data['products'] as $item) {
         'article_html'   => empty($item['article']) ? null : import_article_html((array)$item['article']),
         'updated_at'     => cms_now(),
     ];
+
+    $row = import_only_columns('products', $row);
 
     if ($was) {
         cms_update('products', $row, 'id = :id', ['id' => (int)$was['id']]);
