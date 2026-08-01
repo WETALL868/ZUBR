@@ -65,6 +65,47 @@ HTACCESS);
 }
 
 /**
+ * Объясняет, почему в папку не удалось записать, и что с этим делать.
+ *
+ * «Проверьте права на папку» — совет, после которого владелец сайта ставит
+ * 777 и идёт дальше. А причина почти всегда другая: архив распаковали от
+ * root по SSH, и вся папка сайта принадлежит root, тогда как PHP работает
+ * от пользователя хостинга. Права тут ни при чём, менять нужно владельца.
+ * Поэтому сообщение называет и папку целиком, и её владельца, и от кого
+ * работает PHP, и готовую команду — чтобы не гадать.
+ */
+function upload_dir_problem(string $dir): string
+{
+    $lines = ['Не удалось сохранить файл: папка недоступна для записи.'];
+
+    $lines[] = 'Папка: ' . $dir;
+
+    if (is_dir($dir)) {
+        $mode  = substr(sprintf('%o', fileperms($dir)), -3);
+        $owner = function_exists('posix_getpwuid')
+            ? (posix_getpwuid(fileowner($dir))['name'] ?? (string)fileowner($dir))
+            : (string)fileowner($dir);
+        $lines[] = 'Сейчас: права ' . $mode . ', владелец ' . $owner . '.';
+    } else {
+        $lines[] = 'Сейчас: папки нет вовсе.';
+    }
+
+    $php = function_exists('posix_geteuid') && function_exists('posix_getpwuid')
+        ? (posix_getpwuid(posix_geteuid())['name'] ?? '')
+        : '';
+    if ($php !== '') {
+        $lines[] = 'PHP работает от пользователя ' . $php . '.';
+        $lines[] = 'Выполните на сервере: chown -R ' . $php . ':' . $php . ' ' . CMS_ROOT
+            . ' и затем chmod 775 ' . $dir;
+    } else {
+        $lines[] = 'Поставьте на папку права 775 и убедитесь, что её владелец — '
+            . 'тот же пользователь, от которого работает сайт.';
+    }
+
+    return implode(' ', $lines);
+}
+
+/**
  * Сохраняет присланный файл.
  *
  * @param array  $file  элемент $_FILES
@@ -118,7 +159,7 @@ function upload_image(array $file, string $base): array
     }
 
     if (!move_uploaded_file($tmp, $dir . '/' . $name)) {
-        return ['ok' => false, 'message' => 'Не удалось сохранить файл. Проверьте права на папку ' . UPLOAD_DIR . '.'];
+        return ['ok' => false, 'message' => upload_dir_problem($dir)];
     }
 
     @chmod($dir . '/' . $name, 0644);

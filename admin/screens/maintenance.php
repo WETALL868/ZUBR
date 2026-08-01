@@ -118,18 +118,39 @@ try {
     $checks[] = check(false, 'Связь с базой', '', 'база не отвечает: ' . $e->getMessage());
 }
 
+/*
+ * Совет «поставьте 775» сам по себе бесполезен, если папка принадлежит
+ * не тому пользователю: права не при чём, и владелец сайта будет ставить
+ * 777 по кругу. Поэтому здесь называется и владелец папки, и пользователь,
+ * от которого работает PHP: чаще всего они разошлись потому, что архив
+ * распаковали от root по SSH.
+ */
+$phpUser = function_exists('posix_geteuid') && function_exists('posix_getpwuid')
+    ? (posix_getpwuid(posix_geteuid())['name'] ?? '')
+    : '';
+
 foreach ([
     '/storage'                 => 'сюда пишутся копии и кэш',
     '/storage/backups'         => 'резервные копии',
     '/public/images/products'  => 'загрузка фотографий',
 ] as $path => $why) {
     $full = CMS_ROOT . $path;
-    $checks[] = check(
-        is_dir($full) && is_writable($full),
-        'Папка ' . $path,
-        'доступна для записи',
-        'недоступна для записи — не будет работать: ' . $why . '. Поставьте права 775.'
-    );
+    $bad  = 'недоступна для записи — не будет работать: ' . $why . '.';
+
+    if (!is_dir($full)) {
+        $bad .= ' Папки нет — создайте её.';
+    } else {
+        $owner = function_exists('posix_getpwuid')
+            ? (posix_getpwuid(fileowner($full))['name'] ?? (string)fileowner($full))
+            : (string)fileowner($full);
+        $bad .= ' Права ' . substr(sprintf('%o', fileperms($full)), -3) . ', владелец ' . $owner . '.';
+        $bad .= $phpUser !== '' && $phpUser !== $owner
+            ? ' PHP работает от ' . $phpUser . ' — сначала смените владельца:'
+                . ' chown -R ' . $phpUser . ':' . $phpUser . ' ' . CMS_ROOT . ', потом chmod 775 ' . $full
+            : ' Поставьте права 775.';
+    }
+
+    $checks[] = check(is_dir($full) && is_writable($full), 'Папка ' . $path, 'доступна для записи', $bad);
 }
 
 foreach ([
