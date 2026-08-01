@@ -97,6 +97,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
             'stock_qty'      => admin_post('stock_qty') === '' ? null : admin_post_int('stock_qty'),
             'availability'   => in_array(admin_post('availability'), ['in_stock', 'preorder', 'out_of_stock'], true)
                                     ? (string)admin_post('availability') : 'in_stock',
+            'preorder_note'  => (string)admin_post('preorder_note', '') ?: null,
             'unit'           => admin_post('unit') ?: 'шт.',
             'warranty'       => admin_post('warranty') ?: null,
             'condition_note' => admin_post('condition_note') ?: null,
@@ -409,6 +410,16 @@ require __DIR__ . '/../layout/header.php';
                   <label for="stock_qty">Остаток, шт.</label>
                   <input id="stock_qty" name="stock_qty" type="number" value="<?= e($v('stock_qty')) ?>" />
                   <p class="note">Необязательно. Пустое поле — учёт не ведётся.</p>
+                </div>
+              </div>
+              <div class="adm-cols">
+                <div class="adm-field">
+                  <label for="preorder_note">Что написать про срок поставки</label>
+                  <input id="preorder_note" name="preorder_note" type="text" value="<?= e($v('preorder_note')) ?>" placeholder="Поставка 2-3 недели после предоплаты" />
+                  <p class="note">
+                    Показывается покупателю рядом с ярлыком «Под заказ» — в каталоге,
+                    в быстром просмотре и на странице товара. У товара в наличии не показывается.
+                  </p>
                 </div>
                 <div class="adm-field">
                   <label for="unit">Единица</label>

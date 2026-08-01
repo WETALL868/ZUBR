@@ -336,6 +336,9 @@ const viewerSpecs = viewer?.querySelector(".product-dialog-specs");
 const viewerTags = viewer?.querySelector(".product-dialog-tags");
 const viewerOrder = viewer?.querySelector(".product-dialog-order");
 const viewerFullLink = viewer?.querySelector("[data-product-full-link]");
+const viewerStock = viewer?.querySelector("[data-viewer-stock]");
+const viewerStockLabel = viewer?.querySelector("[data-viewer-stock-label]");
+const viewerStockNote = viewer?.querySelector("[data-viewer-stock-note]");
 const viewerClose = viewer?.querySelector(".photo-viewer-close");
 const productCards = document.querySelectorAll(".model-card:not(.request-card)");
 const requestLinks = document.querySelectorAll(".request-link");
@@ -548,6 +551,26 @@ function openProductViewer(card, trigger, { updateHash = true } = {}) {
   clearNode(viewerPrice);
   priceNode?.childNodes.forEach((node) => viewerPrice.appendChild(node.cloneNode(true)));
   viewerLead.textContent = lead;
+
+  /*
+   * Наличие в быстром просмотре.
+   *
+   * Покупатель часто вообще не открывает страницу товара — кладёт в корзину
+   * прямо отсюда. Значит, «Под заказ» и срок поставки он должен видеть
+   * здесь же, а не узнавать от менеджера после оплаты.
+   */
+  if (viewerStock && viewerStockLabel && viewerStockNote) {
+    const stockCode = card.dataset.stock || "in_stock";
+    const stockLabel = card.dataset.stockLabel || "";
+    const stockNote = card.dataset.stockNote || "";
+
+    viewerStock.className = `product-stock stock-${stockCode}`;
+    viewerStock.hidden = stockLabel === "";
+    viewerStockLabel.textContent = stockLabel;
+    viewerStockNote.textContent = stockCode === "in_stock" ? "" : stockNote;
+    viewerStockNote.hidden = viewerStockNote.textContent === "";
+  }
+
   clearNode(viewerSpecs);
   clearNode(viewerTags);
 

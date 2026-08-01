@@ -17,6 +17,10 @@
           <p class="section-label">Карточка товара</p>
           <h3 id="product-dialog-title"></h3>
           <p class="product-dialog-price"></p>
+          <p class="product-stock" data-viewer-stock hidden>
+            <span class="product-stock-label" data-viewer-stock-label></span>
+            <span class="product-stock-note" data-viewer-stock-note></span>
+          </p>
           <p class="product-dialog-lead"></p>
           <dl class="product-dialog-specs"></dl>
           <ul class="product-dialog-tags" aria-label="Особенности модели"></ul>

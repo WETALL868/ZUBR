@@ -131,6 +131,10 @@ function cms_schema(): array
             'cost_price     {DEC}     NULL',       // закупка, покупателю не видна
             'stock_qty      {INT}     NULL',
             'availability   {STR:20}  NOT NULL DEFAULT \'in_stock\'',
+            // Что написать покупателю у товара «Под заказ»: срок поставки и
+            // условия. Пусто — показывается только сам ярлык «Под заказ», без
+            // подробностей. У товара в наличии не показывается вовсе.
+            'preorder_note  {STR:255} NULL',
             'unit           {STR:20}  NOT NULL DEFAULT \'шт.\'',
             'warranty       {STR:100} NULL',
             'condition_note {STR:100} NULL',       // «OEM, без кулера» и т.п.

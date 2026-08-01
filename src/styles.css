@@ -2268,9 +2268,18 @@ h3 {
 /* ---------------------------------------------------------------------------
    Two category entry cards directly under the hero.
 --------------------------------------------------------------------------- */
+/*
+ * Карточки категорий: сколько влезло, столько и в ряд.
+ *
+ * Раньше здесь было ровно две колонки — по числу категорий на момент, когда
+ * их было две. Третья категория вставала одна во втором ряду и занимала
+ * половину ширины, а в блоке «другая категория» на страницах категорий
+ * получалось то же самое. auto-fit решает это раз и навсегда: сколько
+ * категорий заведут в панели, столько карточек и встанет.
+ */
 .category-split {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 18px;
 }
 
@@ -3582,6 +3591,64 @@ html.has-cookie-banner body {
 .model-card > span.stock-out_of_stock {
   border-color: rgba(255, 255, 255, 0.2);
   color: var(--muted);
+}
+
+/* Товар под заказ — не «в наличии» и не «нет»: жёлтый, как предупреждение. */
+.model-card > span.stock-preorder {
+  border-color: rgba(255, 208, 90, 0.42);
+  color: var(--accent-2);
+}
+
+/* ---------------------------------------------------------------------------
+ * НАЛИЧИЕ НА СТРАНИЦЕ ТОВАРА И В БЫСТРОМ ПРОСМОТРЕ
+ *
+ * Раньше наличие показывала только карточка каталога. Покупатель, пришедший
+ * на страницу товара из поиска, видел цену и кнопку заказа — и был уверен,
+ * что товар на складе. Для позиции под заказ это прямой путь к недовольному
+ * звонку: деньги внесены, а привезут через три недели.
+ * --------------------------------------------------------------------------- */
+.product-stock {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin: -6px 0 14px;
+}
+
+.product-stock[hidden] {
+  display: none;
+}
+
+.product-stock-label {
+  padding: 5px 9px;
+  border: 1px solid rgba(82, 214, 195, 0.35);
+  border-radius: 5px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 850;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.product-stock.stock-preorder .product-stock-label {
+  border-color: rgba(255, 208, 90, 0.42);
+  color: var(--accent-2);
+}
+
+.product-stock.stock-out_of_stock .product-stock-label {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--muted);
+}
+
+.product-stock-note {
+  color: var(--soft);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.product-stock-note[hidden],
+.product-stock-note:empty {
+  display: none;
 }
 
 /* ---------------------------------------------------------------------------

@@ -23,7 +23,7 @@ $stockCode = (string)$card['availability'];
                    строка «Скидка» в оформлении заказа: выгода настоящая, взята
                    из карточки товара, а не придумана к распродаже. Пусто —
                    строки скидки не будет. */ ?>
-          <article class="model-card<?= (int)$card['is_featured'] === 1 ? ' featured' : '' ?>" id="<?= e($card['slug']) ?>" data-price="<?= e(cms_money_machine($cardPrice)) ?>"<?= $cardOld !== null ? ' data-old-price="' . e(cms_money_machine($cardOld)) . '"' : '' ?> data-unit="<?= e((string)$card['unit']) ?>" data-stock="<?= e($stockCode) ?>"<?= repo_is_orderable($card) ? '' : ' data-orderable="false"' ?>>
+          <article class="model-card<?= (int)$card['is_featured'] === 1 ? ' featured' : '' ?>" id="<?= e($card['slug']) ?>" data-price="<?= e(cms_money_machine($cardPrice)) ?>"<?= $cardOld !== null ? ' data-old-price="' . e(cms_money_machine($cardOld)) . '"' : '' ?> data-unit="<?= e((string)$card['unit']) ?>" data-stock="<?= e($stockCode) ?>" data-stock-label="<?= e(repo_stock_label($card)) ?>"<?= $stockCode !== 'in_stock' && trim((string)$card['preorder_note']) !== '' ? ' data-stock-note="' . e(trim((string)$card['preorder_note'])) . '"' : '' ?><?= repo_is_orderable($card) ? '' : ' data-orderable="false"' ?>>
             <figure class="model-photo" role="button" tabindex="0" aria-label="<?= e((string)($card['card_figure_label'] ?: 'Увеличить фото ' . $cardName)) ?>">
               <?= repo_image_tag($card, (string)($card['card_alt'] ?: $card['name']), true) ?>
 

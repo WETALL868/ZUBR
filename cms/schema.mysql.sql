@@ -97,6 +97,7 @@ CREATE TABLE IF NOT EXISTS products (
   cost_price     DECIMAL(12,2)     NULL,
   stock_qty      INT     NULL,
   availability   VARCHAR(20)  NOT NULL DEFAULT 'in_stock',
+  preorder_note  VARCHAR(255) NULL,
   unit           VARCHAR(20)  NOT NULL DEFAULT 'шт.',
   warranty       VARCHAR(100) NULL,
   condition_note VARCHAR(100) NULL,

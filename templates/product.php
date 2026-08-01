@@ -128,6 +128,24 @@ require __DIR__ . '/header.php';
           <h1><?= e((string)($product['seo_h1'] ?: $displayName)) ?></h1>
           <p class="product-dialog-price<?= $price === null ? ' price-unknown' : '' ?>"><?= e(cms_money($price)) ?><?php
             if ($oldPrice !== null): ?> <s class="price-old"><?= e(cms_money($oldPrice)) ?></s><?php endif; ?></p>
+          <?php
+            /*
+             * Наличие на странице товара.
+             *
+             * Раньше его тут не было вовсе: ярлык «Под заказ» показывался
+             * только в каталоге, а на самой странице покупатель видел цену и
+             * кнопку заказа — и был уверен, что товар лежит на складе.
+             * Для товара под заказ это прямой путь к недовольному звонку.
+             */
+            $stockCode = (string)($product['availability'] ?? 'in_stock');
+            $preorderNote = trim((string)($product['preorder_note'] ?? ''));
+          ?>
+          <p class="product-stock stock-<?= e($stockCode) ?>">
+            <span class="product-stock-label"><?= e(repo_stock_label($product)) ?></span>
+            <?php if ($stockCode !== 'in_stock' && $preorderNote !== ''): ?>
+            <span class="product-stock-note"><?= e($preorderNote) ?></span>
+            <?php endif; ?>
+          </p>
           <p class="product-dialog-lead"><?= e((string)($product['lead'] ?: $product['description'])) ?></p>
           <?php if ($params): ?>
           <dl class="product-dialog-specs">
