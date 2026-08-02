@@ -74,7 +74,15 @@ const buildCard = (doc) => {
 };
 
 const buildMain = (catalog) => {
-  const filters = catalog.categories
+  // Кнопка категории показывается, только если в ней есть документы:
+  // переключатель, который всегда приводит к пустому списку, сбивает с толку.
+  // Добавятся материалы по дорогам — кнопка «Дороги» появится сама.
+  const used = new Set(catalog.documents.map((doc) => doc.category));
+  const visibleCategories = catalog.showEmptyCategories
+    ? catalog.categories
+    : catalog.categories.filter(({ value }) => value === 'all' || used.has(value));
+
+  const filters = visibleCategories
     .map(
       ({ value, label }) =>
         `<button type="button" data-category="${escape(value)}"` +
@@ -87,11 +95,10 @@ const buildMain = (catalog) => {
 
   const notice = missing.length
     ? '<div class="privacy-note">' +
-      '<strong>Оригиналы файлов</strong>' +
-      '<p>Структура каталога и переключатели категорий работают. ' +
-      'Файлы публикуются по мере загрузки: положите их в папку ' +
-      '<code>documents/files/</code> под именами из описания проекта. ' +
-      'После загрузки у карточки автоматически появляется кнопка «Скачать».</p>' +
+      '<strong>Публикация файлов</strong>' +
+      `<p>Готовится к публикации документов: ${missing.length}. ` +
+      'Файлы появляются в каталоге по мере загрузки — у карточки ' +
+      'сразу возникает кнопка «Скачать».</p>' +
       '</div>'
     : '';
 
@@ -102,8 +109,8 @@ const buildMain = (catalog) => {
     '<div class="content-width">' +
     '<span class="eyebrow">Документы</span>' +
     '<h1>Электронный архив партнёрства</h1>' +
-    '<p>Учредительные документы, материалы по дорогам, землям общего ' +
-    'пользования, освещению и расчётам. Девять комплектов, 70 страниц.</p>' +
+    `<p>Учредительные документы партнёрства. Всего в каталоге: ` +
+    `${catalog.documents.length}.</p>` +
     '</div>' +
     '</section>' +
     '<section class="content-section content-width">' +
@@ -148,16 +155,20 @@ const main = () => {
   head = head.replace(
     /<meta name="description" content="[^"]*"\/>/,
     '<meta name="description" content="Электронный архив документов СНП «Новая Искань»: ' +
-      'учредительные документы, дороги, земли общего пользования, освещение и финансы."/>',
+      'свидетельство о государственной регистрации и устав партнёрства."/>',
   );
 
   mkdirSync(dirname(TARGET), { recursive: true });
   writeFileSync(TARGET, head + buildMain(catalog) + tail);
 
   const published = catalog.documents.filter((doc) => existsSync(join(FILES_DIR, doc.file))).length;
+  const used = new Set(catalog.documents.map((doc) => doc.category));
+  const shownCategories = catalog.showEmptyCategories
+    ? catalog.categories.length
+    : catalog.categories.filter(({ value }) => value === 'all' || used.has(value)).length;
   console.log(
-    `documents/index.html собрана: ${catalog.documents.length} комплектов, ` +
-      `${catalog.categories.length} категорий, файлов опубликовано: ${published}.`,
+    `documents/index.html собрана: документов ${catalog.documents.length}, ` +
+      `кнопок категорий ${shownCategories}, файлов опубликовано: ${published}.`,
   );
 };
 

@@ -43,9 +43,17 @@ const SITE_ENTRIES = [
   'news',
 ];
 
-/** Что дополнительно входит в полный проект. */
+/**
+ * Что дополнительно входит в полный проект.
+ *
+ * Оригиналы сканов (assets/source/documents) намеренно не включаются:
+ * они есть у владельца, а архив из-за них вырос бы втрое. Для сборки
+ * готовых PDF они нужны только один раз.
+ */
 const PROJECT_EXTRA = [
-  'assets/source',
+  'assets/source/hero-road-production.png',
+  'assets/source/novaya-iskan-logo.png',
+  'assets/source/og.png',
   'docs',
   'eslint.config.mjs',
   'package.json',

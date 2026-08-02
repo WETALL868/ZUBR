@@ -77,10 +77,15 @@ for (const { width, height, label } of WIDTHS) {
   await dismissCookies(page);
   await shot(page, `${width}-3-документы`, { fullPage: true });
 
-  // 4. Документы: выбранная категория
-  await page.click('.filter-row button[data-category="roads"]');
+  // 4. Документы: выбранная категория (берётся первая из имеющихся —
+  //    состав каталога со временем меняется)
+  const category = await page.$eval(
+    '.filter-row button[data-category]:not([data-category="all"])',
+    (button) => ({ value: button.dataset.category, label: button.textContent.trim().toLowerCase() }),
+  );
+  await page.click(`.filter-row button[data-category="${category.value}"]`);
   await page.waitForTimeout(150);
-  await shot(page, `${width}-4-документы-категория-дороги`, { fullPage: true });
+  await shot(page, `${width}-4-документы-категория-${category.label}`, { fullPage: true });
 
   // 5. Форма обращения
   await page.goto(`${site.baseUrl}/appeal`, { waitUntil: 'networkidle' });
