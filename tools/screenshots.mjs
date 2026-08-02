@@ -102,14 +102,17 @@ for (const { width, height, label } of WIDTHS) {
   await page.keyboard.press('Escape');
   await page.waitForTimeout(150);
 
-  // 7. Контакты со схемой проезда
+  // 7. Страница «Контакты» целиком: видно, где стоит схема
   await page.goto(`${site.baseUrl}/contacts`, { waitUntil: 'networkidle' });
   await dismissCookies(page);
-  const mapBlock = await page.$('.map-section');
+  await page.waitForTimeout(300);
+  await shot(page, `${width}-7-контакты-целиком`, { fullPage: true });
+
+  const mapBlock = await page.$('.contact-map-card');
   await mapBlock.scrollIntoViewIfNeeded();
   await page.waitForTimeout(400);
-  await mapBlock.screenshot({ path: join(OUT, `${width}-7-контакты-схема.png`) });
-  console.log(`  ${width}-7-контакты-схема.png`);
+  await mapBlock.screenshot({ path: join(OUT, `${width}-7б-схема-в-контактах.png`) });
+  console.log(`  ${width}-7б-схема-в-контактах.png`);
 
   // 8. Увеличенная схема
   await page.click('[data-open-map]');
@@ -129,26 +132,35 @@ for (const { width, height, label } of WIDTHS) {
   await page.keyboard.press('Escape');
   await page.waitForTimeout(200);
 
-  // 10. Футер с фотографией Оки
+  // 10. Футер: фотография Оки — его фон
   await page.goto(`${site.baseUrl}/`, { waitUntil: 'networkidle' });
   await dismissCookies(page);
-  const footer = await page.$('.footer-photo, .site-footer');
+  const footer = await page.$('.site-footer');
   await footer.scrollIntoViewIfNeeded();
+  // Фон грузится лениво — ждём, пока он окажется на экране.
+  await page.waitForFunction(() => {
+    const image = /** @type {HTMLImageElement | null} */ (
+      document.querySelector('.footer-bg img')
+    );
+    return !image || (image.complete && image.naturalWidth > 0);
+  }, { timeout: 10000 });
   await page.waitForTimeout(400);
+  await footer.screenshot({ path: join(OUT, `${width}-10-футер-ока.png`) });
+  console.log(`  ${width}-10-футер-ока.png`);
+
+  // 10б. Cookie-уведомление в углу
+  await page.goto(`${site.baseUrl}/`, { waitUntil: 'networkidle' });
   await page.evaluate(() => {
-    const photo = document.querySelector('.footer-photo');
-    const foot = document.querySelector('.site-footer');
-    if (photo && foot) {
-      const wrap = document.createElement('div');
-      wrap.id = 'footer-shot';
-      photo.parentNode.insertBefore(wrap, photo);
-      wrap.append(photo, foot);
+    try {
+      window.localStorage.removeItem('novaya-iskan-cookie-choice');
+    } catch {
+      // приватный режим
     }
   });
-  await page.waitForTimeout(200);
-  const shotArea = (await page.$('#footer-shot')) || footer;
-  await shotArea.screenshot({ path: join(OUT, `${width}-10-футер-ока.png`) });
-  console.log(`  ${width}-10-футер-ока.png`);
+  await page.reload({ waitUntil: 'networkidle' });
+  await page.waitForSelector('.cookie-banner:not([hidden])', { timeout: 5000 });
+  await page.waitForTimeout(300);
+  await shot(page, `${width}-10б-cookie-уведомление`);
 
   // 11. Мобильное меню (только на телефоне и планшете)
   if (width <= 768) {

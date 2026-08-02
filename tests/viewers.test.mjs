@@ -27,9 +27,12 @@ test('на странице «Контакты» есть блок «Как на
   const page = await site.page({ width: 1440, height: 900 });
   await page.goto(`${site.baseUrl}/contacts`, { waitUntil: 'networkidle' });
 
-  assert.equal(await page.$eval('.map-section h2', (el) => el.textContent.trim()), 'Как нас найти');
   assert.equal(
-    await page.$eval('.map-subtitle', (el) => el.textContent.trim()),
+    await page.$eval('.contact-map-head h2', (el) => el.textContent.trim()),
+    'Как нас найти',
+  );
+  assert.equal(
+    await page.$eval('.contact-map-head p', (el) => el.textContent.trim()),
     'Схема расположения и проезда к СНП «Новая Искань»',
   );
 
@@ -338,6 +341,209 @@ test('скачивание документов продолжает работ�
     assert.equal(response.status(), 200);
     const body = await response.body();
     assert.equal(body.subarray(0, 5).toString('latin1'), '%PDF-', 'скачался не PDF');
+  }
+
+  await page.context().close();
+});
+
+test('схема стоит между контактными сведениями и порядком обращения', async () => {
+  const page = await site.page({ width: 1440, height: 900 });
+  await page.goto(`${site.baseUrl}/contacts`, { waitUntil: 'networkidle' });
+
+  const order = await page.$$eval('.contact-grid > *', (items) =>
+    items.map((item) => {
+      if (item.classList.contains('contact-map-card')) return 'схема';
+      if (item.classList.contains('contact-guidance')) return 'порядок обращения';
+      return (item.querySelector('h2')?.textContent || '').trim();
+    }),
+  );
+
+  const map = order.indexOf('схема');
+  const guidance = order.indexOf('порядок обращения');
+
+  assert.ok(map > 0, 'схема не должна быть первым блоком страницы');
+  assert.ok(guidance > map, 'схема должна стоять до порядка обращения');
+  assert.equal(guidance, order.length - 1, 'порядок обращения должен идти последним');
+
+  // Схема внутри общей ширины содержимого, а не отдельной секцией.
+  const inGrid = await page.$$eval('.contact-grid .contact-map-card', (els) => els.length);
+  assert.equal(inGrid, 1, 'схема должна лежать в сетке контактов');
+
+  assert.deepEqual(page.consoleErrors, []);
+  await page.context().close();
+});
+
+test('фотография Оки — фон самого футера, отдельного блока и подписи нет', async () => {
+  for (const [width, height] of [
+    [375, 812],
+    [768, 1024],
+    [1440, 900],
+  ]) {
+    const page = await site.page({ width, height });
+    await page.goto(`${site.baseUrl}/`, { waitUntil: 'networkidle' });
+
+    const check = await page.evaluate(() => {
+      const footer = document.querySelector('footer.site-footer');
+      const picture = footer ? footer.querySelector('.footer-bg') : null;
+      const image = picture ? picture.querySelector('img') : null;
+      const inner = footer ? footer.querySelector('.footer-inner') : null;
+      const style = image ? getComputedStyle(image) : null;
+      const footerBox = footer.getBoundingClientRect();
+      const innerBox = inner.getBoundingClientRect();
+
+      return {
+        insideFooter: Boolean(image),
+        separateBlock: Boolean(document.querySelector('.footer-photo')),
+        caption: document.body.textContent.includes('Река Ока'),
+        fit: style ? style.objectFit : null,
+        currentSrc: image ? (image.currentSrc || '').split('/').pop() : null,
+        alt: image ? image.getAttribute('alt') : null,
+        // Текст футера лежит поверх фотографии, а не рядом с ней.
+        overlaps:
+          innerBox.top >= footerBox.top - 1 && innerBox.bottom <= footerBox.bottom + 1,
+        footerHeight: Math.round(footerBox.height),
+        viewportHeight: window.innerHeight,
+      };
+    });
+
+    assert.ok(check.insideFooter, `${width}px: фотография не внутри футера`);
+    assert.equal(check.separateBlock, false, `${width}px: остался отдельный блок с фотографией`);
+    assert.equal(check.caption, false, `${width}px: на странице осталась надпись «Река Ока»`);
+    assert.equal(check.fit, 'cover', `${width}px: фотография может исказиться`);
+    assert.equal(check.alt, '', 'фон должен быть скрыт от чтения с экрана');
+    assert.ok(check.overlaps, `${width}px: содержимое футера не лежит поверх фотографии`);
+    assert.ok(
+      check.footerHeight < check.viewportHeight * 1.4,
+      `${width}px: футер слишком высокий (${check.footerHeight} px)`,
+    );
+
+    await page.context().close();
+  }
+});
+
+test('футер подставляет свой кадр под каждый размер экрана', async () => {
+  const expected = [
+    [375, 'oka-footer-mobile'],
+    [900, 'oka-footer-tablet'],
+    [1440, 'oka-footer-desktop'],
+  ];
+
+  for (const [width, name] of expected) {
+    const page = await site.page({ width, height: 900 });
+    await page.goto(`${site.baseUrl}/`, { waitUntil: 'networkidle' });
+
+    // Фон футера грузится лениво: пока до него не прокрутили, браузер
+    // ещё не выбрал источник и currentSrc пуст.
+    await page.$eval('.footer-bg', (el) => el.scrollIntoView());
+    await page.waitForFunction(() => {
+      const image = /** @type {HTMLImageElement | null} */ (
+        document.querySelector('.footer-bg img')
+      );
+      return Boolean(image && image.complete && image.naturalWidth > 0 && image.currentSrc);
+    }, { timeout: 10000 });
+
+    const file = await page.$eval('.footer-bg img', (el) =>
+      /** @type {HTMLImageElement} */ (el).currentSrc.split('/').pop(),
+    );
+    assert.ok(file.startsWith(name), `ширина ${width}: подставлен ${file}, ожидался ${name}`);
+
+    await page.context().close();
+  }
+});
+
+test('ссылки футера читаются поверх фотографии', async () => {
+  const page = await site.page({ width: 375, height: 812 });
+  await page.goto(`${site.baseUrl}/`, { waitUntil: 'networkidle' });
+
+  const links = await page.$$eval('.footer-nav a, .footer-legal a', (items) =>
+    items.map((item) => {
+      const rect = item.getBoundingClientRect();
+      return {
+        text: item.textContent.trim(),
+        // Фотография не должна перехватывать нажатия по ссылкам.
+        topmost: document.elementFromPoint(
+          rect.left + rect.width / 2,
+          rect.top + rect.height / 2,
+        )?.closest('a') !== null,
+        height: rect.height,
+      };
+    }),
+  );
+
+  assert.ok(links.length > 4);
+  for (const link of links) {
+    assert.ok(link.topmost, `по ссылке «${link.text}» нельзя нажать: её перекрывает фотография`);
+    assert.ok(link.height >= 44, `ссылка «${link.text}» ниже 44 px`);
+  }
+
+  await page.context().close();
+});
+
+test('cookie-уведомление — компактная карточка, а не полоса во всю ширину', async () => {
+  const cases = [
+    { width: 1440, height: 900, maxWidth: 420, minOffset: 18 },
+    { width: 768, height: 1024, maxWidth: 420, minOffset: 18 },
+    { width: 375, height: 812, maxWidth: 360, minOffset: 10 },
+  ];
+
+  for (const { width, height, maxWidth, minOffset } of cases) {
+    const page = await site.page({ width, height });
+    await page.goto(`${site.baseUrl}/`, { waitUntil: 'networkidle' });
+    await page.waitForSelector('.cookie-banner:not([hidden])', { timeout: 5000 });
+
+    const box = await page.evaluate(() => {
+      const rect = document.querySelector('.cookie-banner').getBoundingClientRect();
+      return {
+        width: rect.width,
+        height: rect.height,
+        right: window.innerWidth - rect.right,
+        bottom: window.innerHeight - rect.bottom,
+        share: (rect.width * rect.height) / (window.innerWidth * window.innerHeight),
+      };
+    });
+
+    assert.ok(box.width <= maxWidth, `ширина ${width}: карточка ${Math.round(box.width)} px шире ${maxWidth}`);
+    assert.ok(box.right >= minOffset, `ширина ${width}: нет отступа справа`);
+    assert.ok(box.bottom >= minOffset, `ширина ${width}: нет отступа снизу`);
+    assert.ok(box.height < height * 0.5, `ширина ${width}: карточка занимает больше половины высоты`);
+    assert.ok(box.share < 0.3, `ширина ${width}: карточка закрывает ${Math.round(box.share * 100)}% экрана`);
+
+    await page.context().close();
+  }
+});
+
+test('страница под уведомлением не затемняется', async () => {
+  const page = await site.page({ width: 1440, height: 900 });
+  await page.goto(`${site.baseUrl}/`, { waitUntil: 'networkidle' });
+  await page.waitForSelector('.cookie-banner:not([hidden])', { timeout: 5000 });
+
+  // Слева от карточки должно оставаться обычное содержимое страницы.
+  const topmost = await page.evaluate(() => {
+    const element = document.elementFromPoint(200, window.innerHeight - 100);
+    return element ? element.closest('.cookie-banner') !== null : false;
+  });
+  assert.equal(topmost, false, 'уведомление перекрывает содержимое страницы');
+
+  await page.context().close();
+});
+
+test('выбор cookie запоминается и уведомление не возвращается', async () => {
+  const page = await site.page({ width: 1440, height: 900 });
+  await page.goto(`${site.baseUrl}/`, { waitUntil: 'networkidle' });
+  await page.waitForSelector('.cookie-banner:not([hidden])', { timeout: 5000 });
+
+  await page.click('.cookie-banner [data-cookie-choice]');
+  await page.waitForTimeout(150);
+  assert.equal(await page.$eval('.cookie-banner', (el) => el.hasAttribute('hidden')), true);
+
+  for (const path of ['/documents', '/contacts', '/news', '/']) {
+    await page.goto(site.baseUrl + path, { waitUntil: 'networkidle' });
+    await page.waitForTimeout(150);
+    assert.equal(
+      await page.$eval('.cookie-banner', (el) => el.hasAttribute('hidden')),
+      true,
+      `на странице ${path} уведомление появилось снова`,
+    );
   }
 
   await page.context().close();

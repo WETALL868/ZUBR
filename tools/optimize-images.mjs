@@ -26,6 +26,7 @@ const OUT_DIR = join(ROOT, 'assets', 'img');
  * @property {number} quality    качество AVIF/WebP
  * @property {boolean} [jpeg]    дополнительно собрать JPEG (для og:image)
  * @property {boolean} [png]     дополнительно собрать PNG (запасной формат)
+ * @property {boolean} [flat]    имя файла без суффикса ширины
  */
 
 /** @type {Job[]} */
@@ -55,6 +56,33 @@ const JOBS = [
     widths: [1200],
     quality: 78,
     jpeg: true,
+  },
+  // Фон футера: три готовых кадра от владельца сайта. Здесь они только
+  // сжимаются и переводятся в лёгкие форматы — кадрирование автора
+  // сохраняется без изменений.
+  {
+    source: 'oka-footer-desktop.png',
+    name: 'oka-footer-desktop',
+    widths: [1920],
+    quality: 64,
+    jpeg: true,
+    flat: true,
+  },
+  {
+    source: 'oka-footer-tablet.png',
+    name: 'oka-footer-tablet',
+    widths: [1200],
+    quality: 64,
+    jpeg: true,
+    flat: true,
+  },
+  {
+    source: 'oka-footer-mobile.png',
+    name: 'oka-footer-mobile',
+    widths: [860],
+    quality: 64,
+    jpeg: true,
+    flat: true,
   },
   {
     // Схема проезда на странице «Контакты». Качество выше обычного:
@@ -103,22 +131,25 @@ const run = async () => {
       if (width > meta.width) continue;
       const base = sharp(sourcePath).resize({ width, withoutEnlargement: true });
 
-      const avifPath = join(OUT_DIR, `${job.name}-${width}.avif`);
+      // flat: имя без ширины — файл один и называется по назначению.
+      const suffix = job.flat ? '' : `-${width}`;
+
+      const avifPath = join(OUT_DIR, `${job.name}${suffix}.avif`);
       await base.clone().avif({ quality: job.quality, effort: 6 }).toFile(avifPath);
 
-      const webpPath = join(OUT_DIR, `${job.name}-${width}.webp`);
+      const webpPath = join(OUT_DIR, `${job.name}${suffix}.webp`);
       await base.clone().webp({ quality: job.quality, effort: 6 }).toFile(webpPath);
 
       producedKb += kb(avifPath) + kb(webpPath);
 
       if (job.png) {
-        const pngPath = join(OUT_DIR, `${job.name}-${width}.png`);
+        const pngPath = join(OUT_DIR, `${job.name}${suffix}.png`);
         await base.clone().png({ compressionLevel: 9, palette: true }).toFile(pngPath);
         producedKb += kb(pngPath);
       }
 
       if (job.jpeg) {
-        const jpegPath = join(OUT_DIR, `${job.name}-${width}.jpg`);
+        const jpegPath = join(OUT_DIR, `${job.name}${suffix}.jpg`);
         await base.clone().jpeg({ quality: job.quality, mozjpeg: true }).toFile(jpegPath);
         producedKb += kb(jpegPath);
       }
