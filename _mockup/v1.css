@@ -1,0 +1,134 @@
+/* ===========================================================================
+   ВАРИАНТ 1. Компактная форма на одной странице.
+
+   Всё видно сразу, ничего не спрятано за шагами: покупатель окидывает форму
+   одним взглядом и заполняет в любом порядке. Высота уходит за счёт того, что
+   поля стоят по нескольку в ряд, а способы доставки и оплаты стали плитками
+   в сетке вместо списка во всю ширину.
+   =========================================================================== */
+
+@media (min-width: 1000px) {
+  /* Форме нужно больше места, чем текстовой колонке рядом: в ней теперь по
+     четыре поля в ряд. Текст слева ужимаем, но не убираем — он объясняет,
+     зачем заявка, и в этом смысл всей секции. */
+  .order-section {
+    grid-template-columns: minmax(0, 0.5fr) minmax(620px, 1fr);
+    gap: 36px;
+  }
+
+  /* Покупатель: четыре коротких поля в один ряд. */
+  .checkout-form > .co-section:nth-of-type(1) .co-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  /* Реквизиты организации длиннее — по три в ряд. */
+  /* Селектор длиннее, чем у правила выше, намеренно: иначе общая сетка
+     раздела «Покупатель» перебьёт его, и двадцатизначный расчётный счёт
+     не поместится в узкую колонку. */
+  .checkout-form > .co-section:nth-of-type(1) [data-customer-fields="legal"] .co-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  /* Регион и город — половина ширины, они короткие. */
+  .checkout-form > .co-section:nth-of-type(2) > .co-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 62%;
+  }
+
+  /* Оплата — по две плитки в ряд. */
+  .co-cards[data-payment-cards] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Способы доставки — плитки в ряд, сколько влезет. Одинаковая высота нужна,
+   чтобы выбор способа с длинным названием не двигал соседние блоки. */
+.co-cards[data-delivery-cards] {
+  grid-template-columns: repeat(auto-fit, minmax(136px, 1fr));
+}
+
+.co-cards[data-delivery-cards] .co-card-body {
+  min-height: 74px;
+  align-content: center;
+}
+
+.co-cards[data-payment-cards] .co-card-body {
+  min-height: 62px;
+  align-content: center;
+}
+
+/* Сводка по доставке: одна строка вместо блока из подписей. */
+.co-delivery-detail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  align-items: baseline;
+}
+
+.co-delivery-detail .co-field-label::after {
+  content: ":";
+}
+
+.co-delivery-option-title {
+  font-size: 14px;
+}
+
+/* Согласия — в один ряд, они короткие. */
+@media (min-width: 1000px) {
+  .co-consents {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .co-consents .co-error {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Итог: сумма слева, кнопка справа — одна строка вместо четырёх, и всё это
+   приклеено к низу экрана, пока покупатель заполняет форму. */
+.co-summary {
+  display: grid;
+  grid-template-areas:
+    "comment comment"
+    "totals  action";
+  grid-template-columns: minmax(0, 1fr) minmax(230px, 0.5fr);
+  gap: 8px 20px;
+  align-items: center;
+}
+
+.co-comment-toggle { grid-area: comment; justify-self: start; }
+.co-comment-box    { grid-area: comment; }
+.co-totals         { grid-area: totals; margin: 0; }
+.co-submit         { grid-area: action; margin: 0; }
+.form-note,
+.form-status       { grid-column: 1 / -1; }
+
+.co-grand dt,
+.co-grand dd {
+  font-size: 19px;
+}
+
+/* ------------------------------------------------------------------ телефон */
+
+@media (max-width: 720px) {
+  .co-summary {
+    grid-template-areas:
+      "comment"
+      "totals"
+      "action";
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  /* На телефоне поля идут в одну колонку — кроме способов доставки: две
+     плитки в ряд помещаются и экономят четыре экрана прокрутки. */
+  .co-cards[data-delivery-cards] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .co-cards[data-delivery-cards] .co-card-body {
+    min-height: 78px;
+  }
+}

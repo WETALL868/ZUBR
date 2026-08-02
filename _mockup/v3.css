@@ -1,0 +1,157 @@
+/* ===========================================================================
+   ВАРИАНТ 3. Складывающиеся разделы.
+
+   Свёрнутый раздел — одна строка: название и то, что в нём выбрано. Три
+   строки вместо трёх экранов, при этом любой раздел открывается одним
+   нажатием, без прохода по шагам.
+   =========================================================================== */
+
+.co-acc {
+  gap: 0;
+  border: 1px solid rgba(120, 140, 135, 0.3);
+  border-radius: 9px;
+  background: rgba(14, 19, 18, 0.72);
+  overflow: hidden;
+}
+
+.co-acc + .co-acc {
+  margin-top: -4px;
+}
+
+/* --------------------------------------------------------------- заголовок */
+
+.co-acc-head {
+  display: grid;
+  grid-template-columns: minmax(96px, auto) minmax(0, 1fr) 20px;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  margin: 0;
+  padding: 13px 14px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.co-acc-head:hover {
+  background: rgba(79, 244, 224, 0.06);
+}
+
+.co-acc-name {
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.co-acc-recap {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.co-acc.is-filled .co-acc-recap {
+  color: var(--accent-2);
+}
+
+.co-acc.is-open .co-acc-recap {
+  visibility: hidden;
+}
+
+.co-acc-caret {
+  justify-self: end;
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
+  transform: rotate(45deg) translate(-2px, -2px);
+  transition: transform 0.18s ease;
+}
+
+.co-acc.is-open .co-acc-caret {
+  transform: rotate(-135deg) translate(-3px, -3px);
+}
+
+/* Заполненный раздел помечается слева зелёной полосой — видно, что сделано. */
+.co-acc.is-filled {
+  border-left: 3px solid var(--accent-2);
+}
+
+.co-acc.is-open {
+  border-color: rgba(82, 214, 195, 0.5);
+  background: rgba(16, 24, 22, 0.92);
+}
+
+/* ------------------------------------------------------------- содержимое */
+
+.co-acc-body {
+  display: grid;
+  gap: 10px;
+  padding: 0 14px 14px;
+}
+
+.co-acc-body[hidden] {
+  display: none;
+}
+
+.co-acc-done {
+  justify-self: start;
+  min-height: 42px;
+  margin: 2px 0 0;
+  padding: 9px 26px;
+}
+
+@media (min-width: 900px) {
+  .checkout-form > .co-section:nth-of-type(1) .co-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Селектор длиннее, чем у правила выше, намеренно: иначе общая сетка
+     раздела «Покупатель» перебьёт его, и двадцатизначный расчётный счёт
+     не поместится в узкую колонку. */
+  .checkout-form > .co-section:nth-of-type(1) [data-customer-fields="legal"] .co-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .co-cards[data-delivery-cards] {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+
+  .co-cards[data-payment-cards] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.co-cards[data-delivery-cards] .co-card-body {
+  min-height: 72px;
+  align-content: center;
+}
+
+/* ------------------------------------------------------------------ телефон */
+
+@media (max-width: 720px) {
+  .co-acc-head {
+    grid-template-columns: minmax(0, 1fr) 16px;
+    grid-template-areas:
+      "name  caret"
+      "recap recap";
+    gap: 3px 10px;
+    padding: 11px 12px;
+  }
+
+  .co-acc-name { grid-area: name; }
+  .co-acc-recap { grid-area: recap; white-space: normal; }
+  .co-acc-caret { grid-area: caret; align-self: center; }
+
+  .co-cards[data-delivery-cards] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .co-acc-done {
+    justify-self: stretch;
+  }
+}

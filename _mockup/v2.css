@@ -1,0 +1,232 @@
+/* ===========================================================================
+   ВАРИАНТ 2. Пошаговое оформление.
+
+   На экране всегда один раздел, поэтому форма занимает примерно один экран
+   на любом шаге и на любом устройстве. Побочный выигрыш: высота секции почти
+   не меняется, и фону просто нечего пересчитывать.
+   =========================================================================== */
+
+.co-step-hidden {
+  display: none !important;
+}
+
+/* Минимальная высота: шаги разной длины не должны дёргать страницу вверх-вниз
+   при переходе. Берём по самому длинному — реквизитам организации. */
+.checkout-form {
+  min-height: 620px;
+  align-content: start;
+}
+
+/* ------------------------------------------------------------ полоса шагов */
+
+.co-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0 0 4px;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.co-step {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  padding: 9px 8px;
+  border: 1px solid rgba(120, 140, 135, 0.34);
+  border-bottom-width: 2px;
+  border-radius: 7px;
+  background: rgba(20, 26, 24, 0.72);
+  color: var(--muted);
+  cursor: default;
+  font-size: 12px;
+  font-weight: 800;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.co-step-num {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid currentcolor;
+  border-radius: 50%;
+  font-size: 12px;
+}
+
+.co-step-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.co-step.is-done {
+  border-color: rgba(82, 214, 195, 0.5);
+  color: var(--accent-2);
+  cursor: pointer;
+}
+
+.co-step.is-done .co-step-num {
+  border-color: var(--accent-2);
+}
+
+.co-step.is-current {
+  border-color: var(--accent);
+  border-bottom-color: var(--accent);
+  background: rgba(79, 244, 224, 0.12);
+  color: var(--ink);
+}
+
+.co-step.is-current .co-step-num {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #05201c;
+}
+
+/* --------------------------------------------------------- поля внутри шага */
+
+@media (min-width: 900px) {
+  .checkout-form > .co-section:nth-of-type(1) .co-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Селектор длиннее, чем у правила выше, намеренно: иначе общая сетка
+     раздела «Покупатель» перебьёт его, и двадцатизначный расчётный счёт
+     не поместится в узкую колонку. */
+  .checkout-form > .co-section:nth-of-type(1) [data-customer-fields="legal"] .co-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .co-cards[data-delivery-cards] {
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  }
+
+  .co-cards[data-payment-cards] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.co-cards[data-delivery-cards] .co-card-body {
+  min-height: 74px;
+  align-content: center;
+}
+
+/* ------------------------------------------------------ сводка перед оплатой */
+
+.co-recap {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(82, 214, 195, 0.28);
+  border-radius: 8px;
+  background: rgba(7, 9, 7, 0.55);
+}
+
+.co-recap > div {
+  display: grid;
+  grid-template-columns: 116px minmax(0, 1fr);
+  gap: 10px;
+  align-items: baseline;
+}
+
+.co-recap dt {
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.co-recap dd {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* ------------------------------------------------------------ нижняя полоса */
+
+.co-stepbar {
+  position: sticky;
+  bottom: 0;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  margin-top: 4px;
+  padding: 10px 12px;
+  border: 1px solid rgba(82, 214, 195, 0.34);
+  border-radius: 9px;
+  background: rgba(9, 13, 12, 0.97);
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.co-stepbar .button {
+  min-height: 44px;
+  margin: 0;
+  padding: 10px 22px;
+}
+
+.co-stepbar-total {
+  color: var(--accent);
+  font-size: 15px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.co-stepbar .button[hidden] {
+  display: none;
+}
+
+.co-back[disabled] {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* На последнем шаге кнопка «Далее» не нужна: подтверждает сам «Подтвердить
+   заказ» в блоке итога. */
+.co-stepbar.is-last {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+/* Итог на последнем шаге больше не липкий — он и так на экране. */
+.co-summary {
+  position: static;
+  box-shadow: none;
+}
+
+@media (max-width: 720px) {
+  .co-steps {
+    gap: 4px;
+  }
+
+  .co-step {
+    flex-direction: column;
+    gap: 4px;
+    padding: 7px 4px;
+    font-size: 10.5px;
+    text-align: center;
+  }
+
+  .co-step-name {
+    white-space: normal;
+  }
+
+  .co-stepbar {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "total total"
+      "back  next";
+    gap: 8px;
+  }
+
+  .co-stepbar-total { grid-area: total; }
+  .co-back { grid-area: back; }
+  .co-next { grid-area: next; }
+
+  .co-cards[data-delivery-cards] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

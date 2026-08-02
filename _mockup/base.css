@@ -1,0 +1,310 @@
+/* ===========================================================================
+   МАКЕТ. Общая часть для всех трёх вариантов.
+   Здесь лежит то, что нужно исправить в любом случае, независимо от того,
+   какую компоновку вы выберете: фон, переключатель, плотность, скрытые поля.
+   =========================================================================== */
+
+/* --------------------------------------------------------------- 1. ФОН ---
+   Причина скачков: .order-section::before растянут на всю высоту секции
+   (inset: 0 ...), а картинка задана как cover. cover масштабирует картинку по
+   большей из двух сторон — а здесь всегда по высоте, потому что секция в
+   2-3 раза выше, чем позволяет пропорция снимка. Значит размер картинки на
+   экране целиком определяется высотой формы: появилось поле — картинка
+   выросла, скрылось — уменьшилась.
+
+   Замеры на текущей версии:
+     физ. лицо  секция 2387 px -> снимок отрисован 4246 x 2387
+     юр. лицо   секция 2752 px -> снимок отрисован 4895 x 2752   (+15 %)
+     телефон физ 3346 px -> 5948 x 3346, юр 3886 px -> 6908 x 3886 (+16 %)
+
+   Лечение: размер снимка привязан к ШИРИНЕ слоя, а ширина у него всегда равна
+   ширине окна и от формы не зависит. Высоту снимок больше не слушает вовсе,
+   поэтому переключения его не трогают. Низ гасится градиентом, чтобы не было
+   видно, где снимок заканчивается. */
+
+.order-section {
+  /* Доля высоты снимка от его ширины: 1012 / 1800. Ниже она нужна дважды. */
+  --bg-ratio: 0.5622;
+}
+
+.order-section::before {
+  /* Слой фона прибит к верху секции и имеет СВОЮ высоту — ровно ту, в которую
+     снимок укладывается целиком по его собственной пропорции. Высота секции
+     на слой больше не влияет никак: ни на снимок, ни на затемняющий градиент
+     поверх него. Ниже слоя идёт обычный тёмный фон страницы, и градиент
+     доведён до него вплотную, поэтому границы не видно. */
+  bottom: auto;
+  /* На широком экране снимок укладывается целиком по своей пропорции; на
+     телефоне такая полоса была бы всего 224 px высотой, поэтому снизу стоит
+     ограничение. И то и другое зависит только от ширины окна — от содержимого
+     формы высота слоя не зависит ни в одном из случаев. */
+  height: clamp(360px, calc(100vw * var(--bg-ratio)), 920px);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(7, 9, 7, 0.80) 0%,
+      rgba(7, 9, 7, 0.58) 22%,
+      rgba(7, 9, 7, 0.72) 55%,
+      rgba(7, 9, 7, 0.94) 84%,
+      rgb(7, 9, 7) 100%
+    ),
+    url("/public/assets/bg-final-order.webp") center top / cover no-repeat;
+  opacity: 0.82;
+}
+
+/* ------------------------------------------------------- 2. ПЕРЕКЛЮЧАТЕЛЬ ---
+   Было: невыбранная половина — просто серый текст на тёмном, границы нет.
+   Стало: обе половины выглядят кнопками, у выбранной заливка акцентом.
+   Ширина половин одинаковая и фиксированная, поэтому при переключении
+   переключатель не меняет размер и соседние блоки не дёргаются. */
+
+.co-switch {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(140px, 1fr));
+  gap: 6px;
+  width: fit-content;
+  max-width: 100%;
+  padding: 5px;
+  border: 1px solid rgba(82, 214, 195, 0.34);
+  border-radius: 10px;
+  background: rgba(7, 9, 7, 0.62);
+}
+
+.co-switch-option span {
+  min-height: 42px;
+  padding: 9px 18px;
+  border: 1px solid rgba(120, 140, 135, 0.42);
+  border-radius: 7px;
+  background: rgba(20, 26, 24, 0.9);
+  color: var(--ink);
+  font-size: 15px;
+  transition: background 0.14s ease, color 0.14s ease, border-color 0.14s ease;
+}
+
+.co-switch-option:hover span {
+  border-color: rgba(82, 214, 195, 0.6);
+}
+
+.co-switch-option.is-active span {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #05201c;
+  box-shadow: 0 0 0 1px var(--accent) inset;
+}
+
+/* ------------------------------------------------------ 3. СКРЫТЫЕ ПОЛЯ ---
+   Найдено при разборе: .co-field { display: grid } перебивает служебное
+   правило браузера [hidden] { display: none }, поэтому атрибут hidden на
+   поле адреса ничего не делал — «Улица, дом, квартира» показывалась даже
+   при самовывозе, и звёздочка обязательности вместе с ней. */
+
+.co-field[hidden],
+.co-grid[hidden],
+.co-cards[hidden] {
+  display: none;
+}
+
+/* ------------------------------------------------------------ 4. ПЛОТНОСТЬ */
+
+.checkout-form {
+  gap: 14px;
+  padding: 18px;
+}
+
+.co-section {
+  gap: 10px;
+}
+
+.co-title {
+  margin: 0;
+  font-size: 19px;
+}
+
+.co-grid {
+  gap: 10px 12px;
+}
+
+.co-field {
+  gap: 4px;
+}
+
+.co-field label,
+.co-field-label {
+  font-size: 13px;
+}
+
+.checkout-form input[type="text"],
+.checkout-form input[type="tel"],
+.checkout-form input[type="email"],
+.checkout-form select,
+.checkout-form textarea {
+  padding: 9px 11px;
+  font-size: 15px;
+}
+
+.checkout-form textarea {
+  min-height: 62px;
+}
+
+.co-cards {
+  gap: 8px;
+}
+
+.co-card-body {
+  gap: 2px;
+  padding: 10px 12px;
+}
+
+.co-card-body strong {
+  font-size: 14px;
+}
+
+.co-card-body em {
+  font-size: 12.5px;
+}
+
+.co-consents {
+  gap: 6px;
+}
+
+.consent-label {
+  padding: 8px 10px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.co-totals {
+  gap: 4px;
+}
+
+/* Когда поля стоят в ряд, подписи разной длины съезжают на две строки и
+   поля перестают выстраиваться по одной линии. Резервируем под подпись две
+   строки — ряд выглядит ровным, а не рваным. */
+@media (min-width: 1000px) {
+  .co-grid > .co-field > label {
+    display: flex;
+    align-items: flex-end;
+    min-height: 2.5em;
+  }
+}
+
+/* Подсказка под полем — мелкая и приглушённая, чтобы не спорила с подписью. */
+.co-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+/* ------------------------------------------------- 5. ДОСТАВКА КОМПАКТНЕЕ ---
+   Способы доставки — плитки одинаковой высоты, выбранная выделена рамкой,
+   заливкой и галочкой. Высота плиток задана, поэтому выбор способа с более
+   длинным названием не меняет высоту блока. */
+
+.co-cards[data-delivery-cards] {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.co-card input:checked + .co-card-body {
+  border-color: var(--accent);
+  background: rgba(79, 244, 224, 0.1);
+}
+
+.co-card input:checked + .co-card-body::after {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  color: var(--accent);
+  content: "✓";
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.co-card-body {
+  position: relative;
+}
+
+/* Сводка по доставке — одной строкой вместо списка определений. */
+.co-delivery-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 0;
+  padding: 8px 11px;
+  border: 1px solid rgba(82, 214, 195, 0.2);
+  border-radius: 7px;
+  background: rgba(7, 9, 7, 0.42);
+  font-size: 13px;
+}
+
+.co-delivery-summary > div {
+  display: flex;
+  gap: 7px;
+  align-items: baseline;
+}
+
+.co-delivery-summary dt,
+.co-delivery-summary dd {
+  margin: 0;
+}
+
+.co-delivery-detail {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+/* -------------------------------------------------------- 6. ИТОГ ПОД РУКОЙ
+   Итог и кнопка не уезжают за экран: на телефоне полоса приклеена к низу
+   окна, на компьютере — к низу колонки с формой. */
+
+.co-summary {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  padding: 12px 14px;
+  border: 1px solid rgba(82, 214, 195, 0.34);
+  border-radius: 9px;
+  background: rgba(9, 13, 12, 0.97);
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+}
+
+.co-submit {
+  width: 100%;
+  min-height: 46px;
+}
+
+.form-note {
+  margin: 6px 0 0;
+  font-size: 12px;
+}
+
+/* ------------------------------------------------------------- служебное */
+
+.mockup-main {
+  padding-top: 0;
+}
+
+.mockup-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  align-items: center;
+  margin: 0 0 8px;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(82, 214, 195, 0.28);
+  background: rgba(255, 208, 90, 0.1);
+  font-size: 13px;
+}
+
+.mockup-bar nav {
+  display: flex;
+  gap: 12px;
+  margin-left: auto;
+}
+
+.mockup-bar a {
+  color: var(--accent);
+  font-weight: 800;
+}
