@@ -209,7 +209,8 @@ test('без согласий обращение не принимается', a
     return { status: result.status, payload: await result.json() };
   }, site.baseUrl);
 
-  assert.equal(response.status, 422);
+  // Неверные данные — 400, как требует описание API.
+  assert.equal(response.status, 400);
   assert.equal(response.payload.ok, false);
   assert.equal(saved().length, before);
   await page.context().close();

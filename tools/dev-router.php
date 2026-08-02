@@ -16,6 +16,19 @@ if (str_contains($path, '..') || preg_match('#^/_private(/|$)#', $path)) {
     exit('403 Forbidden');
 }
 
+/**
+ * Постоянные перенаправления. Повторяют правила из .htaccess,
+ * чтобы локальная проверка совпадала с поведением на хостинге.
+ */
+$redirects = [
+    '/infrastructure' => '/documents',
+    '/infrastructure/' => '/documents',
+];
+if (isset($redirects[$path])) {
+    header('Location: ' . $redirects[$path], true, 301);
+    return true;
+}
+
 $target = $root . str_replace('/', DIRECTORY_SEPARATOR, $path);
 
 if (is_dir($target)) {

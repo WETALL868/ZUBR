@@ -63,6 +63,12 @@ Options -Indexes
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
+
+  # Устаревший раздел «Дороги и инфраструктура» убран с сайта.
+  # Старый адрес мог остаться в закладках и поисковой выдаче,
+  # поэтому он не отдаёт 404, а ведёт в актуальный раздел документов.
+  RewriteRule ^infrastructure/?$ /documents [R=301,L]
+
   # Папки разработки на хостинге не нужны, но если попадут — закрыты.
   RewriteRule ^(tools|tests|node_modules|assets/source)/ - [F,L]
 </IfModule>

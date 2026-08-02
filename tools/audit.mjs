@@ -15,7 +15,6 @@ const PAGES = [
   ['/documents', 'Документы'],
   ['/meetings', 'Собрания'],
   ['/contacts', 'Контакты'],
-  ['/infrastructure', 'Инфраструктура'],
   ['/appeal', 'Форма обращения'],
   ['/legal/privacy', 'Политика'],
   ['/legal/cookies', 'Cookie'],

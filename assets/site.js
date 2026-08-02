@@ -240,8 +240,251 @@
   };
 
   /* ================================================================ *
+   * 3.5. Общее поведение больших окон
+   *
+   * Одинаково работает и для схемы проезда, и для просмотра документа:
+   * Escape закрывает окно средствами самого <dialog>, нажатие по
+   * затемнённому фону — вручную, фокус возвращается на элемент,
+   * с которого окно открыли.
+   * ================================================================ */
+
+  /**
+   * @param {HTMLDialogElement} dialog
+   */
+  const setupDialog = (dialog) => {
+    for (const closer of dialog.querySelectorAll('[data-close-modal]')) {
+      closer.addEventListener('click', () => dialog.close());
+    }
+
+    // Нажатие по затемнённому фону: клик приходит на сам <dialog>,
+    // а не на его содержимое, поэтому сравниваем цель события.
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+
+    // Запасной путь для браузеров без showModal(): там Escape
+    // и фон обрабатываются вручную.
+    document.addEventListener('keydown', (event) => {
+      if (
+        event.key === 'Escape' &&
+        dialog.hasAttribute('open') &&
+        dialog.classList.contains('modal-fallback')
+      ) {
+        event.preventDefault();
+        closeDialogElement(dialog);
+      }
+    });
+  };
+
+  /**
+   * @param {HTMLDialogElement} dialog
+   */
+  const openDialogElement = (dialog) => {
+    if (typeof dialog.showModal === 'function') {
+      dialog.showModal();
+    } else {
+      dialog.classList.add('modal-fallback');
+      dialog.setAttribute('open', '');
+    }
+  };
+
+  /**
+   * @param {HTMLDialogElement} dialog
+   */
+  const closeDialogElement = (dialog) => {
+    if (typeof dialog.close === 'function' && dialog.open) dialog.close();
+    else dialog.removeAttribute('open');
+    dialog.classList.remove('modal-fallback');
+  };
+
+  /* ================================================================ *
+   * 3.6. Схема проезда крупнее
+   * ================================================================ */
+
+  const setupMap = () => {
+    const dialog = /** @type {HTMLDialogElement | null} */ (document.querySelector('#map-modal'));
+    const openers = document.querySelectorAll('[data-open-map]');
+    if (!dialog || !openers.length) return;
+
+    setupDialog(dialog);
+
+    for (const opener of openers) {
+      opener.addEventListener('click', () => {
+        openDialogElement(dialog);
+        const close = dialog.querySelector('[data-close-modal]');
+        if (close instanceof HTMLElement) close.focus();
+      });
+    }
+
+    // Штатный <dialog> сам возвращает фокус на элемент, с которого его
+    // открыли; в запасном режиме это делается вручную.
+    dialog.addEventListener('close', () => {
+      const opener = document.querySelector('[data-open-map]');
+      if (opener instanceof HTMLElement) opener.focus();
+    });
+  };
+
+  /* ================================================================ *
+   * 3.7. Просмотр документа
+   * ================================================================ */
+
+  const setupDocumentViewer = () => {
+    const dialog = /** @type {HTMLDialogElement | null} */ (
+      document.querySelector('#document-viewer')
+    );
+    const buttons = document.querySelectorAll('[data-view-document]');
+    if (!dialog || !buttons.length) return;
+
+    const title = dialog.querySelector('#document-viewer-title');
+    const body = dialog.querySelector('[data-viewer-body]');
+    const actions = dialog.querySelector('[data-viewer-actions]');
+    const closeButton = dialog.querySelector('[data-close-modal]');
+
+    /**
+     * Ссылки действий создаются при открытии документа и удаляются
+     * при закрытии: держать в разметке заготовки с href="#" нельзя,
+     * это переход в никуда.
+     * @param {string} file
+     */
+    const buildActions = (file) => {
+      if (!actions) return;
+      for (const stale of actions.querySelectorAll('a')) stale.remove();
+
+      const download = document.createElement('a');
+      download.href = file;
+      download.setAttribute('download', '');
+      download.dataset.viewerDownload = '';
+      download.textContent = 'Скачать';
+
+      const tab = document.createElement('a');
+      tab.href = file;
+      tab.target = '_blank';
+      tab.rel = 'noopener';
+      tab.dataset.viewerTab = '';
+      tab.textContent = 'Открыть в новой вкладке';
+
+      actions.prepend(download, tab);
+    };
+
+    /** Элемент, с которого открыли окно: на него возвращается фокус. */
+    let lastOpener = null;
+
+    setupDialog(dialog);
+
+    dialog.addEventListener('close', () => {
+      // Тяжёлый PDF выгружается, чтобы не висел в памяти после закрытия.
+      if (body) body.innerHTML = '';
+      if (actions) for (const stale of actions.querySelectorAll('a')) stale.remove();
+      if (lastOpener instanceof HTMLElement) lastOpener.focus();
+    });
+
+    /**
+     * Сообщение вместо просмотра: когда браузер не умеет показывать PDF
+     * внутри страницы или файл не открылся.
+     * @param {string} heading
+     * @param {string} text
+     * @param {string} file
+     */
+    const showNotice = (heading, text, file) => {
+      if (!body) return;
+      body.innerHTML = '';
+
+      const notice = document.createElement('p');
+      notice.className = 'viewer-notice';
+
+      const strong = document.createElement('strong');
+      strong.textContent = heading;
+      notice.append(strong, document.createTextNode(text));
+
+      const link = document.createElement('a');
+      link.className = 'button button-gold';
+      link.href = file;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.textContent = 'Открыть в новой вкладке';
+      notice.append(document.createElement('br'), link);
+
+      body.append(notice);
+    };
+
+    for (const button of buttons) {
+      button.addEventListener('click', async () => {
+        const file = button.getAttribute('data-file');
+        const name = button.getAttribute('data-title') || 'Документ';
+        if (!file) return;
+
+        lastOpener = button;
+        if (title) title.textContent = name;
+        buildActions(file);
+        if (body) body.innerHTML = '';
+
+        openDialogElement(dialog);
+        if (closeButton instanceof HTMLElement) closeButton.focus();
+
+        // Файл проверяется до показа: встроенный просмотр не сообщает
+        // об ошибке сам, и посетитель увидел бы пустое серое окно.
+        let available = false;
+        try {
+          const response = await fetch(file, { method: 'HEAD' });
+          available = response.ok && (response.headers.get('content-type') || '').includes('pdf');
+          if (!response.ok) {
+            showNotice(
+              'Документ не открылся',
+              ` Сервер ответил кодом ${response.status}. Попробуйте скачать файл или сообщите администратору.`,
+              file,
+            );
+            return;
+          }
+        } catch {
+          showNotice(
+            'Документ не открылся',
+            ' Не удалось связаться с сервером. Проверьте подключение и попробуйте ещё раз.',
+            file,
+          );
+          return;
+        }
+
+        // Часть телефонов не умеет показывать PDF внутри страницы.
+        // Показывать пустую рамку вместо документа нельзя — вместо этого
+        // предлагается открыть файл отдельной вкладкой.
+        if (navigator.pdfViewerEnabled === false) {
+          showNotice(
+            'Просмотр внутри страницы недоступен',
+            ' Браузер не умеет показывать PDF на странице. Документ откроется отдельной вкладкой.',
+            file,
+          );
+          return;
+        }
+
+        if (!available || !body) return;
+
+        const frame = document.createElement('iframe');
+        frame.className = 'viewer-frame';
+        // Документ открывается с первой страницы и вписывается в окно
+        // целиком: FitH растягивал страницу по ширине, и посетитель
+        // видел увеличенный угол вместо всего листа.
+        frame.src = `${file}#page=1&view=Fit`;
+        frame.title = name;
+        body.innerHTML = '';
+        body.append(frame);
+      });
+    }
+  };
+
+  /* ================================================================ *
    * 4. Отправка обращения
    * ================================================================ */
+
+  /** Предел размера вложения — тот же, что проверяет сервер. */
+  const MAX_ATTACHMENT_BYTES = 5 * 1024 * 1024;
+
+  /**
+   * Текст для случая, когда сервер ответил не JSON. Техническое
+   * «Unexpected token '<'» посетителю показывать нельзя.
+   */
+  const UNEXPECTED_ANSWER =
+    'Не удалось отправить обращение. Сервер вернул некорректный ответ. ' +
+    'Попробуйте ещё раз или сообщите администратору.';
 
   const setupAppealForm = () => {
     const form = /** @type {HTMLFormElement | null} */ (document.querySelector('.appeal-form'));
@@ -322,6 +565,66 @@
       });
     }
 
+    /**
+     * Проверка вложения на стороне браузера — до отправки, чтобы не гонять
+     * лишние мегабайты по мобильной сети. Те же правила повторно проверяет
+     * сервер: на клиентскую проверку полагаться нельзя.
+     */
+    const checkAttachment = () => {
+      const field = /** @type {HTMLInputElement | null} */ (
+        form.querySelector('input[type="file"][name="attachment"]')
+      );
+      const file = field && field.files && field.files[0];
+      if (!file) return null;
+
+      const allowed = ['application/pdf', 'image/jpeg', 'image/png'];
+      const byExtension = /\.(pdf|jpe?g|png)$/i.test(file.name);
+      if (file.type && !allowed.includes(file.type) && !byExtension) {
+        return 'Разрешены только PDF, JPG и PNG.';
+      }
+      if (file.size > MAX_ATTACHMENT_BYTES) {
+        const size = (file.size / 1024 / 1024).toFixed(1);
+        return `Файл весит ${size} МБ. Размер вложения не должен превышать 5 МБ.`;
+      }
+      if (file.size === 0) return 'Выбранный файл пустой.';
+      return null;
+    };
+
+    /**
+     * Разбор ответа сервера.
+     *
+     * Вызывать response.json() безусловно нельзя: если сервер по какой-то
+     * причине вернёт HTML (страница ошибки хостинга, перенаправление на
+     * вход), разбор упадёт с техническим текстом вида
+     * «Unexpected token '<'», непонятным посетителю.
+     *
+     * @param {Response} response
+     * @returns {Promise<{ ok?: boolean, appealNumber?: string, publicId?: string, error?: string }>}
+     */
+    const readAnswer = async (response) => {
+      const type = (response.headers.get('content-type') || '').toLowerCase();
+      const body = (await response.text()).trim();
+
+      if (!type.includes('application/json')) {
+        // Сервер ответил не тем форматом — показываем понятную причину
+        // и оставляем подробности в консоли для разбора.
+        console.error(
+          `Ответ от ${response.url}: статус ${response.status}, тип «${type || 'не указан'}».`,
+          body.slice(0, 300),
+        );
+        throw new Error(UNEXPECTED_ANSWER);
+      }
+
+      if (body === '') throw new Error(UNEXPECTED_ANSWER);
+
+      try {
+        return JSON.parse(body);
+      } catch {
+        console.error(`Не удалось разобрать ответ от ${response.url}:`, body.slice(0, 300));
+        throw new Error(UNEXPECTED_ANSWER);
+      }
+    };
+
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
 
@@ -330,41 +633,46 @@
       if (sending) return;
       if (!form.reportValidity()) return;
 
+      const previousAlert = form.querySelector('.simple-alert');
+      if (previousAlert) previousAlert.remove();
+
+      const attachmentProblem = checkAttachment();
+      if (attachmentProblem) {
+        showAlert(attachmentProblem, 'error');
+        return;
+      }
+
       sending = true;
       const previousLabel = button ? button.textContent : '';
       if (button) {
         button.disabled = true;
         button.setAttribute('aria-busy', 'true');
-        button.textContent = 'Отправка…';
+        button.textContent = 'Отправляем…';
       }
 
-      const previousAlert = form.querySelector('.simple-alert');
-      if (previousAlert) previousAlert.remove();
-
       try {
+        // Content-Type для multipart/form-data выставляет сам браузер:
+        // он добавляет границу разделителя, вручную его задавать нельзя.
         const response = await fetch(form.action, {
           method: 'POST',
           body: new FormData(form),
           headers: { Accept: 'application/json' },
         });
 
-        /** @type {{ ok?: boolean, publicId?: string, error?: string }} */
-        let payload = {};
-        try {
-          payload = await response.json();
-        } catch {
-          throw new Error('Сервер вернул неожиданный ответ. Попробуйте позже.');
-        }
+        const payload = await readAnswer(response);
+        const number = payload.appealNumber || payload.publicId;
 
         // Окно успеха показывается только после реального сохранения.
-        if (!response.ok || !payload.ok || !payload.publicId) {
+        if (!response.ok || !payload.ok || !number) {
           throw new Error(payload.error || 'Не удалось отправить обращение.');
         }
 
         // Форма очищается только после подтверждённого сохранения на сервере.
         form.reset();
-        openDialog(payload.publicId);
+        openDialog(number);
       } catch (error) {
+        // При ошибке введённые данные остаются на месте: посетитель
+        // может исправить одно поле и отправить снова.
         showAlert(
           error instanceof Error ? error.message : 'Не удалось отправить обращение.',
           'error',
@@ -390,6 +698,8 @@
       setupFilterGroup(/** @type {HTMLElement} */ (group));
     }
     setupCookieBanner();
+    setupMap();
+    setupDocumentViewer();
     setupAppealForm();
   };
 

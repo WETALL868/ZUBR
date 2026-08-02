@@ -102,20 +102,61 @@ for (const { width, height, label } of WIDTHS) {
   await page.keyboard.press('Escape');
   await page.waitForTimeout(150);
 
-  // 7. Футер
+  // 7. Контакты со схемой проезда
+  await page.goto(`${site.baseUrl}/contacts`, { waitUntil: 'networkidle' });
+  await dismissCookies(page);
+  const mapBlock = await page.$('.map-section');
+  await mapBlock.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(400);
+  await mapBlock.screenshot({ path: join(OUT, `${width}-7-контакты-схема.png`) });
+  console.log(`  ${width}-7-контакты-схема.png`);
+
+  // 8. Увеличенная схема
+  await page.click('[data-open-map]');
+  await page.waitForTimeout(500);
+  await shot(page, `${width}-8-схема-увеличенная`);
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(200);
+
+  // 9. Просмотр документа
+  await page.goto(`${site.baseUrl}/documents`, { waitUntil: 'networkidle' });
+  await dismissCookies(page);
+  await page.click('[data-view-document]');
+  await page.waitForSelector('#document-viewer[open]', { timeout: 10000 });
+  // Встроенному просмотрщику нужно время на отрисовку первой страницы.
+  await page.waitForTimeout(2500);
+  await shot(page, `${width}-9-просмотр-документа`);
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(200);
+
+  // 10. Футер с фотографией Оки
   await page.goto(`${site.baseUrl}/`, { waitUntil: 'networkidle' });
   await dismissCookies(page);
   const footer = await page.$('.footer-photo, .site-footer');
   await footer.scrollIntoViewIfNeeded();
-  await page.waitForTimeout(300);
-  await footer.screenshot({ path: join(OUT, `${width}-7-футер.png`) });
-  console.log(`  ${width}-7-футер.png`);
+  await page.waitForTimeout(400);
+  await page.evaluate(() => {
+    const photo = document.querySelector('.footer-photo');
+    const foot = document.querySelector('.site-footer');
+    if (photo && foot) {
+      const wrap = document.createElement('div');
+      wrap.id = 'footer-shot';
+      photo.parentNode.insertBefore(wrap, photo);
+      wrap.append(photo, foot);
+    }
+  });
+  await page.waitForTimeout(200);
+  const shotArea = (await page.$('#footer-shot')) || footer;
+  await shotArea.screenshot({ path: join(OUT, `${width}-10-футер-ока.png`) });
+  console.log(`  ${width}-10-футер-ока.png`);
 
-  // 8. Мобильное меню (только на телефоне и планшете)
+  // 11. Мобильное меню (только на телефоне и планшете)
   if (width <= 768) {
+    await page.goto(`${site.baseUrl}/`, { waitUntil: 'networkidle' });
+    await dismissCookies(page);
     await page.click('.mobile-menu summary');
-    await page.waitForTimeout(250);
-    await shot(page, `${width}-8-мобильное-меню`);
+    await page.waitForTimeout(300);
+    await shot(page, `${width}-11-мобильное-меню`);
   }
 
   await page.context().close();

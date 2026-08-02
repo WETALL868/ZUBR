@@ -60,16 +60,30 @@ export const startSite = async () => {
   );
 
   const port = 8100 + Math.floor(Math.random() * 800);
+  // Пределы задаются явно теми же значениями, что стоят в .user.ini
+  // и .htaccess сайта: иначе тесты вложений проверяли бы настройки
+  // машины разработчика, а не настройки проекта.
   const server = spawn(
     'php',
-    ['-S', `127.0.0.1:${port}`, '-t', workdir, join(workdir, 'tools', 'dev-router.php')],
+    [
+      '-d', 'upload_max_filesize=6M',
+      '-d', 'post_max_size=7M',
+      '-d', 'max_file_uploads=1',
+      '-S', `127.0.0.1:${port}`,
+      '-t', workdir,
+      join(workdir, 'tools', 'dev-router.php'),
+    ],
     { cwd: workdir, stdio: 'ignore' },
   );
 
   const baseUrl = `http://127.0.0.1:${port}`;
   await waitForServer(baseUrl);
 
-  const browser = await chromium.launch();
+  // Полная сборка Chromium, а не облегчённая: в headless shell нет
+  // встроенного модуля просмотра PDF, и navigator.pdfViewerEnabled
+  // всегда false. Тогда проверка просмотра документов ушла бы
+  // по запасному пути и ничего бы не проверила.
+  const browser = await chromium.launch({ channel: 'chromium' });
 
   return {
     baseUrl,
@@ -113,7 +127,6 @@ export const sitePages = [
   '/documents',
   '/meetings',
   '/contacts',
-  '/infrastructure',
   '/appeal',
   '/legal/privacy',
   '/legal/cookies',

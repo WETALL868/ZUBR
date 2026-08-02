@@ -207,3 +207,58 @@ test('cookie-уведомление не перекрывает меню и ос
 
   await page.context().close();
 });
+
+test('устаревший раздел «Дороги и инфраструктура» убран отовсюду', async () => {
+  const page = await site.page({ width: 1440, height: 900 });
+
+  for (const path of sitePages) {
+    await page.goto(site.baseUrl + path, { waitUntil: 'domcontentloaded' });
+
+    const traces = await page.$$eval('a[href]', (links) =>
+      links
+        .map((link) => ({
+          href: link.getAttribute('href') || '',
+          text: (link.textContent || '').trim(),
+        }))
+        .filter(
+          (link) =>
+            link.href.includes('infrastructure') ||
+            /дороги и инфраструктура/i.test(link.text),
+        ),
+    );
+    assert.deepEqual(traces, [], `на странице ${path} осталась ссылка на устаревший раздел`);
+  }
+
+  await page.context().close();
+});
+
+test('старый адрес раздела ведёт в документы, а не в ошибку 404', async () => {
+  const page = await site.page();
+
+  for (const path of ['/infrastructure', '/infrastructure/']) {
+    const direct = await page.request.get(site.baseUrl + path, { maxRedirects: 0 });
+    assert.equal(direct.status(), 301, `${path}: ожидалось постоянное перенаправление`);
+    assert.match(direct.headers().location || '', /\/documents$/);
+
+    const followed = await page.request.get(site.baseUrl + path);
+    assert.equal(followed.status(), 200, `${path}: переход завершился ошибкой`);
+  }
+
+  await page.context().close();
+});
+
+test('в мобильном меню нет пунктов удалённого раздела', async () => {
+  const page = await site.page({ width: 375, height: 812 });
+  await page.goto(`${site.baseUrl}/`, { waitUntil: 'networkidle' });
+
+  const items = await page.$$eval('.mobile-menu nav a', (links) =>
+    links.map((link) => ({ href: link.getAttribute('href'), text: link.textContent.trim() })),
+  );
+
+  for (const item of items) {
+    assert.ok(!item.href.includes('infrastructure'), `в меню осталась ссылка ${item.href}`);
+    assert.ok(!/инфраструктур/i.test(item.text), `в меню остался пункт «${item.text}»`);
+  }
+
+  await page.context().close();
+});

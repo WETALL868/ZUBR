@@ -56,6 +56,20 @@ const JOBS = [
     quality: 78,
     jpeg: true,
   },
+  {
+    // Схема проезда на странице «Контакты». Качество выше обычного:
+    // на схеме мелкие номера участков и названия улиц, при сильном
+    // сжатии они замыливаются. Полный размер нужен для увеличения
+    // по нажатию, поэтому исходная ширина сохраняется как вариант.
+    source: 'contact-map.png',
+    name: 'contact-map',
+    widths: [900, 1400, 1980],
+    quality: 74,
+    // JPEG нужен как запасной формат и как файл для кнопки
+    // «Открыть в новой вкладке»: исходный PNG лежит в assets/source,
+    // а эта папка закрыта от посетителей.
+    jpeg: true,
+  },
 ];
 
 const kb = (path) => Math.round(statSync(path).size / 1024);
@@ -63,9 +77,14 @@ const kb = (path) => Math.round(statSync(path).size / 1024);
 const run = async () => {
   mkdirSync(OUT_DIR, { recursive: true });
 
-  // Прошлые результаты удаляются, чтобы не копились файлы от старых настроек.
+  // Удаляются только прежние результаты этого скрипта: в той же папке
+  // лежат файлы, собранные другими инструментами (например фотография
+  // Оки из tools/install-oka-photo.mjs), и стирать их нельзя.
+  const ownPrefixes = JOBS.map((job) => `${job.name}-`);
   for (const file of existsSync(OUT_DIR) ? readdirSync(OUT_DIR) : []) {
-    unlinkSync(join(OUT_DIR, file));
+    if (ownPrefixes.some((prefix) => file.startsWith(prefix))) {
+      unlinkSync(join(OUT_DIR, file));
+    }
   }
 
   const report = [];

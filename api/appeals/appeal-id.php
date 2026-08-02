@@ -9,12 +9,16 @@
 declare(strict_types=1);
 
 /**
- * Буквы без I и O: в коротком номере их путают с единицей и нулём.
+ * Буква номера. Постоянная «N» — от «Новая Искань»: номер сразу
+ * узнаётся и легко диктуется по телефону. Пространство номеров
+ * при этом остаётся 100 000 — для партнёрства с запасом.
  */
-const APPEAL_ID_LETTERS = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+const APPEAL_ID_LETTER = 'N';
 
 /**
  * Формат номера, выдаваемого сейчас: N48271.
+ * Проверка допускает любую заглавную латинскую букву, чтобы номера,
+ * выданные до фиксации буквы, продолжали распознаваться.
  */
 const APPEAL_ID_PATTERN = '/^[A-Z]\d{5}$/';
 
@@ -40,10 +44,9 @@ function is_appeal_id(string $value): bool
  */
 function build_appeal_id(): string
 {
-    $letter = APPEAL_ID_LETTERS[random_int(0, strlen(APPEAL_ID_LETTERS) - 1)];
     $digits = str_pad((string)random_int(0, 99999), 5, '0', STR_PAD_LEFT);
 
-    return $letter . $digits;
+    return APPEAL_ID_LETTER . $digits;
 }
 
 /**

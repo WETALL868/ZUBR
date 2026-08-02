@@ -55,9 +55,16 @@ const buildCard = (doc) => {
   const path = join(FILES_DIR, doc.file);
   const present = existsSync(path);
 
+  // Кнопки появляются только у документов, файл которых действительно
+  // лежит на диске: просмотр несуществующего файла был бы обманом.
   const status = present
     ? `<span>${escape(doc.kind)} · ${humanSize(statSync(path).size)}</span>` +
-      `<a href="/documents/files/${escape(doc.file)}" download>Скачать</a>`
+      '<div class="doc-actions">' +
+      `<button type="button" class="doc-view" data-view-document` +
+      ` data-file="/documents/files/${escape(doc.file)}"` +
+      ` data-title="${escape(doc.title)}">Посмотреть</button>` +
+      `<a class="doc-download" href="/documents/files/${escape(doc.file)}" download>Скачать</a>` +
+      '</div>'
     : '<span>Файл готовится к публикации</span>';
 
   return (
@@ -129,9 +136,30 @@ const buildMain = (catalog) => {
     '</p>' +
     '</div>' +
     '</section>' +
+    buildViewer() +
     '</main>'
   );
 };
+
+/**
+ * Окно просмотра документа. Название, ссылки и содержимое подставляет
+ * скрипт при нажатии «Посмотреть».
+ */
+const buildViewer = () =>
+  '<dialog class="modal modal-wide" id="document-viewer" aria-labelledby="document-viewer-title">' +
+  '<div class="modal-frame">' +
+  '<div class="modal-bar">' +
+  '<strong id="document-viewer-title">Документ</strong>' +
+  // Ссылки «Скачать» и «Открыть в новой вкладке» создаёт скрипт в момент
+  // открытия документа. В разметке их нет намеренно: заготовка с href="#"
+  // была бы переходом в никуда, а такие ссылки на сайте недопустимы.
+  '<div class="modal-bar-actions" data-viewer-actions>' +
+  '<button type="button" class="modal-close" data-close-modal>Закрыть</button>' +
+  '</div>' +
+  '</div>' +
+  '<div class="modal-scroll" data-viewer-body></div>' +
+  '</div>' +
+  '</dialog>';
 
 const main = () => {
   const catalog = JSON.parse(readFileSync(CATALOG, 'utf8'));

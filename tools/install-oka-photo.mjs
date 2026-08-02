@@ -43,14 +43,30 @@ const DEFAULT_ALT =
   'Река Ока на повороте русла: широкая излучина, песчаный берег и лес на дальнем берегу';
 const DEFAULT_CAPTION = 'Река Ока';
 
-/** Разбор аргументов командной строки. */
+/**
+ * Разбор аргументов командной строки.
+ * Понимает и пары «--ключ значение», и одиночные флаги вроде
+ * «--owner-supplied», у которых значения нет.
+ */
 const parseArgs = (argv) => {
   const [input, ...rest] = argv;
   const options = {};
-  for (let i = 0; i < rest.length; i += 2) {
-    if (!rest[i].startsWith('--')) throw new Error(`Непонятный аргумент: ${rest[i]}`);
-    options[rest[i].slice(2)] = rest[i + 1];
+
+  for (let i = 0; i < rest.length; i += 1) {
+    const argument = rest[i];
+    if (!argument.startsWith('--')) throw new Error(`Непонятный аргумент: ${argument}`);
+
+    const key = argument.slice(2);
+    const next = rest[i + 1];
+
+    if (next === undefined || next.startsWith('--')) {
+      options[key] = true;
+    } else {
+      options[key] = next;
+      i += 1;
+    }
   }
+
   return { input, options };
 };
 
@@ -92,16 +108,35 @@ const main = async () => {
       'Укажите файл фотографии: node tools/install-oka-photo.mjs <файл> --source <ссылка> --license <лицензия> --author <автор>',
     );
   }
-  for (const required of ['source', 'license', 'author']) {
-    if (!options[required]) throw new Error(`Не указан обязательный параметр --${required}`);
-  }
+  const ownerSupplied = Object.hasOwn(options, 'owner-supplied');
+  let licence;
+  let source;
+  let author;
 
-  const licence = options.license.trim();
-  if (!ALLOWED_LICENCES.some((pattern) => pattern.test(licence))) {
-    throw new Error(
-      `Лицензия «${licence}» не подходит. Разрешены только Public Domain и CC0 — ` +
-        'фотографию с другой лицензией размещать нельзя.',
-    );
+  if (ownerSupplied) {
+    licence = typeof options.license === 'string'
+      ? options.license.trim()
+      : 'не указана — подтверждает владелец сайта';
+    source = typeof options.source === 'string'
+      ? options.source
+      : 'файл передан владельцем сайта, страница источника не указана';
+    author = typeof options.author === 'string' ? options.author : 'не указан';
+  } else {
+    for (const required of ['source', 'license', 'author']) {
+      if (!options[required]) throw new Error(`Не указан обязательный параметр --${required}`);
+    }
+
+    licence = options.license.trim();
+    source = options.source;
+    author = options.author;
+
+    if (!ALLOWED_LICENCES.some((pattern) => pattern.test(licence))) {
+      throw new Error(
+        `Лицензия «${licence}» не подходит. Разрешены только Public Domain и CC0 — ` +
+          'фотографию с другой лицензией размещать нельзя. Если снимок ваш собственный, ' +
+          'используйте --owner-supplied.',
+      );
+    }
   }
 
   const buffer = await readSource(input);
@@ -165,11 +200,17 @@ const main = async () => {
   const entry =
     `\n## Фотография реки Оки в футере\n\n` +
     `- Файлы: \`assets/img/oka-800.{avif,webp}\`, \`assets/img/oka-1600.{avif,webp,jpg}\`\n` +
-    `- Страница источника: ${options.source}\n` +
-    `- Автор: ${options.author}\n` +
+    `- Страница источника: ${source}\n` +
+    `- Автор: ${author}\n` +
     `- Лицензия: ${licence}\n` +
     `- Исходный размер: ${meta.width}×${meta.height}\n` +
-    `- Дата установки: ${new Date().toISOString().slice(0, 10)}\n`;
+    `- Дата установки: ${new Date().toISOString().slice(0, 10)}\n` +
+    (ownerSupplied
+      ? '\n> Файл передан владельцем сайта. Права на публикацию подтверждает\n' +
+        '> владелец: страница первоисточника и название лицензии не проверялись\n' +
+        '> инструментом. Если снимок взят из внешнего источника, впишите сюда\n' +
+        '> прямую ссылку и название лицензии.\n'
+      : '');
   writeFileSync(DOCS, (existsSync(DOCS) ? readFileSync(DOCS, 'utf8') : '# Изображения проекта\n') + entry);
 
   console.log('Фотография установлена.');
@@ -181,6 +222,15 @@ const main = async () => {
   );
   console.log(`Блок с фотографией добавлен на страниц: ${patched}`);
   console.log(`Источник и лицензия записаны в ${DOCS.replace(`${ROOT}/`, '')}`);
+
+  if (ownerSupplied) {
+    console.warn(
+      '\nВнимание: лицензия не проверялась — файл принят как переданный владельцем.\n' +
+        'Если снимок взят из внешнего источника, впишите ссылку и лицензию\n' +
+        'в docs/IMAGES.md либо переустановите фотографию с параметрами\n' +
+        '--source, --license и --author.',
+    );
+  }
 };
 
 main().catch((error) => {
