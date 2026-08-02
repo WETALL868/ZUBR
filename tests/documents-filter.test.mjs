@@ -187,9 +187,9 @@ test('кнопка «Назад» возвращает предыдущую ка
 
   await page.click('.filter-row button[data-category="documents"]');
   await page.waitForTimeout(50);
-  await page.click('.filter-row button[data-category="lighting"]');
+  await page.click('.filter-row button[data-category="site"]');
   await page.waitForTimeout(50);
-  assert.equal(await selectedLabel(page), 'Освещение');
+  assert.equal(await selectedLabel(page), 'Сайт');
 
   await page.goBack();
   await page.waitForTimeout(120);

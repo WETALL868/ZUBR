@@ -22,7 +22,8 @@
     "images": "node tools/optimize-images.mjs",
     "photo:oka": "node tools/install-oka-photo.mjs",
     "documents": "node tools/build-documents.mjs",
-    "documents:prepare": "node tools/prepare-documents.mjs"
+    "documents:prepare": "node tools/prepare-documents.mjs",
+    "news": "node tools/build-news.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
