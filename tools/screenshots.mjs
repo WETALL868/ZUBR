@@ -4,6 +4,9 @@
  * Для каждой ширины снимаются: главная страница, документы, форма
  * обращения, окно успешной отправки и футер.
  *
+ * Отдельно снимается футер на 375, 768, 1366, 1920 и 2048 px —
+ * на широких экранах фотография раньше занимала лишь часть ширины.
+ *
  * Запуск: npm run screenshots
  * Результат: screenshots/<ширина>-<название>.png
  */
@@ -173,6 +176,61 @@ for (const { width, height, label } of WIDTHS) {
 
   await page.context().close();
 }
+
+/* ------------------------------------------------------------------ *
+ * Футер на всех спорных ширинах
+ * ------------------------------------------------------------------ */
+
+console.log('\nФутер — 375, 768, 1366, 1920, 2048 px');
+
+for (const width of [375, 768, 1366, 1920, 2048]) {
+  const page = await site.page({ width, height: 900 });
+  await page.goto(`${site.baseUrl}/contacts`, { waitUntil: 'networkidle' });
+  await dismissCookies(page);
+
+  const footer = await page.$('.site-footer');
+  await footer.scrollIntoViewIfNeeded();
+  await page.waitForFunction(
+    () => {
+      const image = /** @type {HTMLImageElement | null} */ (
+        document.querySelector('.footer-bg img')
+      );
+      return Boolean(image && image.complete && image.naturalWidth > 0);
+    },
+    { timeout: 10000 },
+  );
+  await page.waitForTimeout(400);
+
+  await footer.screenshot({ path: join(OUT, `${width}-футер.png`) });
+  console.log(`  ${width}-футер.png`);
+
+  await page.context().close();
+}
+
+/* ------------------------------------------------------------------ *
+ * Просмотр документа на телефоне: страницы, а не только «Скачать»
+ * ------------------------------------------------------------------ */
+
+console.log('\nПросмотр документа на телефоне');
+
+const phone = await site.page({ width: 375, height: 812 });
+await phone.goto(`${site.baseUrl}/documents`, { waitUntil: 'networkidle' });
+await dismissCookies(phone);
+const viewButtons = await phone.$$('[data-view-document]');
+await viewButtons[viewButtons.length - 1].click();
+await phone.waitForSelector('#document-viewer .viewer-page img', { timeout: 10000 });
+await phone.waitForFunction(
+  () => {
+    const image = /** @type {HTMLImageElement | null} */ (
+      document.querySelector('.viewer-page img')
+    );
+    return Boolean(image && image.complete && image.naturalWidth > 0);
+  },
+  { timeout: 10000 },
+);
+await phone.waitForTimeout(300);
+await shot(phone, '375-12-просмотр-документа-страницами');
+await phone.context().close();
 
 await site.stop();
 console.log(`\nСкриншоты сохранены в ${OUT.replace(`${ROOT}/`, '')}/`);

@@ -241,13 +241,16 @@ test('каждый документ открывается на просмотр
       const state = await page.evaluate(() => {
         const dialog = document.querySelector('#document-viewer');
         const frame = dialog.querySelector('iframe');
+        const first = dialog.querySelector('.viewer-page img');
         const box = dialog.querySelector('.modal-frame').getBoundingClientRect();
         return {
           title: dialog.querySelector('#document-viewer-title').textContent.trim(),
           src: frame ? frame.getAttribute('src') : null,
+          firstPage: first ? first.getAttribute('src') : null,
+          pages: dialog.querySelectorAll('.viewer-page').length,
           notice: dialog.querySelector('.viewer-notice')?.textContent.trim() || null,
           download: dialog.querySelector('[data-viewer-download]').getAttribute('href'),
-          tab: dialog.querySelector('[data-viewer-tab]').getAttribute('href'),
+          tab: dialog.querySelector('[data-viewer-tab]')?.getAttribute('href') ?? null,
           fits:
             box.left >= -1 &&
             box.top >= -1 &&
@@ -258,14 +261,18 @@ test('каждый документ открывается на просмотр
 
       assert.equal(state.title, expectedTitle, 'в окне не то название');
       assert.equal(state.download, expectedFile);
-      assert.equal(state.tab, expectedFile);
       assert.ok(state.fits, `ширина ${width}: окно документа выходит за экран`);
 
-      // Либо встроенный просмотр, либо честное пояснение с запасной кнопкой.
       if (state.src) {
+        // Компьютер: PDF во встроенной рамке.
         assert.ok(state.src.includes('#page=1'), 'документ открылся не с первой страницы');
         assert.ok(state.src.includes('view=Fit'), 'страница не вписана в окно');
         assert.ok(state.src.startsWith(expectedFile), 'показан не тот файл');
+        assert.equal(state.tab, expectedFile);
+      } else if (state.firstPage) {
+        // Телефон: те же страницы, но картинками.
+        assert.match(state.firstPage, /\/01\.webp$/, 'просмотр начинается не с первой страницы');
+        assert.ok(state.pages >= 1, 'ни одной страницы не построено');
       } else {
         assert.ok(state.notice, 'нет ни просмотра, ни пояснения');
       }
@@ -277,6 +284,98 @@ test('каждый документ открывается на просмотр
 
     await page.context().close();
   }
+});
+
+test('на телефоне документ действительно показывается, а не только скачивается', async () => {
+  const page = await site.page({ width: 375, height: 812 });
+  await page.goto(`${site.baseUrl}/documents`, { waitUntil: 'networkidle' });
+
+  const buttons = await page.$$('[data-view-document]');
+  for (let index = 0; index < buttons.length; index += 1) {
+    const expected = Number(await buttons[index].getAttribute('data-pages'));
+
+    await buttons[index].click();
+    await page.waitForSelector('#document-viewer .viewer-page img', { timeout: 10000 });
+    await page.waitForFunction(
+      () => {
+        const image = /** @type {HTMLImageElement | null} */ (
+          document.querySelector('.viewer-page img')
+        );
+        return Boolean(image && image.complete && image.naturalWidth > 0);
+      },
+      { timeout: 10000 },
+    );
+
+    const state = await page.evaluate(() => {
+      const dialog = document.querySelector('#document-viewer');
+      const first = /** @type {HTMLImageElement} */ (dialog.querySelector('.viewer-page img'));
+      const rect = first.getBoundingClientRect();
+      const last = dialog.querySelector('.viewer-page:last-child img');
+      return {
+        pages: dialog.querySelectorAll('.viewer-page').length,
+        frame: Boolean(dialog.querySelector('iframe')),
+        notice: Boolean(dialog.querySelector('.viewer-notice')),
+        // Ширина страницы должна занимать окно, а не быть маркой на конверте.
+        widthShare: rect.width / window.innerWidth,
+        withinScreen: rect.left >= -1 && rect.right <= window.innerWidth + 1,
+        // Остальные страницы ждут прокрутки и не тратят мобильный трафик.
+        lazyRest: last ? last.getAttribute('loading') : null,
+        firstEager: first.getAttribute('loading'),
+        captions: [...dialog.querySelectorAll('.viewer-page figcaption')].map((el) =>
+          el.textContent.trim(),
+        ),
+        scrollable: (() => {
+          const body = dialog.querySelector('[data-viewer-body]');
+          return body.scrollHeight > body.clientHeight;
+        })(),
+      };
+    });
+
+    assert.equal(state.frame, false, 'на телефоне встроенная рамка PDF не работает');
+    assert.equal(state.notice, false, 'вместо документа показано сообщение');
+    assert.equal(state.pages, expected, 'показаны не все страницы документа');
+    assert.ok(state.widthShare > 0.8, `страница занимает лишь ${Math.round(state.widthShare * 100)}% ширины`);
+    assert.ok(state.withinScreen, 'страница выходит за экран');
+    assert.equal(state.firstEager, 'eager', 'первая страница должна грузиться сразу');
+    assert.equal(state.captions[0], `Страница 1 из ${expected}`);
+    if (expected > 1) {
+      assert.equal(state.lazyRest, 'lazy', 'остальные страницы должны грузиться по мере прокрутки');
+      assert.ok(state.scrollable, 'документ нельзя пролистать');
+    }
+
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(250);
+  }
+
+  assert.deepEqual(page.consoleErrors, []);
+  await page.context().close();
+});
+
+test('все страницы документов отдаются сервером', async () => {
+  const page = await site.page({ width: 375, height: 812 });
+  await page.goto(`${site.baseUrl}/documents`, { waitUntil: 'networkidle' });
+
+  const documents = await page.$$eval('[data-view-document]', (items) =>
+    items.map((item) => ({
+      dir: item.getAttribute('data-pages-dir'),
+      pages: Number(item.getAttribute('data-pages')),
+    })),
+  );
+
+  assert.ok(documents.length > 0);
+  for (const { dir, pages } of documents) {
+    assert.ok(dir, 'у документа нет постраничных картинок');
+    assert.ok(pages >= 1);
+
+    for (const number of [1, pages]) {
+      const path = `${dir}/${String(number).padStart(2, '0')}.webp`;
+      const response = await page.request.get(site.baseUrl + path);
+      assert.equal(response.status(), 200, `страница ${path} не отдаётся`);
+      assert.ok((response.headers()['content-type'] || '').includes('image/webp'));
+    }
+  }
+
+  await page.context().close();
 });
 
 test('после закрытия фокус возвращается к тому же документу', async () => {
@@ -416,6 +515,72 @@ test('фотография Оки — фон самого футера, отде
       check.footerHeight < check.viewportHeight * 1.4,
       `${width}px: футер слишком высокий (${check.footerHeight} px)`,
     );
+
+    await page.context().close();
+  }
+});
+
+test('фотография занимает весь футер от левого до правого края окна', async () => {
+  // Ширины из замечания к живому сайту: на широком экране снимок
+  // занимал около трёх четвертей ширины, справа оставалась зелёная
+  // заливка, а меню уезжало под картинку.
+  for (const width of [375, 768, 1024, 1366, 1920, 2048, 2560]) {
+    const page = await site.page({ width, height: 900 });
+    await page.goto(`${site.baseUrl}/contacts`, { waitUntil: 'networkidle' });
+
+    await page.$eval('.footer-bg', (el) => el.scrollIntoView());
+    await page.waitForFunction(
+      () => {
+        const image = /** @type {HTMLImageElement | null} */ (
+          document.querySelector('.footer-bg img')
+        );
+        return Boolean(image && image.complete && image.naturalWidth > 0);
+      },
+      { timeout: 10000 },
+    );
+
+    const check = await page.evaluate(() => {
+      const footer = document.querySelector('footer.site-footer');
+      const image = /** @type {HTMLImageElement} */ (footer.querySelector('.footer-bg img'));
+      const inner = footer.querySelector('.footer-inner');
+      const footerBox = footer.getBoundingClientRect();
+      const imageBox = image.getBoundingClientRect();
+      const innerBox = inner.getBoundingClientRect();
+      const style = getComputedStyle(image);
+      const brand = footer.querySelector('.footer-brand').getBoundingClientRect();
+      const nav = footer.querySelector('.footer-nav').getBoundingClientRect();
+
+      return {
+        position: style.position,
+        widthShare: imageBox.width / footerBox.width,
+        heightShare: imageBox.height / footerBox.height,
+        left: imageBox.left - footerBox.left,
+        top: imageBox.top - footerBox.top,
+        fullWidth: Math.abs(imageBox.width - document.documentElement.clientWidth) <= 1,
+        footerHeight: footerBox.height,
+        // Текст лежит поверх снимка, а не под ним.
+        contentOverPhoto:
+          innerBox.top >= imageBox.top - 1 && innerBox.bottom <= imageBox.bottom + 1,
+        navOverPhoto: nav.bottom <= imageBox.bottom + 1 && nav.top >= imageBox.top - 1,
+        brandOverPhoto: brand.bottom <= imageBox.bottom + 1,
+        // Над фотографией не должно оставаться зелёной полосы.
+        paddingTop: getComputedStyle(footer).paddingTop,
+        borderTop: getComputedStyle(footer).borderTopWidth,
+      };
+    });
+
+    assert.equal(check.position, 'absolute', `${width}px: фотография осталась в обычном потоке`);
+    assert.ok(check.widthShare > 0.999, `${width}px: снимок занимает ${Math.round(check.widthShare * 100)}% ширины футера`);
+    assert.ok(check.heightShare > 0.999, `${width}px: снимок занимает ${Math.round(check.heightShare * 100)}% высоты футера`);
+    assert.ok(Math.abs(check.left) <= 1, `${width}px: снимок сдвинут от левого края`);
+    assert.ok(Math.abs(check.top) <= 1, `${width}px: над снимком осталась полоса`);
+    assert.ok(check.fullWidth, `${width}px: снимок не во всю ширину окна`);
+    assert.ok(check.contentOverPhoto, `${width}px: содержимое футера не лежит поверх снимка`);
+    assert.ok(check.navOverPhoto, `${width}px: меню оказалось за пределами снимка`);
+    assert.ok(check.brandOverPhoto, `${width}px: название партнёрства ушло из-под снимка`);
+    assert.equal(check.paddingTop, '0px', `${width}px: у футера остался верхний отступ`);
+    assert.equal(check.borderTop, '0px', `${width}px: над фотографией осталась линия`);
+    assert.ok(check.footerHeight >= 420, `${width}px: футер слишком низкий (${check.footerHeight} px)`);
 
     await page.context().close();
   }

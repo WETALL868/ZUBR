@@ -407,6 +407,86 @@
       body.append(notice);
     };
 
+    /**
+     * Может ли браузер показать PDF прямо в окне.
+     *
+     * Chrome для Android и большинство мобильных браузеров этого
+     * не умеют: вместо документа появляется пустая рамка или файл
+     * молча уходит в загрузки. Поэтому на телефонах и планшетах
+     * документ всегда показывается страницами-картинками.
+     */
+    const canEmbedPdf = () => {
+      if (window.matchMedia('(max-width: 820px), (pointer: coarse)').matches) return false;
+      return navigator.pdfViewerEnabled !== false;
+    };
+
+    /**
+     * Постраничный просмотр картинками — то, что видит телефон.
+     * Страницы подгружаются по мере прокрутки, поэтому открытие
+     * документа стоит одной страницы, а не всех двадцати четырёх.
+     *
+     * @param {Element} button кнопка «Посмотреть» со сведениями о страницах
+     * @param {string} file адрес исходного PDF
+     * @returns {boolean} удалось ли построить просмотр
+     */
+    const showPages = (button, file) => {
+      const dir = button.getAttribute('data-pages-dir');
+      const total = Number(button.getAttribute('data-pages'));
+      if (!body || !dir || !Number.isFinite(total) || total < 1) return false;
+
+      const width = Number(button.getAttribute('data-page-width')) || 1000;
+      const height = Number(button.getAttribute('data-page-height')) || 1414;
+
+      body.innerHTML = '';
+
+      const list = document.createElement('div');
+      list.className = 'viewer-pages';
+
+      for (let number = 1; number <= total; number += 1) {
+        const figure = document.createElement('figure');
+        figure.className = 'viewer-page';
+
+        const image = document.createElement('img');
+        image.src = `${dir}/${String(number).padStart(2, '0')}.webp`;
+        image.alt = `Страница ${number} из ${total}`;
+        image.width = width;
+        image.height = height;
+        // Первая страница нужна сразу, остальные — по мере прокрутки.
+        image.loading = number === 1 ? 'eager' : 'lazy';
+        image.decoding = 'async';
+
+        if (number === 1) {
+          // Если не открылась даже первая страница, показывать пустое
+          // окно нельзя: посетитель должен увидеть, что делать дальше.
+          image.addEventListener('error', () => {
+            showNotice(
+              'Документ не открылся',
+              ' Страницы документа не загрузились. Попробуйте скачать файл или сообщите администратору.',
+              file,
+            );
+          });
+        }
+
+        const caption = document.createElement('figcaption');
+        caption.textContent = `Страница ${number} из ${total}`;
+
+        figure.append(image, caption);
+        list.append(figure);
+      }
+
+      body.append(list);
+
+      /*
+       * «Открыть в новой вкладке» здесь лишняя: документ уже показан
+       * страницами, а мобильный браузер по этой ссылке всё равно
+       * скачал бы PDF — то же, что и «Скачать». На узком экране
+       * длинная надпись занимала треть верхней полосы.
+       */
+      actions?.querySelector('[data-viewer-tab]')?.remove();
+
+      return true;
+    };
+
     for (const button of buttons) {
       button.addEventListener('click', async () => {
         const file = button.getAttribute('data-file');
@@ -444,10 +524,13 @@
           return;
         }
 
-        // Часть телефонов не умеет показывать PDF внутри страницы.
-        // Показывать пустую рамку вместо документа нельзя — вместо этого
-        // предлагается открыть файл отдельной вкладкой.
-        if (navigator.pdfViewerEnabled === false) {
+        // Телефон и планшет получают документ страницами-картинками:
+        // встроенную рамку с PDF они не отрисовывают.
+        if (!canEmbedPdf()) {
+          if (showPages(button, file)) return;
+
+          // Картинок страниц нет (документ добавили, но не выполнили
+          // npm run documents:pages) — остаётся отдельная вкладка.
           showNotice(
             'Просмотр внутри страницы недоступен',
             ' Браузер не умеет показывать PDF на странице. Документ откроется отдельной вкладкой.',

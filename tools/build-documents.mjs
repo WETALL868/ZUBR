@@ -20,6 +20,7 @@ const CATALOG = join(ROOT, 'docs', 'documents-catalog.json');
 const SHELL_SOURCE = join(ROOT, 'meetings', 'index.html');
 const TARGET = join(ROOT, 'documents', 'index.html');
 const FILES_DIR = join(ROOT, 'documents', 'files');
+const PAGES_DIR = join(ROOT, 'documents', 'pages');
 
 const NAV = [
   ['/', 'Главная'],
@@ -51,9 +52,39 @@ const buildNav = () =>
   ).join('') +
   '</nav>';
 
+/**
+ * Сведения о постраничных картинках документа: их собирает
+ * npm run documents:pages. По ним телефон показывает документ
+ * страницами вместо PDF-рамки, которую мобильные браузеры не умеют
+ * отрисовывать.
+ * @param {string} file
+ * @returns {{ dir: string, pages: number, width: number, height: number } | null}
+ */
+const pageImages = (file) => {
+  const slug = file.replace(/\.pdf$/i, '');
+  const manifest = join(PAGES_DIR, slug, 'pages.json');
+  if (!existsSync(manifest)) return null;
+
+  const data = JSON.parse(readFileSync(manifest, 'utf8'));
+  if (!data.pages) return null;
+  return {
+    dir: `/documents/pages/${slug}`,
+    pages: data.pages,
+    width: data.width,
+    height: data.height,
+  };
+};
+
 const buildCard = (doc) => {
   const path = join(FILES_DIR, doc.file);
   const present = existsSync(path);
+  const pages = present ? pageImages(doc.file) : null;
+  // Размеры страницы нужны, чтобы окно просмотра не «прыгало»,
+  // пока картинки подгружаются.
+  const pageData = pages
+    ? ` data-pages="${pages.pages}" data-pages-dir="${escape(pages.dir)}"` +
+      ` data-page-width="${pages.width}" data-page-height="${pages.height}"`
+    : '';
 
   // Кнопки появляются только у документов, файл которых действительно
   // лежит на диске: просмотр несуществующего файла был бы обманом.
@@ -62,6 +93,7 @@ const buildCard = (doc) => {
       '<div class="doc-actions">' +
       `<button type="button" class="doc-view" data-view-document` +
       ` data-file="/documents/files/${escape(doc.file)}"` +
+      pageData +
       ` data-title="${escape(doc.title)}">Посмотреть</button>` +
       `<a class="doc-download" href="/documents/files/${escape(doc.file)}" download>Скачать</a>` +
       '</div>'

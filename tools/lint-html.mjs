@@ -15,8 +15,12 @@ import { glob } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseHTML } from 'linkedom';
+import { assetVersion } from './asset-version.mjs';
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
+
+/** Номер версии стилей и скрипта — он же стоит в адресах на страницах. */
+const VERSION = assetVersion();
 
 /** Пути, которые обслуживает PHP, а не статический файл. */
 const PHP_ROUTES = ['/admin', '/admin/', '/api/appeals/'];
@@ -107,6 +111,17 @@ for (const path of pages) {
   // Обязательные части общей оболочки.
   if (!html.includes('/assets/site.css')) report('не подключён assets/site.css');
   if (!html.includes('/assets/site.js')) report('не подключён assets/site.js');
+
+  /*
+   * Номер версии в адресе стилей и скрипта. Без него браузер (и хостинг)
+   * ещё неделю отдаёт файл из кеша, и правки не видно на живом сайте —
+   * именно так исправленный футер не появился после загрузки архива.
+   */
+  for (const asset of ['site.css', 'site.js']) {
+    if (!html.includes(`/assets/${asset}?v=${VERSION}`)) {
+      report(`у /assets/${asset} нет номера версии ?v=${VERSION} — выполните npm run assets:version`);
+    }
+  }
   if (!html.includes('viewport-fit=cover')) report('в теге viewport нет viewport-fit=cover');
   if (!document.querySelector('.cookie-banner')) report('нет cookie-уведомления');
   if (!document.querySelector('html[lang]')) report('не указан язык страницы');

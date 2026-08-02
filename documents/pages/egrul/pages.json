@@ -1,0 +1,7 @@
+{
+  "_комментарий": "Файл собирается командой npm run documents:pages. Править вручную не нужно.",
+  "source": "/documents/files/egrul.pdf",
+  "pages": 1,
+  "width": 1000,
+  "height": 1379
+}

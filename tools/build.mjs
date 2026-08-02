@@ -37,7 +37,6 @@ const SITE_ENTRIES = [
   'documents',
   'favicon.svg',
   'index.html',
-  'infrastructure',
   'legal',
   'meetings',
   'news',

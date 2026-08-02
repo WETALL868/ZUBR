@@ -1,4 +1,11 @@
 /*
+ * ВЕРСИЯ ФАЙЛА: 4 (футер во всю ширину, постраничный просмотр документов)
+ *
+ * Чтобы проверить, какая версия лежит на хостинге, откройте
+ * ВАШ-ДОМЕН/assets/site.css — номер написан в первой строке. Если он
+ * меньше указанного здесь, файл не обновился: перезалейте assets/site.css
+ * и обновите страницу с Ctrl+F5.
+ *
  * Слой мобильных исправлений для сайта СНП «Новая Искань».
  *
  * Подключается ПОСЛЕ основного файла стилей и только дополняет его.
@@ -85,7 +92,11 @@ html {
     padding-right: max(0px, env(safe-area-inset-right));
   }
 
-  .site-footer {
+  /*
+   * У футера с фотографией собственные отступы: там нижний край
+   * задаётся у .footer-inner (раздел 10), иначе фон и текст разъезжаются.
+   */
+  .site-footer:not(.has-photo) {
     padding-bottom: max(60px, env(safe-area-inset-bottom));
   }
 
@@ -704,35 +715,58 @@ body.menu-open .site-header {
 /* ------------------------------------------------------------------ *
  * 10. Футер с фотографией реки Оки
  *
- * Фотография — фон самого футера, а не отдельная полоса над ним:
- * название партнёрства, меню и правовые ссылки лежат прямо поверх
- * снимка. Читаемость обеспечивает тёмно-зелёный градиент между
- * фотографией и текстом.
+ * Фотография — фон самого футера, а не полоса над ним: она занимает
+ * всю ширину окна и всю высоту футера, а название партнёрства, меню
+ * и правовые ссылки лежат прямо поверх снимка. Читаемость обеспечивает
+ * тёмно-зелёный градиент между фотографией и текстом.
+ *
+ * Здесь переопределяются три правила основного файла стилей, из-за
+ * которых футер выглядел полосой:
+ *   .site-footer  padding: 60px 0     — давал зелёный кант над фото;
+ *   .site-footer  border-top          — вторую линию над кантом;
+ *   .footer-inner grid + width        — прижимал текст к левой части.
  * ------------------------------------------------------------------ */
 
 .site-footer.has-photo {
   position: relative;
   isolation: isolate;
   overflow: hidden;
+  /* Отступы переносятся внутрь, иначе фон не доходит до краёв футера. */
+  padding: 0;
+  border-top: 0;
+  /* Высота полосы с фотографией: 26vw, но не ниже 440 и не выше 560. */
+  min-height: clamp(440px, 26vw, 560px);
+  /* Пока фотография грузится, футер уже нужного цвета. */
   background-color: #061f19;
+  color: #d7e0d8;
 }
 
-/* Сама фотография: заполняет футер целиком, пропорции сохраняются. */
-.footer-bg,
-.footer-bg img {
+/*
+ * Сама фотография. Растягивается на весь футер от левого до правого
+ * края окна; пропорции сохраняет object-fit: cover.
+ *
+ * Правило задано и для <picture>, и для <img> внутри: без него
+ * <picture> остаётся строчным элементом обычного потока — тогда
+ * снимок и вставал отдельной картинкой над текстом, занимая
+ * лишь часть ширины.
+ */
+.site-footer.has-photo .footer-bg,
+.site-footer.has-photo .footer-bg img {
   position: absolute;
   inset: 0;
   display: block;
   width: 100%;
   height: 100%;
+  max-width: none;
+  margin: 0;
 }
 
-.footer-bg {
-  z-index: -2;
+.site-footer.has-photo .footer-bg {
+  z-index: 0;
   pointer-events: none;
 }
 
-.footer-bg img {
+.site-footer.has-photo .footer-bg img {
   object-fit: cover;
   /* Излучина расположена по центру кадра; небо сверху можно срезать. */
   object-position: center 55%;
@@ -742,24 +776,38 @@ body.menu-open .site-header {
  * Тёмно-зелёный слой поверх фотографии. Снизу он плотнее: там мельче
  * текст правовой информации и копирайт.
  */
-.site-footer.has-photo::before {
+.site-footer.has-photo::after {
   content: '';
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: 1;
+  pointer-events: none;
   background:
-    linear-gradient(180deg, #04180fbf 0%, #04180f9e 45%, #031310e6 100%),
-    linear-gradient(90deg, #04180f80 0%, #04180f1a 60%, #04180f73 100%);
+    linear-gradient(180deg, #04180f3d 0%, #04180f80 42%, #031310eb 100%),
+    linear-gradient(90deg, #04180f6b 0%, #04180f14 55%, #04180f5c 100%);
 }
 
+/*
+ * Текст лежит поверх фотографии и градиента и прижат к нижнему краю:
+ * сверху остаётся открытый вид на реку.
+ */
 .site-footer.has-photo .footer-inner {
   position: relative;
-  z-index: 1;
+  z-index: 2;
+  width: min(1360px, 100% - 80px);
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: 1.2fr 0.75fr 1.4fr;
+  align-items: end;
+  gap: clamp(28px, 4vw, 60px);
+  /* Верхний отступ и есть открытая часть снимка. */
+  padding-block: clamp(240px, 17vw, 340px) 40px;
 }
 
-/* Поверх фотографии текст и ссылки должны быть заметнее обычного. */
-.site-footer.has-photo {
-  color: #d7e0d8;
+@supports (padding: max(0px)) {
+  .site-footer.has-photo .footer-inner {
+    padding-bottom: max(40px, env(safe-area-inset-bottom));
+  }
 }
 
 .site-footer.has-photo .footer-brand,
@@ -791,36 +839,64 @@ body.menu-open .site-header {
   text-shadow: 0 1px 8px #02120c99;
 }
 
-@media (max-width: 1100px) {
-  .footer-bg img {
-    object-position: center 58%;
-  }
-}
-
-@media (max-width: 820px) {
-  .site-footer {
-    padding: 44px 0;
+/* Планшет: две колонки, правовой блок занимает всю ширину строки. */
+@media (max-width: 1024px) {
+  .site-footer.has-photo {
+    min-height: clamp(420px, 44vw, 520px);
   }
 
-  .footer-note {
+  .site-footer.has-photo .footer-inner {
+    width: min(100% - 48px, 900px);
+    grid-template-columns: 1fr 1fr;
+    /* Колонки выравниваются по верху: на планшете меню выше названия,
+       и по нижнему краю оно повисало в стороне от текста. */
+    align-items: start;
+    padding-block: clamp(190px, 30vw, 300px) 36px;
+    gap: 28px 40px;
+  }
+
+  .site-footer.has-photo .footer-note {
+    grid-column: 1 / -1;
     text-align: left;
   }
 
-  .footer-legal {
+  .site-footer.has-photo .footer-legal {
     justify-content: flex-start;
   }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 1100px) {
+  .site-footer.has-photo .footer-bg img {
+    object-position: center 58%;
+  }
+}
+
+/* Телефон: одна колонка, кадр вертикальный. */
+@media (max-width: 600px) {
+  .site-footer.has-photo {
+    min-height: clamp(520px, 130vw, 720px);
+  }
+
+  .site-footer.has-photo .footer-inner {
+    width: min(100% - 36px, 720px);
+    grid-template-columns: 1fr;
+    padding-block: clamp(240px, 62vw, 380px) 32px;
+    gap: 26px;
+  }
+
+  .site-footer.has-photo .footer-note {
+    grid-column: auto;
+  }
+
   /* Кадр для телефона вытянут вертикально — обрезка идёт по краям,
      а изгиб русла остаётся в кадре. */
-  .footer-bg img {
+  .site-footer.has-photo .footer-bg img {
     object-position: center 45%;
   }
 
   /* Снизу плотнее: на узком экране текста больше, а места меньше. */
-  .site-footer.has-photo::before {
-    background: linear-gradient(180deg, #04180fb3 0%, #04180fcc 40%, #031310f2 100%);
+  .site-footer.has-photo::after {
+    background: linear-gradient(180deg, #04180f47 0%, #04180fa6 38%, #031310f5 100%);
   }
 }
 
@@ -912,14 +988,11 @@ body.menu-open .site-header {
   }
 }
 
-/* Планшет в книжной ориентации: карточки в две колонки, а не в одну. */
+/* Планшет в книжной ориентации: карточки в две колонки, а не в одну.
+ * Сетка футера здесь не трогается: ею занимается раздел 10. */
 @media (min-width: 600px) and (max-width: 820px) {
   .quick-grid {
     grid-template-columns: repeat(2, 1fr);
-  }
-
-  .footer-inner {
-    grid-template-columns: 1fr 1fr;
   }
 }
 
@@ -1408,6 +1481,45 @@ body.menu-open .site-header {
   .viewer-frame {
     height: calc(100dvh - 132px);
   }
+}
+
+/*
+ * Постраничный просмотр — то, что видит телефон.
+ *
+ * Рамку с PDF мобильные браузеры не отрисовывают: раньше на телефоне
+ * работало только «Скачать». Теперь документ показывается страницами;
+ * они листаются обычной прокруткой и подгружаются по мере пролистывания.
+ */
+.viewer-pages {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 12px 24px;
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  background: #0b1c17;
+}
+
+.viewer-page {
+  margin: 0;
+  width: 100%;
+  max-width: 900px;
+}
+
+.viewer-page img {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 6px 20px #00000059;
+}
+
+.viewer-page figcaption {
+  margin-top: 6px;
+  text-align: center;
+  font-size: 12px;
+  color: #9fb1a6;
 }
 
 /* Сообщение, когда встроенный просмотр недоступен или файл не открылся. */

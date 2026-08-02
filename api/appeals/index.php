@@ -92,7 +92,7 @@ function respond(int $status, array $payload): void
         '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">',
         '<title>', escape_html($title), ' — СНП «Новая Искань»</title>',
         '<link rel="stylesheet" href="/_next/static/chunks/17orm0rfv_bic.css">',
-        '<link rel="stylesheet" href="/assets/site.css">',
+        '<link rel="stylesheet" href="/assets/site.css?v=4">',
         '</head><body><main class="content-section content-width">',
         '<div class="modal-window" style="margin:60px auto">',
         '<span>', $ok ? 'Обращение принято' : 'Ошибка', '</span>',

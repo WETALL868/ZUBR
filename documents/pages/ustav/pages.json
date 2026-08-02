@@ -1,0 +1,7 @@
+{
+  "_комментарий": "Файл собирается командой npm run documents:pages. Править вручную не нужно.",
+  "source": "/documents/files/ustav.pdf",
+  "pages": 24,
+  "width": 1000,
+  "height": 1374
+}
