@@ -10,4 +10,8 @@
 /.dev-runtime/
 /dist/
 /screenshots/
+
+# Файлы документов загружаются владельцем на хостинг
+/documents/files/*
+!/documents/files/README.txt
 npm-debug.log*

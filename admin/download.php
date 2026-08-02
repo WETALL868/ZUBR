@@ -1,10 +1,14 @@
 <?php
 declare(strict_types=1);
 require __DIR__ . DIRECTORY_SEPARATOR . 'functions.php';
+require __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'api'
+    . DIRECTORY_SEPARATOR . 'appeals' . DIRECTORY_SEPARATOR . 'appeal-id.php';
 require_admin();
 
+// Принимаются и новые короткие номера (N48271), и номера прежнего формата:
+// обращения, сохранённые до обновления, должны продолжать открываться.
 $id = (string)($_GET['id'] ?? '');
-if (!preg_match('/^НИ-\d{8}-[A-F0-9]{8}$/u', $id)) {
+if (!is_appeal_id($id)) {
     http_response_code(404);
     exit;
 }

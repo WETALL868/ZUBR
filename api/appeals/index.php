@@ -1,13 +1,58 @@
 <?php
 declare(strict_types=1);
 
-header('Content-Type: application/json; charset=utf-8');
+require __DIR__ . DIRECTORY_SEPARATOR . 'appeal-id.php';
+
 header('X-Content-Type-Options: nosniff');
+
+/**
+ * Форма отправляется скриптом (fetch) и получает JSON.
+ * Если скрипты отключены, браузер отправляет форму обычным способом —
+ * тогда отвечаем страницей, а не голым JSON.
+ */
+function wants_json(): bool
+{
+    return str_contains((string)($_SERVER['HTTP_ACCEPT'] ?? ''), 'application/json');
+}
 
 function respond(int $status, array $payload): void
 {
     http_response_code($status);
-    echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+    if (wants_json()) {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    // Ответ без JavaScript: та же информация обычной страницей.
+    header('Content-Type: text/html; charset=utf-8');
+    $ok = !empty($payload['ok']);
+    $title = $ok ? 'Ваше сообщение отправлено' : 'Обращение не отправлено';
+    $number = (string)($payload['publicId'] ?? '');
+    $error = (string)($payload['error'] ?? '');
+    $escape = static fn (string $value): string => htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
+    echo '<!doctype html><html lang="ru"><head><meta charset="utf-8">',
+        '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">',
+        '<title>', $escape($title), ' — СНП «Новая Искань»</title>',
+        '<link rel="stylesheet" href="/_next/static/chunks/17orm0rfv_bic.css">',
+        '<link rel="stylesheet" href="/assets/site.css">',
+        '</head><body><main class="content-section content-width">',
+        '<div class="modal-window" style="margin:60px auto">',
+        '<span>', $ok ? 'Обращение принято' : 'Ошибка', '</span>',
+        '<h2>', $escape($title), '</h2>';
+
+    if ($ok && $number !== '') {
+        echo '<p>Номер вашего обращения:</p>',
+            '<span class="appeal-number">', $escape($number), '</span>',
+            '<p>Сохраните номер — по нему правление найдёт обращение.</p>';
+    } else {
+        echo '<p>', $escape($error !== '' ? $error : 'Не удалось отправить обращение.'), '</p>';
+    }
+
+    echo '<a class="button button-dark" href="/appeal">Вернуться к форме</a>',
+        '</div></main></body></html>';
     exit;
 }
 
@@ -25,6 +70,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
     respond(405, ['ok' => false, 'error' => 'Допустима только отправка формы.']);
 }
 
+// Скрытое поле-ловушка: заполняют его только автоматические рассылки.
 if (!empty($_POST['website'] ?? '')) {
     respond(400, ['ok' => false, 'error' => 'Не удалось отправить обращение.']);
 }
@@ -57,15 +103,36 @@ if (!is_dir($storageDir) && !mkdir($storageDir, 0750, true) && !is_dir($storageD
     respond(500, ['ok' => false, 'error' => 'Сервер не смог создать папку для обращений.']);
 }
 
-$publicId = 'НИ-' . date('Ymd') . '-' . strtoupper(bin2hex(random_bytes(4)));
+// Номер подбирается и занимается до записи данных: если свободный номер
+// не нашёлся, обращение не сохраняется и посетитель видит честную ошибку,
+// а не выдуманное подтверждение.
+$reserved = reserve_appeal_id($storageDir);
+if ($reserved === null) {
+    respond(500, ['ok' => false, 'error' => 'Не удалось присвоить номер обращению. Попробуйте ещё раз.']);
+}
+[$publicId, $recordHandle, $recordPath] = $reserved;
+
+/**
+ * Снимает бронь номера, если сохранить обращение не удалось:
+ * иначе номер остался бы занятым пустым файлом.
+ */
+$releaseReservation = static function () use ($recordHandle, $recordPath): void {
+    if (is_resource($recordHandle)) {
+        fclose($recordHandle);
+    }
+    @unlink($recordPath);
+};
+
 $attachment = null;
 
 if (isset($_FILES['attachment']) && (int)$_FILES['attachment']['error'] !== UPLOAD_ERR_NO_FILE) {
     $file = $_FILES['attachment'];
     if ((int)$file['error'] !== UPLOAD_ERR_OK) {
+        $releaseReservation();
         respond(422, ['ok' => false, 'error' => 'Не удалось загрузить вложение.']);
     }
     if ((int)$file['size'] > 5 * 1024 * 1024) {
+        $releaseReservation();
         respond(422, ['ok' => false, 'error' => 'Размер вложения не должен превышать 5 МБ.']);
     }
 
@@ -84,14 +151,20 @@ if (isset($_FILES['attachment']) && (int)$_FILES['attachment']['error'] !== UPLO
         'image/png' => 'png',
     ];
     if (!isset($allowed[$mime])) {
+        $releaseReservation();
         respond(422, ['ok' => false, 'error' => 'Разрешены только PDF, JPG и PNG.']);
     }
 
+    // Расширение .php и заглушка в начале файла не дают выполнить
+    // или отдать вложение по прямой ссылке.
     $storedName = $publicId . '.upload.php';
     $storedPath = $storageDir . DIRECTORY_SEPARATOR . $storedName;
     $input = fopen((string)$file['tmp_name'], 'rb');
     $output = fopen($storedPath, 'wb');
     if (!$input || !$output) {
+        if ($input) fclose($input);
+        if ($output) fclose($output);
+        $releaseReservation();
         respond(500, ['ok' => false, 'error' => 'Не удалось сохранить вложение.']);
     }
     fwrite($output, "<?php exit; ?>\n");
@@ -120,10 +193,13 @@ $record = [
     'attachment' => $attachment,
 ];
 
-$recordPath = $storageDir . DIRECTORY_SEPARATOR . $publicId . '.record.php';
 $recordBody = "<?php exit; ?>\n" . base64_encode(serialize($record));
-if (file_put_contents($recordPath, $recordBody, LOCK_EX) === false) {
+$written = fwrite($recordHandle, $recordBody);
+fclose($recordHandle);
+
+if ($written === false || $written < strlen($recordBody)) {
     if ($attachment) @unlink($storageDir . DIRECTORY_SEPARATOR . $attachment['stored_name']);
+    @unlink($recordPath);
     respond(500, ['ok' => false, 'error' => 'Не удалось сохранить обращение.']);
 }
 chmod($recordPath, 0640);
@@ -137,4 +213,6 @@ if ($recipient !== '' && filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
     @mail($recipient, $encodedSubject, $mailBody, "Content-Type: text/plain; charset=UTF-8\r\n");
 }
 
+// Успех подтверждается только здесь — после того как запись действительно
+// оказалась на диске.
 respond(200, ['ok' => true, 'publicId' => $publicId]);

@@ -5,3 +5,64 @@ Options -Indexes
   php_value upload_max_filesize 6M
   php_value post_max_size 7M
 </IfModule>
+
+# ------------------------------------------------------------------
+# Сжатие. На медленном мобильном интернете это главный выигрыш:
+# стили и разметка сжимаются примерно в пять раз.
+# ------------------------------------------------------------------
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml
+  AddOutputFilterByType DEFLATE application/javascript application/x-javascript
+  AddOutputFilterByType DEFLATE application/json application/xml
+  AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+<IfModule mod_brotli.c>
+  AddOutputFilterByType BROTLI_COMPRESS text/html text/css text/plain
+  AddOutputFilterByType BROTLI_COMPRESS application/javascript application/json
+  AddOutputFilterByType BROTLI_COMPRESS image/svg+xml
+</IfModule>
+
+# ------------------------------------------------------------------
+# Кеширование. Картинки и стили с постоянными именами можно держать
+# в кеше долго, страницы — проверять при каждом заходе.
+# ------------------------------------------------------------------
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/avif "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType text/css "access plus 7 days"
+  ExpiresByType application/javascript "access plus 7 days"
+  ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+
+<IfModule mod_headers.c>
+  # Файлы с хешем в имени не меняются — их можно кешировать навсегда.
+  <FilesMatch "\.(avif|webp|jpe?g|png|svg|woff2?)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # Страницы всегда перепроверяются, чтобы правки появлялись сразу.
+  <FilesMatch "\.(html|php)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# ------------------------------------------------------------------
+# Служебные файлы не должны отдаваться посетителям.
+# ------------------------------------------------------------------
+<FilesMatch "^(config\.php|config\.example\.php|package(-lock)?\.json|tsconfig\.json|eslint\.config\.mjs|\.gitignore|\.user\.ini)$">
+  Require all denied
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # Папки разработки на хостинге не нужны, но если попадут — закрыты.
+  RewriteRule ^(tools|tests|node_modules|assets/source)/ - [F,L]
+</IfModule>
