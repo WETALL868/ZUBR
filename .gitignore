@@ -1,0 +1,13 @@
+# Реальные учётные данные администратора не хранятся в репозитории.
+# Шаблон: config.example.php — скопируйте его в config.php на хостинге.
+/config.php
+
+# Пользовательские обращения и вложения (создаются на сервере).
+/_private/submissions/
+
+# Локальная разработка
+/node_modules/
+/.dev-runtime/
+/dist/
+/screenshots/
+npm-debug.log*
