@@ -371,6 +371,28 @@ function capture_utm(): void
     }
 }
 
+// ── Демонстрационный режим ────────────────────────────────────────────────
+
+/**
+ * Сайт закрыт от индексации целиком?
+ *
+ * Помимо явного флага runtime.staging срабатывают две страховки:
+ * режим разработки и демонстрационный домен. Даже если флаг случайно
+ * переключат, сайт на example-домене в индекс не попадёт.
+ */
+function is_staging(): bool
+{
+    return config('runtime.staging') === true
+        || config('runtime.env') === 'development'
+        || str_contains((string) config('site.domain'), 'example');
+}
+
+/** Значение meta robots и заголовка X-Robots-Tag для демонстрационного режима. */
+function staging_robots(): string
+{
+    return 'noindex, nofollow, noarchive, nosnippet';
+}
+
 // ── Диагностика конфигурации (только для владельца) ───────────────────────
 
 /**
@@ -413,6 +435,10 @@ function diagnostics_issues(): array
     if (str_contains((string) config('contacts.phone.raw'), '0000000')) {
         $issues[] = 'Телефон всё ещё демонстрационный: +7 (000) 000-00-00';
     }
+    if (is_staging()) {
+        $issues[] = 'Включён демонстрационный режим: весь сайт закрыт от индексации '
+            . '(config/site.php → runtime.staging). Выключайте только на рабочем домене после проверки данных';
+    }
     if (config('mail.transport') === 'log') {
         $issues[] = 'Почта в режиме «log»: письма НЕ отправляются, а пишутся в storage/logs. Настройте SMTP в config/mail.php';
     }
@@ -441,6 +467,12 @@ if (PHP_SAPI !== 'cli') {
     header('Referrer-Policy: strict-origin-when-cross-origin');
     header('Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=()');
     header('X-Frame-Options: SAMEORIGIN');
+
+    // Демонстрационная версия закрывается от индексации и на уровне заголовка:
+    // это работает даже для файлов, которые не проходят через шаблоны.
+    if (is_staging()) {
+        header('X-Robots-Tag: ' . staging_robots());
+    }
 
     // Content-Security-Policy. Карта и аналитика подключаются только
     // при включённых модулях, поэтому источники добавляются условно.

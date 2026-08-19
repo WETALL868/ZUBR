@@ -15,7 +15,8 @@ declare(strict_types=1);
  *   2. Удаляет каталоги, которые создал сам, но которых больше нет в реестре
  *      (например, после отключения раздела метро). Чужие файлы не трогает:
  *      удаляются только каталоги с нашей меткой в index.php.
- *   3. Обновляет строку Sitemap в robots.txt по домену из конфигурации.
+ *   3. Перезаписывает robots.txt: рабочие правила или полный запрет,
+ *      если включён демонстрационный режим (runtime.staging).
  *   4. Записывает статический sitemap.xml, чтобы карта работала даже
  *      без правил перезаписи.
  *
@@ -135,24 +136,14 @@ foreach ($roots as $root) {
 
 $robotsFile = APP_ROOT . '/robots.txt';
 
-if (is_file($robotsFile)) {
-    $robots = (string) file_get_contents($robotsFile);
-    $line = 'Sitemap: ' . Sitemap::fileUrl('/sitemap.xml');
-    $robots = preg_replace('/^Sitemap:.*$/m', $line, $robots, 1, $count);
-
-    if ((int) $count === 0) {
-        $robots = rtrim($robots) . "\n\n" . $line . "\n";
-    }
-
-    if (!$dryRun) {
-        file_put_contents($robotsFile, $robots);
-    }
-    echo "  robots.txt: " . $line . "\n";
-}
-
 if (!$dryRun) {
-    file_put_contents(APP_ROOT . '/sitemap.xml', Sitemap::urlset());
+    file_put_contents($robotsFile, Sitemap::robotsTxt());
+    file_put_contents(APP_ROOT . '/sitemap.xml', is_staging() ? Sitemap::stagingUrlset() : Sitemap::urlset());
 }
+
+echo is_staging()
+    ? "  robots.txt: ДЕМОНСТРАЦИОННЫЙ РЕЖИМ — Disallow: / , sitemap.xml пустой\n"
+    : '  robots.txt: Sitemap: ' . Sitemap::fileUrl('/sitemap.xml') . "\n";
 
 // ── Итог ─────────────────────────────────────────────────────────────────
 
@@ -168,7 +159,12 @@ echo sprintf(
     $removed,
     $kept
 );
-echo sprintf("Всего страниц: %d, из них индексируется: %d\n", $total, $indexable);
+echo sprintf(
+    "Всего страниц: %d, готовы к индексации: %d%s\n",
+    $total,
+    $indexable,
+    is_staging() ? ' (сейчас закрыты все: демонстрационный режим)' : ''
+);
 
 /** Содержимое маршрутного файла. */
 function renderStub(array $page): string

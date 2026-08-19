@@ -15,9 +15,10 @@ $description = (string) ($state['description'] ?? '');
 $canonical = filled($state['canonical']) ? (string) $state['canonical'] : absolute_url(request_path());
 $robots = (string) ($state['robots'] ?? 'index, follow');
 
-// Черновой домен и режим разработки индексировать нельзя.
-if (config('runtime.env') === 'development' || str_contains((string) config('site.domain'), 'example')) {
-    $robots = 'noindex, nofollow';
+// Демонстрационный режим перекрывает любые настройки страницы:
+// пока сайт не на рабочем домене, в индекс не должно попасть ничего.
+if (is_staging()) {
+    $robots = staging_robots();
 }
 ?>
     <title><?= e($title) ?></title>

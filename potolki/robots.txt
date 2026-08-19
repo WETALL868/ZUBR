@@ -1,29 +1,12 @@
-# robots.txt
-# Строку Sitemap обновляет tools/build-routes.php по домену из config/site.php.
-# После смены домена запустите: php tools/build-routes.php
+# robots.txt — ДЕМОНСТРАЦИОННЫЙ РЕЖИМ
+#
+# Сайт закрыт от индексации целиком: config/site.php → runtime.staging = true.
+# Дополнительно каждая страница отдаёт meta robots и заголовок X-Robots-Tag
+# со значением noindex, nofollow.
+#
+# После переноса на рабочий домен, заполнения данных и ручной проверки:
+#   1. поставьте runtime.staging = false;
+#   2. выполните php tools/build-routes.php — файл перезапишется рабочими правилами.
 
 User-agent: *
-Allow: /
-
-# Служебные каталоги и точки API
-Disallow: /api/
-Disallow: /config/
-Disallow: /src/
-Disallow: /storage/
-Disallow: /tests/
-Disallow: /tools/
-Disallow: /includes/
-Disallow: /templates/
-Disallow: /content/
-
-# Служебные страницы и результаты отправки форм
-Disallow: /thanks/
-Disallow: /*?form=
-Disallow: /*?diag=
-
-# Параметры не создают новых страниц — исключаем дубли
-Disallow: /*?utm_
-Disallow: /*?part=
-Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term&form&diag
-
-Sitemap: https://example-potolki.ru/sitemap.xml
+Disallow: /

@@ -21,6 +21,12 @@ use Potolki\Seo\Sitemap;
 header('Content-Type: application/xml; charset=utf-8');
 header('X-Robots-Tag: noindex');
 
+// Демонстрационная версия не отдаёт список страниц: индексировать нечего.
+if (is_staging()) {
+    echo Sitemap::stagingUrlset();
+    exit;
+}
+
 $part = isset($_GET['part']) && is_string($_GET['part']) ? $_GET['part'] : null;
 
 if ($part !== null && isset(Sitemap::parts()[$part])) {

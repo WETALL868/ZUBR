@@ -127,11 +127,19 @@ T::suite('SEO: robots.txt');
 $robots = (string) @file_get_contents(APP_ROOT . '/robots.txt');
 
 T::ok($robots !== '', 'robots.txt существует');
-T::ok(str_contains($robots, 'Sitemap: '), 'в robots.txt указана карта сайта');
-T::ok(str_contains($robots, 'Disallow: /api/'), 'служебные точки API закрыты');
-T::ok(str_contains($robots, 'Disallow: /config/'), 'каталог конфигурации закрыт');
-T::ok(str_contains($robots, 'Disallow: /thanks/'), 'страница благодарности закрыта');
-T::ok(str_contains($robots, 'Clean-param:'), 'параметры отсечены директивой Clean-param');
+
+if (is_staging()) {
+    T::ok(str_contains($robots, 'User-agent: *'), 'в robots.txt есть директива для всех роботов');
+    T::ok(str_contains($robots, 'Disallow: /'), 'демонстрационный режим: индексация запрещена целиком');
+    T::ok(!str_contains($robots, 'Sitemap: '), 'демонстрационный режим: карта сайта не публикуется');
+    T::ok(!str_contains($robots, 'Allow: /'), 'демонстрационный режим: разрешающих правил нет');
+} else {
+    T::ok(str_contains($robots, 'Sitemap: '), 'в robots.txt указана карта сайта');
+    T::ok(str_contains($robots, 'Disallow: /api/'), 'служебные точки API закрыты');
+    T::ok(str_contains($robots, 'Disallow: /config/'), 'каталог конфигурации закрыт');
+    T::ok(str_contains($robots, 'Disallow: /thanks/'), 'страница благодарности закрыта');
+    T::ok(str_contains($robots, 'Clean-param:'), 'параметры отсечены директивой Clean-param');
+}
 
 T::suite('SEO: юридические страницы');
 

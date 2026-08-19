@@ -75,6 +75,78 @@ final class Sitemap
         return $xml . '</sitemapindex>';
     }
 
+    /**
+     * Карта для демонстрационного режима: пустая, с пояснением внутри.
+     * Так случайно отправленный в поисковую систему файл ничего не откроет.
+     */
+    public static function stagingUrlset(): string
+    {
+        return '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
+            . '<!-- Демонстрационная версия сайта. Индексация запрещена целиком: '
+            . 'config/site.php → runtime.staging. Карта будет заполнена после переноса '
+            . 'на рабочий домен. -->' . "\n"
+            . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>';
+    }
+
+    /**
+     * Содержимое robots.txt. В демонстрационном режиме — полный запрет,
+     * в рабочем — обычные правила со ссылкой на карту сайта.
+     */
+    public static function robotsTxt(): string
+    {
+        $sitemap = self::fileUrl('/sitemap.xml');
+
+        if (is_staging()) {
+            return <<<TXT
+# robots.txt — ДЕМОНСТРАЦИОННЫЙ РЕЖИМ
+#
+# Сайт закрыт от индексации целиком: config/site.php → runtime.staging = true.
+# Дополнительно каждая страница отдаёт meta robots и заголовок X-Robots-Tag
+# со значением noindex, nofollow.
+#
+# После переноса на рабочий домен, заполнения данных и ручной проверки:
+#   1. поставьте runtime.staging = false;
+#   2. выполните php tools/build-routes.php — файл перезапишется рабочими правилами.
+
+User-agent: *
+Disallow: /
+
+TXT;
+        }
+
+        return <<<TXT
+# robots.txt
+# Файл создаётся командой php tools/build-routes.php по данным из config.
+
+User-agent: *
+Allow: /
+
+# Служебные каталоги и точки API
+Disallow: /api/
+Disallow: /config/
+Disallow: /src/
+Disallow: /storage/
+Disallow: /tests/
+Disallow: /tools/
+Disallow: /includes/
+Disallow: /templates/
+Disallow: /content/
+
+# Служебные страницы и результаты отправки форм
+Disallow: /thanks/
+Disallow: /*?form=
+Disallow: /*?diag=
+
+# Параметры не создают новых страниц — исключаем дубли
+Disallow: /*?utm_
+Disallow: /*?part=
+Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term&form&diag
+
+Sitemap: {$sitemap}
+
+TXT;
+    }
+
     /** Абсолютный адрес файла в корне сайта (без завершающего слэша). */
     public static function fileUrl(string $file): string
     {

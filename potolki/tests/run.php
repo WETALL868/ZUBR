@@ -23,6 +23,7 @@ $suites = [
     'calculator' => __DIR__ . '/calculator_test.php',
     'forms'      => __DIR__ . '/forms_test.php',
     'seo'        => __DIR__ . '/seo_test.php',
+    'staging'    => __DIR__ . '/staging_test.php',
     'geo'        => __DIR__ . '/geo_quality_test.php',
     'links'      => __DIR__ . '/links_test.php',
     'syntax'     => __DIR__ . '/syntax_test.php',
