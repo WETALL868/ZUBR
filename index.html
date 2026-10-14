@@ -468,50 +468,59 @@ html:has(.drawer.open),html:has(.drawer.open) body{overflow:hidden}
 .main-ph .arr.l{left:12px}.main-ph .arr.r{right:12px}
 .main-ph .cnt{position:absolute;bottom:12px;right:14px;font-family:var(--mono);font-size:12px;padding:4px 8px;border-radius:8px;background:rgba(19,35,58,.06)}
 .p-opts{min-width:0;display:flex;flex-direction:column;gap:18px}
-.var-dim b{display:block;margin-bottom:8px;font-size:14px}
-.var-dim b span{font-weight:500;color:var(--ink2)}
-.var-vals{display:flex;flex-wrap:wrap;gap:8px}
-.var-vals a,.var-vals .x{min-width:52px;padding:8px 12px;border-radius:10px;border:2px solid var(--line);background:#fff;text-decoration:none;color:var(--ink);font-weight:700;font-size:14px;text-align:center}
-.var-vals a:hover{border-color:#C9D6EA}
-.var-vals a.on{border-color:var(--accent);background:var(--soft);color:var(--accent)}
-.var-vals a.alt{color:var(--muted);border-style:dashed}
-.var-vals a small{display:block;margin-top:1px;font-size:12px;font-weight:600;color:var(--muted)}
-.var-vals a.on small{color:var(--accent)}
-.var-vals a.alt:hover{border-color:#9DB3D3;color:var(--ink)}
-.var-note{display:flex;align-items:center;gap:8px;margin:-6px 0 0;font-size:12.5px;color:var(--muted)}
-.var-note i{position:relative;flex:0 0 26px;height:16px;border:2px solid var(--line);border-radius:5px;background:#F7F8FA}
-.var-note i::after{content:'';position:absolute;left:3px;right:3px;top:50%;border-top:1.5px solid #B4BECB}
-.var-vals .x{position:relative;color:#A9B4C2;background:#F7F8FA;border-color:#EEF1F5;font-weight:600;text-decoration:line-through;text-decoration-color:#A9B4C2;cursor:not-allowed}
-.var-vals .x.on{border-color:#9DB6E4;border-style:dashed;background:#F4F7FD;color:#8FA2C0}
-.vo-empty{margin:0;padding:12px 14px;border:1px dashed var(--line);border-radius:12px;font-size:13.5px;color:var(--muted)}
 .variants-table tr.oos td{color:var(--muted2)}
 /* таблица вариантов выбранного размера */
-.vpick{display:flex;flex-direction:column;gap:16px;min-width:0}
-.vpick .var-note{margin:-4px 0 0}
-.vopts{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
-.vo-h{margin:0;padding:10px 14px;font-size:13.5px;font-weight:800;background:var(--tile);border-bottom:1px solid var(--line2)}
-.vo-wrap{overflow:auto}
-.vopts.collapsed .vo-wrap{max-height:352px;overflow:hidden;position:relative}
-.vopts.collapsed .vo-wrap::after{content:'';position:absolute;left:0;right:0;bottom:0;height:56px;background:linear-gradient(rgba(255,255,255,0),#fff);pointer-events:none}
-.vo-t{width:100%;border-collapse:collapse;font-size:13.5px}
-.vo-t th{padding:8px 8px 6px;text-align:left;font-size:11px;font-weight:700;line-height:1.2;color:var(--muted2);text-transform:uppercase;letter-spacing:.03em;vertical-align:bottom}
-.vo-t th:last-child,.vo-p{text-align:right}
-.vo-t td{padding:8px;border-top:1px solid var(--line2);white-space:nowrap}
-.vo-t td:nth-child(2){white-space:normal;min-width:90px}
-.vo-t tr.g td{border-top:2px solid var(--line)}
-.vo-t tbody tr{cursor:pointer;transition:background .12s}
-.vo-t tbody tr:hover{background:var(--tile)}
-.vo-t tr.on,.vo-t tr.on:hover{background:var(--soft)}
-.vo-t td a{color:var(--ink);font-weight:700;text-decoration:none}
-.vo-t tr.on td a{color:var(--accent)}
-.vo-r{width:26px;padding-right:0!important}
-.vo-r i{display:block;width:16px;height:16px;border-radius:50%;border:2px solid #C3CDDA;background:#fff}
-.vo-t tr.on .vo-r i{border:5px solid var(--accent)}
-.vo-p b{display:block;font-weight:800;font-size:14px}
-.vo-p .stock{display:block;font-size:11.5px;font-weight:600;line-height:1.3}
-.vo-more{display:block;width:100%;padding:11px;border:0;border-top:1px solid var(--line2);background:#fff;color:var(--accent);font-weight:700;cursor:pointer}
-.vo-more:hover{background:var(--tile)}
-.vo-s{display:none}
+/* выбор варианта — как на Ozon: «Параметр: значение», кнопки размеров, плитки с фото для цвета, бренда, модели */
+.vpick{display:flex;flex-direction:column;gap:18px;min-width:0}
+.var-l{margin:0 0 10px;font-size:14px;color:var(--muted)}
+.var-l b{color:var(--ink);font-weight:700}
+.var-vals,.var-tiles{display:flex;flex-wrap:wrap;gap:8px}
+.vc{display:inline-flex;align-items:center;justify-content:center;min-width:56px;height:44px;padding:0 14px;border-radius:12px;border:1px solid #D3DCE8;background:#fff;color:var(--ink);font-weight:600;font-size:15px;text-decoration:none;white-space:nowrap;transition:border-color .12s,box-shadow .12s}
+.vc:hover{border-color:#9DB3D3;color:var(--ink)}
+.vc.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.vc.alt{color:#9AA7B8;border-color:#E3E9F0}
+.vc.alt:hover{color:var(--ink);border-color:#9DB3D3}
+.vc.x{color:#B9C3CF;background:#F6F8FA;border-color:#EEF1F5;text-decoration:line-through;cursor:not-allowed}
+.vc.oos,.vt.oos .ph{border-style:dashed}
+.vc.more{font:inherit;font-size:14px;font-weight:700;color:var(--accent);background:var(--soft);border-color:transparent;cursor:pointer}
+.vt{display:flex;flex-direction:column;align-items:center;gap:3px;width:84px;padding:0 0 4px;text-decoration:none;color:var(--ink);text-align:center}
+.vt .ph{width:76px;height:76px;border-radius:12px;border:1px solid #D3DCE8;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:border-color .12s,box-shadow .12s}
+.vt .ph img{width:64px;height:64px;object-fit:contain}
+.vt .nm{max-width:84px;margin-top:3px;font-size:12.5px;font-weight:700;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vt .pr{font-size:12px;font-weight:600;color:var(--muted)}
+.vt:hover{color:var(--ink)}
+.vt:hover .ph{border-color:#9DB3D3}
+.vt.on .ph{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.vt.on .nm{color:var(--accent)}
+.vt.alt .ph img{opacity:.45}
+.vt.alt .nm,.vt.alt .pr{color:#9AA7B8}
+.vt.x{cursor:not-allowed}
+.vt.x .ph{background:#F6F8FA;border-color:#EEF1F5}
+.vt.x .ph img{opacity:.3;filter:grayscale(1)}
+.vt.x .nm{color:#B9C3CF;text-decoration:line-through}
+.vt.x .pr{color:#B9C3CF}
+.vt.more{justify-content:center;width:76px;height:76px;border:0;border-radius:12px;background:var(--soft);color:var(--accent);font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.var-vals .vh,.var-tiles .vh{display:none}
+.var-vals.all .vh{display:inline-flex}
+.var-tiles.all .vh{display:flex}
+.var-note{margin:-6px 0 0;font-size:12.5px;color:var(--muted)}
+.vpop{position:absolute;z-index:95;width:164px;padding:8px;border-radius:14px;background:#13233A;color:#fff;box-shadow:0 16px 40px rgba(14,35,64,.35);transform:translateY(-100%);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .12s}
+.vpop.on{opacity:1;visibility:visible}
+.vpop img{display:block;width:148px;height:148px;object-fit:contain;background:#fff;border-radius:10px}
+.vp-p{display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 8px;margin-top:8px;padding:0 2px}
+.vp-p b{font-size:17px;font-weight:800}
+.vp-p s{font-size:12.5px;color:#9FB0C6}
+.vp-p em{font-style:normal;font-size:13.5px;font-weight:700;color:#FFB4AE}
+.var-all{align-self:flex-start;font-size:14px;font-weight:700;color:var(--accent);text-decoration:none}
+.var-all:hover{text-decoration:underline}
+@media (max-width:600px){
+  .var-tiles{flex-wrap:nowrap;overflow-x:auto;margin:0 -16px;padding:2px 16px 4px;scrollbar-width:none}
+  .var-tiles::-webkit-scrollbar{display:none}
+  .var-tiles .vh{display:flex}
+  .var-tiles .more{display:none}
+  .vt{flex:0 0 auto}
+  .vc{height:42px;padding:0 12px;font-size:14px}
+}
 .rail-more{display:none}
 @media (max-width:600px){
   /* ленты «Похожие», «С этим покупают», «Вы смотрели» — сеткой, без обрезанных карточек */
@@ -525,8 +534,6 @@ html:has(.drawer.open),html:has(.drawer.open) body{overflow:hidden}
   .toolbar label:has([data-sort]){flex:1;min-width:0;font-size:0;gap:0}
   .toolbar label:has([data-sort]) .select{width:100%;height:40px;font-size:14px}
   .toolbar label:has([data-per]),.toolbar .check,.toolbar .views{display:none}
-  .vo-t th:not(:first-child):not(:nth-child(2)):not(:last-child),.vo-t td:not(.vo-r):not(:nth-child(2)):not(.vo-p){display:none}
-  .vo-s{display:block;margin-top:2px;font-size:12px;font-weight:500;color:var(--muted)}
 }
 .keyspecs{padding:16px 18px}
 .keyspecs b{display:block;margin-bottom:8px}
@@ -998,6 +1005,20 @@ window.GRAN_ASSETS = {"assets/img/bg-about.svg": "data:image/svg+xml;base64,PHN2
     return '<div class="strip' + (cls || '') + '"' + (bg ? ' style="background-image:url(' + asset(bg) + ')"' : '') + '><div class="strip-tx"><p class="eyebrow">' + esc(s[0]) + '</p><b>' + esc(s[1]) + '</b><span>' + esc(s[2]) + '</span></div>' + act + '</div>';
   }
 
+  // ------------------------------------------------------------ выбор варианта: при наведении на кнопку — фото и цена этого варианта (как на Ozon)
+  var pvBox = null, pvFor = null;
+  function pvShow(a) {
+    var d = (a.getAttribute('data-pv') || '').split('|');
+    if (!pvBox) { pvBox = D.createElement('div'); pvBox.className = 'vpop'; pvBox.setAttribute('aria-hidden', 'true'); D.body.appendChild(pvBox); }
+    pvBox.innerHTML = (d[0] ? '<img src="' + esc(d[0]) + '" alt="">' : '') + '<span class="vp-p">' +
+      (d[3] ? '<em>' + esc(d[3]) + '</em>' : '<b>' + esc(d[1] || 'Цена по запросу') + '</b>' + (d[2] ? '<s>' + esc(d[2]) + '</s>' : '')) + '</span>';
+    var r = a.getBoundingClientRect();
+    pvBox.style.left = Math.round(Math.max(8, Math.min(D.documentElement.clientWidth - 172, r.left + r.width / 2 - 82))) + 'px';
+    pvBox.style.top = Math.round(r.top + scrollY - 10) + 'px';
+    pvBox.classList.add('on'); pvFor = a;
+  }
+  function pvHide() { if (pvBox) pvBox.classList.remove('on'); pvFor = null; }
+
   // ------------------------------------------------------------ мега-меню и мобильное меню
   function menuRoots() { return (window.MENU && window.MENU.roots) || []; }
   function renderMega() {
@@ -1250,6 +1271,15 @@ window.GRAN_ASSETS = {"assets/img/bg-about.svg": "data:image/svg+xml;base64,PHN2
     store.set('profile', formData(f)); closeModal(); nav(R + 'account.html');
   });
 
+  D.addEventListener('mouseover', function (e) {
+    if (!window.matchMedia || !matchMedia('(hover: hover)').matches) return;
+    var a = e.target.closest ? e.target.closest('.vc[data-pv]') : null;
+    if (a !== pvFor) { if (a) pvShow(a); else pvHide(); }
+  });
+  D.addEventListener('click', pvHide, true);
+  window.addEventListener('hashchange', pvHide);
+  window.addEventListener('scroll', function () { if (pvFor) pvHide(); }, { passive: true });
+
   // ------------------------------------------------------------ делегирование кликов
   D.addEventListener('click', function (e) {
     var t = e.target, el;
@@ -1270,8 +1300,7 @@ window.GRAN_ASSETS = {"assets/img/bg-about.svg": "data:image/svg+xml;base64,PHN2
     if ((el = t.closest('.burger'))) { openDrawer(); return; }
     if ((el = t.closest('[data-yt]'))) { el.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + el.getAttribute('data-yt') + '?autoplay=1" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen title="Видео"></iframe>'; el.removeAttribute('data-yt'); return; }
     if ((el = t.closest('[data-rail-more]'))) { var rb = el.previousElementSibling; if (rb) rb.classList.add('all'); el.remove(); return; }
-    if ((el = t.closest('[data-vo-more]'))) { el.parentNode.classList.remove('collapsed'); el.remove(); return; }
-    if ((el = t.closest('tr[data-row]')) && !t.closest('a')) { var ra = el.querySelector('a'); if (ra) ra.click(); return; }
+    if ((el = t.closest('[data-var-more]'))) { el.parentNode.classList.add('all'); el.remove(); return; }
     if ((el = t.closest('[data-expand]'))) { var sc = el.parentNode.previousElementSibling; if (sc) sc.classList.remove('collapsed'); el.parentNode.remove(); return; }
     if ((el = t.closest('[data-share]'))) {
       var url = location.href;
@@ -1967,63 +1996,46 @@ window.GRAN_ASSETS = {"assets/img/bg-about.svg": "data:image/svg+xml;base64,PHN2
     if (Array.isArray(a)) { for (var i = 0; i < a.length; i++) { var c = cmpAny(a[i], b[i]); if (c) return c; } return 0; }
     return a < b ? -1 : a > b ? 1 : 0;
   }
-  // как variant_picker в сборщике: кнопки главного размера + таблица вариантов этого размера
-  // как variant_picker в сборщике: каскад только по тому, что в наличии
+  // как variant_picker в сборщике: строка на параметр; в следующих строках — только то, что есть при выбранном выше
+  var VISUAL = { 'Цвет': 1, 'Бренд': 1, 'Модель': 1, 'Модель 2': 1, 'Вариант': 1, 'Вариант 2': 1, 'Исполнение': 1, 'Комплектация': 1, 'Тип': 1 };
   function variantPicker(p, fam) {
-    var items = fam.items, cur = p.var, multi = fam.dims.indexOf('Бренд') >= 0;
-    var avail = items.filter(function (x) { return x.stock; });
-    var sizes = fam.dims.filter(function (d) { return d !== 'Бренд'; });
-    var prim = sizes.length ? sizes[0] : null, other = sizes.slice(1), out = '', crossed = false;
-    sizes.forEach(function (d, di) {
-      var rest = sizes.filter(function (o) { return o !== d; }), above = sizes.slice(0, di);
-      var vals = [];
-      items.forEach(function (x) { if (vals.indexOf(x.var[d]) < 0) vals.push(x.var[d]); });
+    var items = fam.items, cur = p.var, dims = fam.dims, out = '', hasX = false;
+    dims.forEach(function (d, di) {
+      var above = dims.slice(0, di), below = dims.slice(di + 1), vals = [];
+      var pool = items.filter(function (x) { return above.every(function (o) { return x.var[o] === cur[o]; }); });
+      pool.forEach(function (x) { if (vals.indexOf(x.var[d]) < 0) vals.push(x.var[d]); });
       vals.sort(function (a, b) { return cmpAny(vkey(a), vkey(b)); });
-      out += '<div class="var-dim"><b>' + e(d) + ': <span>' + e(cur[d]) + '</span></b><div class="var-vals">' + vals.map(function (v) {
-        var on = v === cur[d], t = null, tk = null, prices = [];
-        avail.forEach(function (x) {
-          if (x.var[d] !== v || !above.every(function (o) { return x.var[o] === cur[o]; })) return;
-          // куда ведёт кнопка: ближайшие остальные размеры, тот же бренд, дешевле
-          var k = [rest.map(function (o) { return vdist(x.var[o], cur[o]); }), !multi || x.var['Бренд'] === cur['Бренд'] ? 0 : 1, x.price || 1e12];
+      var opts = vals.map(function (v) {
+        var t = null, tk = null, state;
+        if (v === cur[d]) return { v: v, t: p, s: p.stock ? 'on' : 'on oos' };
+        pool.forEach(function (x) {      // ближайшие нижние параметры, потом дешевле
+          if (x.var[d] !== v || !x.stock) return;
+          var k = [below.map(function (o) { return vdist(x.var[o], cur[o]); }), x.price || 1e12];
           if (!t || cmpAny(k, tk) < 0) { t = x; tk = k; }
-          if (x.price && prices.indexOf(x.price) < 0) prices.push(x.price);
         });
-        if (!t) {
-          crossed = true;
-          var why = on ? 'Этого варианта нет в наличии' : 'Нет в наличии' + (above.length ? ' для: ' + above.map(function (o) { return o.toLowerCase() + ' ' + cur[o]; }).join(', ') : '');
-          return '<span class="x' + (on ? ' on' : '') + '" title="' + e(why) + '">' + e(v) + '</span>';
-        }
-        prices.sort(function (a, b) { return a - b; });
-        var low = d === prim && prices.length ? '<small>' + (prices.length > 1 ? 'от ' : '') + fmt(prices[0]) + ' ₽</small>' : '';
-        return '<a href="#/' + t.url + '"' + (on ? ' class="on"' : '') + '>' + e(v) + low + '</a>';
-      }).join('') + '</div></div>';
+        state = t ? '' : 'x';
+        return { v: v, t: t || pool.filter(function (x) { return x.var[d] === v; })[0], s: state };
+      });
+      opts = opts.filter(function (o) { return o.s !== 'x'; }).concat(opts.filter(function (o) { return o.s === 'x'; }));     // чего нет в наличии — в конец
+      opts.forEach(function (o) { if (o.s === 'x') hasX = true; });
+      var imgs = {}; opts.forEach(function (o) { if (o.t.img) imgs[o.t.img] = 1; });
+      var tiles = VISUAL[d] && opts.length <= 30 && Object.keys(imgs).length >= 2;
+      var limit = tiles ? 10 : 16, cut = opts.length > limit + 2, hidden = 0, tag = tiles ? 'vt' : 'vc';
+      var h = opts.map(function (o, k) {
+        var hide = cut && k >= limit && o.s.indexOf('on') < 0; if (hide) hidden++;
+        var cls = [o.s, hide ? 'vh' : ''].filter(Boolean).join(' ');
+        var price = o.t.price ? fmt(o.t.price) + ' ₽' : '';
+        var inner = tiles ? '<span class="ph">' + (o.t.img ? img(o.t.img, '') : '') + '</span><span class="nm">' + e(o.v) + '</span><span class="pr">' + (o.s === 'x' || o.s === 'on oos' ? 'нет в наличии' : price) + '</span>' : e(o.v);
+        if (o.s === 'x') return '<span class="' + tag + ' ' + cls + '" title="' + e(o.v) + ' — нет в наличии">' + inner + '</span>';
+        var pv = [o.t.img ? G.thumb(o.t.img) : '', price, o.t.old > o.t.price ? fmt(o.t.old) + ' ₽' : '', o.t.stock ? '' : 'нет в наличии'].join('|');
+        return '<a class="' + tag + (cls ? ' ' + cls : '') + '" href="#/' + o.t.url + '" data-pv="' + e(pv) + '" aria-label="' + e(d) + ': ' + e(o.v) + (price ? ', ' + price : '') + '">' + inner + '</a>';
+      }).join('');
+      if (cut) h += '<button type="button" class="' + tag + ' more" data-var-more>Ещё ' + hidden + '</button>';
+      out += '<div class="var-dim"><p class="var-l">' + e(d) + ': <b>' + e(cur[d]) + '</b></p><div class="' + (tiles ? 'var-tiles' : 'var-vals') + '">' + h + '</div></div>';
     });
-    if (crossed) out += '<p class="var-note"><i></i>Перечёркнутых вариантов нет в наличии при выбранных параметрах</p>';
-    var cols = (multi ? ['Бренд'] : []).concat(other);
-    if (cols.length) {
-      var group = avail.filter(function (x) { return !prim || x.var[prim] === cur[prim]; }).map(function (x, i) {
-        return { x: x, i: i, k: [other.map(function (d) { return vkey(x.var[d]); }), x.price || 1e12] };
-      }).sort(function (a, b) { return cmpAny(a.k, b.k) || a.i - b.i; }).map(function (g) { return g.x; });
-      var n = group.length;
-      if (!n) { if (prim) out += '<p class="vo-empty">' + e(prim) + ' ' + e(cur[prim]) + ' сейчас нет в наличии — выберите другой ' + e(prim.toLowerCase()) + '</p>'; }
-      else {
-        var bset = {}; if (multi) group.forEach(function (x) { bset[x.var['Бренд']] = 1; });
-        var nb = Object.keys(bset).length;
-        var head = (prim ? e(prim) + ' ' + e(cur[prim]) + ' — ' : '') + 'в наличии ' + n + ' ' + plural(n, 'вариант', 'варианта', 'вариантов') + (nb > 1 ? ' у ' + nb + ' ' + plural(nb, 'бренда', 'брендов', 'брендов') : '');
-        var prev = null;
-        var rows = group.map(function (x) {
-          var spec = other.map(function (d) { return x.var[d]; }).join('\u0001');
-          var cls = [x.id === p.id ? 'on' : '', prev !== null && spec !== prev ? 'g' : ''].filter(Boolean).join(' ');
-          prev = spec;
-          var rest = cols.slice(1).map(function (d) { return x.var[d]; }).join(' · ');
-          var cells = '<td><a href="#/' + x.url + '">' + e(x.var[cols[0]]) + '</a>' + (rest ? '<small class="vo-s">' + e(rest) + '</small>' : '') + '</td>' + cols.slice(1).map(function (d) { return '<td>' + e(x.var[d]) + '</td>'; }).join('');
-          return '<tr data-row' + (cls ? ' class="' + cls + '"' : '') + '><td class="vo-r"><i></i></td>' + cells + '<td class="vo-p"><b>' + (x.price ? fmt(x.price) + ' ₽' : 'по запросу') + '</b></td></tr>';
-        }).join('');
-        var th = '<th></th>' + cols.map(function (c) { return '<th>' + e(c) + '</th>'; }).join('') + '<th>Цена</th>';
-        var more = n > 8 ? '<button type="button" class="vo-more" data-vo-more>Показать все ' + n + ' ' + plural(n, 'вариант', 'варианта', 'вариантов') + ' ↓</button>' : '';
-        out += '<div class="vopts' + (n > 8 ? ' collapsed' : '') + '"><p class="vo-h">' + head + '</p><div class="vo-wrap"><table class="vo-t"><thead><tr>' + th + '</tr></thead><tbody>' + rows + '</tbody></table></div>' + more + '</div>';
-      }
-    }
+    if (hasX) out += '<p class="var-note">Перечёркнутых вариантов нет в наличии</p>';
+    var avail = items.filter(function (x) { return x.stock; }), pr = avail.filter(function (x) { return x.price; }).map(function (x) { return x.price; });
+    out += '<a class="var-all" href="#variants">Все варианты: ' + items.length + ', в наличии ' + avail.length + (pr.length ? ' от ' + fmt(Math.min.apply(null, pr)) + ' ₽' : '') + ' →</a>';
     return '<div class="vpick" id="pick">' + out + '</div>';
   }
 
