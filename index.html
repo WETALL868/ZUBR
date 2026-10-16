@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru" data-root="#/" data-hdr="band" data-ft="seasons" data-w="wide" data-menu="glass">
+<html lang="ru" data-root="#/" data-hdr="band" data-ft="seasons" data-w="wide" data-menu="glass" data-cards="x2">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1072,6 +1072,87 @@ html[data-menu=head] .mega-head h2 small{color:#C7D4E4}
 html[data-menu=head] .mega-head .eyebrow{color:#9FC0F5}
 html[data-menu=head] .mega-head .btn{background:#fff;border-color:#fff}
 
+/* ------------------------------------------------------------ крупные карточки товаров: ×1,5 и ×2 (html[data-cards]) */
+html[data-cards=x15] .grid:not(.list){grid-template-columns:repeat(auto-fill,minmax(min(310px,100%),1fr));gap:18px}
+html[data-cards=x15] .grid.cols6{grid-template-columns:repeat(4,minmax(0,1fr))}
+html[data-cards=x15] .rail{grid-auto-columns:minmax(300px,1fr);gap:18px}
+html[data-cards=x15] .grid:not(.list) .pc,html[data-cards=x15] .rail .pc{padding:15px;gap:10px;border-radius:18px}
+html[data-cards=x15] .grid:not(.list) .pc .ph,html[data-cards=x15] .rail .pc .ph{height:290px;border-radius:14px}
+html[data-cards=x15] .grid:not(.list) .pc .ph img,html[data-cards=x15] .rail .pc .ph img{height:262px}
+html[data-cards=x15] .pc .meta{font-size:12px}
+html[data-cards=x15] .grid:not(.list) .pc .nm,html[data-cards=x15] .rail .pc .nm{font-size:16px;min-height:4.05em}
+html[data-cards=x15] .pc .vars{font-size:13px}
+html[data-cards=x15] .pc .stock{font-size:14px}
+html[data-cards=x15] .pc .pr .price{font-size:25px}
+html[data-cards=x15] .pc .buy .btn{height:48px;font-size:16px}
+html[data-cards=x15] .pc .qty{height:48px}
+html[data-cards=x15] .pc .acts .icon-btn{width:36px;height:36px}
+
+html[data-cards=x2] .grid:not(.list){grid-template-columns:repeat(auto-fill,minmax(min(400px,100%),1fr));gap:22px}
+html[data-cards=x2] .grid.cols6{grid-template-columns:repeat(3,minmax(0,1fr))}
+html[data-cards=x2] .rail{grid-auto-columns:minmax(400px,1fr);gap:22px}
+html[data-cards=x2] .grid:not(.list) .pc,html[data-cards=x2] .rail .pc{padding:18px;gap:12px;border-radius:22px}
+html[data-cards=x2] .grid:not(.list) .pc .ph,html[data-cards=x2] .rail .pc .ph{height:390px;border-radius:16px}
+html[data-cards=x2] .grid:not(.list) .pc .ph img,html[data-cards=x2] .rail .pc .ph img{width:84%;height:350px}
+html[data-cards=x2] .pc .badges{top:14px;left:14px}
+html[data-cards=x2] .pc .badge{height:28px;font-size:14px;padding:0 10px}
+html[data-cards=x2] .pc .acts{top:14px;right:14px;gap:8px}
+html[data-cards=x2] .pc .acts .icon-btn{width:42px;height:42px}
+html[data-cards=x2] .pc .meta{font-size:13px}
+html[data-cards=x2] .grid:not(.list) .pc .nm,html[data-cards=x2] .rail .pc .nm{font-size:19px;line-height:1.35;min-height:4.05em}
+html[data-cards=x2] .pc .vars{font-size:14px;gap:6px}
+html[data-cards=x2] .pc .vars span{padding:4px 10px;border-radius:8px}
+html[data-cards=x2] .pc .stock{font-size:15px}
+html[data-cards=x2] .pc .pr .price{font-size:32px}
+html[data-cards=x2] .pc .pr .old{font-size:17px}
+html[data-cards=x2] .pc .buy{gap:10px}
+html[data-cards=x2] .pc .buy .btn{height:56px;font-size:17px;border-radius:14px}
+html[data-cards=x2] .pc .qty{height:56px;border-radius:14px}
+html[data-cards=x2] .pc .qty button{width:42px;font-size:22px}
+html[data-cards=x2] .pc .qty input{width:42px;font-size:17px}
+html[data-cards=x2] .ph-dots{bottom:12px;left:18px;right:18px}
+html[data-cards=x2] .ph-dots i{height:4px}
+@media (max-width:600px){
+  html[data-cards=x2] .grid:not(.list),html[data-cards=x2] .grid.cols6{grid-template-columns:1fr;gap:14px}
+  html[data-cards=x2] .rail{grid-template-columns:1fr}
+  html[data-cards=x2] .grid:not(.list) .pc .ph,html[data-cards=x2] .rail .pc .ph{height:300px}
+  html[data-cards=x2] .grid:not(.list) .pc .ph img,html[data-cards=x2] .rail .pc .ph img{height:270px}
+  html[data-cards=x2] .pc .buy .qty{display:inline-flex}
+  html[data-cards=x2] .rail:not(.all)>.pc:nth-child(n+3){display:none}
+  html[data-cards=x15] .grid:not(.list){grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  html[data-cards=x15] .grid:not(.list) .pc{padding:9px}
+  html[data-cards=x15] .grid:not(.list) .pc .ph{height:170px}
+  html[data-cards=x15] .grid:not(.list) .pc .ph img{height:150px}
+  html[data-cards=x15] .grid:not(.list) .pc .nm{font-size:14.5px}
+  html[data-cards=x15] .pc .pr .price{font-size:21px}
+}
+
+/* ------------------------------------------------------------ такие же товары других брендов; разделы и описание бренда */
+.ob .sec-head{align-items:center}
+.ob-sub{font-size:14px;color:var(--muted)}
+.ob-tabs{display:flex;gap:10px;margin-bottom:16px;overflow-x:auto;scrollbar-width:none;padding:2px}
+.ob-tabs::-webkit-scrollbar{display:none}
+.ob-tab{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-width:180px;height:94px;padding:10px 18px;border-radius:16px;border:1px solid var(--line);background:#fff;font:inherit;color:var(--ink);cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .15s}
+.ob-tab:hover{border-color:#9DB3D3;transform:translateY(-1px)}
+.ob-tab.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent),0 10px 24px rgba(30,99,214,.12)}
+.ob-tab>span:last-child{font-size:13px;font-weight:600;color:var(--muted)}
+.ob-tab.on>span:last-child{color:var(--accent)}
+.ob-l{display:flex;align-items:center;justify-content:center;height:40px}
+.ob-l img{max-width:150px;max-height:40px;object-fit:contain}
+.ob-t{font-size:18px;font-weight:800;letter-spacing:.04em}
+.ob-all{display:inline-block;margin-top:12px;font-weight:700;color:var(--accent);text-decoration:none}
+.ob-all:hover{text-decoration:underline}
+.brand-secs{margin-bottom:8px}
+.brand-secs .sec-head{align-items:center}
+.seo-text{color:var(--ink2)}
+.seo-text h2{margin:0 0 10px;font-size:20px;color:var(--ink)}
+.seo-text p{margin:0 0 10px;max-width:1100px}
+.seo-text p:last-child{margin:0}
+@media (max-width:600px){
+  .ob-tab{min-width:150px;height:84px;padding:8px 12px}
+  .ob-l img{max-width:120px;max-height:32px}
+}
+
 .mega.shut .mega-drop{visibility:hidden!important;opacity:0!important}
 .boot{min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;color:var(--muted);font-weight:600}
 .boot i{width:44px;height:44px;border-radius:50%;border:4px solid #D9E3F2;border-top-color:#1E63D6;animation:bootspin .8s linear infinite}
@@ -1099,6 +1180,7 @@ window.GRAN_ASSETS = {"assets/img/bg-about.jpg": "data:image/jpeg;base64,/9j/4AA
 <b>Шапка</b><div data-k="hdr"><button type="button" data-v="light">Светлая</button><button type="button" data-v="band">Фото-полоса</button><button type="button" data-v="photo">Вся на фото</button></div>
 <b>Подвал</b><div data-k="ft"><button type="button" data-v="seasons">Панорама сезонов</button><button type="button" data-v="workshop">Мастерская</button><button type="button" data-v="lineart">Как было</button></div>
 <b>Меню каталога</b><div data-k="menu"><button type="button" data-v="glass">Фото на всю область</button><button type="button" data-v="head">Фото-шапка</button></div>
+<b>Карточки товаров</b><div data-k="cards"><button type="button" data-v="normal">Обычные</button><button type="button" data-v="x15">Крупнее ×1,5</button><button type="button" data-v="x2">Крупные ×2</button></div>
 <b>Ширина сайта</b><div data-k="w"><button type="button" data-v="normal">Обычная</button><button type="button" data-v="wide">Широкая</button></div></div></div>
 <style>
 .look-sw{position:fixed;left:16px;bottom:16px;z-index:300;font:600 14px/1.3 var(--font)}
@@ -1166,6 +1248,24 @@ window.GRAN_ASSETS = {"assets/img/bg-about.jpg": "data:image/jpeg;base64,/9j/4AA
   function imgTag(p, alt, cls) {
     if (!p) return '<img src="' + asset('assets/img/no-photo.svg') + '" alt="" class="' + (cls || '') + '">';
     return '<img src="' + thumb(p) + '" alt="' + esc(alt || '') + '" loading="lazy"' + (cls ? ' class="' + cls + '"' : '') + '>';
+  }
+  // крупные карточки (html[data-cards=x15|x2]): фото в карточках — оригинал, превью поставщика всего 265 px
+  var relayout = null;      // перерисовка выдачи при смене размера карточек (полосы встают после 2-го ряда)
+  function bigCards() { var v = D.documentElement.getAttribute('data-cards'); return !!v && v !== 'normal'; }
+  function cardSrc(p) { return bigCards() && !/^https?:/.test(p) ? orig(p) + '.webp' : thumb(p); }
+  function upgradeCards(root) {
+    if (!bigCards()) return;
+    $$('.pc .ph img', root).forEach(function (im) {
+      var s = im.getAttribute('src') || '', m = /\/upload\/resize_cache\/(iblock\/[^/]+\/[^/]+\/)265_265_0\/(.+)$/.exec(s);
+      if (m) im.src = CDN + m[1] + m[2] + '.webp';
+    });
+  }
+  if (window.MutationObserver) {
+    new MutationObserver(function () { upgradeCards(); if (relayout && $('#lst-grid')) relayout(); }).observe(D.documentElement, { attributes: true, attributeFilter: ['data-cards'] });
+    new MutationObserver(function (list) {
+      if (!bigCards()) return;
+      list.forEach(function (m) { m.addedNodes.forEach(function (n) { if (n.nodeType === 1) upgradeCards(n.matches && n.matches('.pc') ? n.parentNode : n); }); });
+    }).observe(D.documentElement, { childList: true, subtree: true });
   }
   // фото, упавшие до загрузки скрипта, — отправляем по запасным адресам
   $$('img').forEach(function (im) { if (im.complete && !im.naturalWidth && window.imgFb) window.imgFb(im); });
@@ -1553,7 +1653,7 @@ window.GRAN_ASSETS = {"assets/img/bg-about.jpg": "data:image/jpeg;base64,/9j/4AA
     if (!ph) return;
     var list = ph.getAttribute('data-pics').split('|'), img = ph.querySelector('img');
     if (!img || !list[k] || +ph.getAttribute('data-k') === k) return;
-    ph.setAttribute('data-k', k); img.src = thumb(list[k]);
+    ph.setAttribute('data-k', k); img.src = cardSrc(list[k]);
     $$('.ph-dots i', ph).forEach(function (d, i) { d.classList.toggle('on', i === k); });
   }
   function tiltOff(el) {
@@ -1569,7 +1669,7 @@ window.GRAN_ASSETS = {"assets/img/bg-about.jpg": "data:image/jpeg;base64,/9j/4AA
         if (el) {      // заранее подгружаем остальные фото товара
           el.classList.add('tilt');
           var pp = el.querySelector('.ph[data-pics]');
-          if (pp && !pp.hasAttribute('data-pre')) { pp.setAttribute('data-pre', 1); pp.getAttribute('data-pics').split('|').slice(1).forEach(function (x) { new Image().src = thumb(x); }); }
+          if (pp && !pp.hasAttribute('data-pre')) { pp.setAttribute('data-pre', 1); pp.getAttribute('data-pics').split('|').slice(1).forEach(function (x) { new Image().src = cardSrc(x); }); }
         }
       }
       if (!el) return;
@@ -1636,6 +1736,12 @@ window.GRAN_ASSETS = {"assets/img/bg-about.jpg": "data:image/jpeg;base64,/9j/4AA
     if ((el = t.closest('.burger'))) { openDrawer(); return; }
     if ((el = t.closest('[data-yt]'))) { el.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + el.getAttribute('data-yt') + '?autoplay=1" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen title="Видео"></iframe>'; el.removeAttribute('data-yt'); return; }
     if ((el = t.closest('[data-rail-more]'))) { var rb = el.previousElementSibling; if (rb) rb.classList.add('all'); el.remove(); return; }
+    if ((el = t.closest('[data-ob-tab]'))) {      // такие же товары других брендов: вкладка бренда
+      var ob = el.closest('[data-ob]'), k = el.getAttribute('data-ob-tab');
+      $$('[data-ob-tab]', ob).forEach(function (b) { b.classList.toggle('on', b === el); });
+      $$('[data-ob-pane]', ob).forEach(function (pn) { pn.hidden = pn.getAttribute('data-ob-pane') !== k; });
+      return;
+    }
     if ((el = t.closest('[data-var-more]'))) { el.parentNode.classList.add('all'); el.remove(); return; }
     if ((el = t.closest('[data-expand]'))) { var sc = el.parentNode.previousElementSibling; if (sc) sc.classList.remove('collapsed'); el.parentNode.remove(); return; }
     if ((el = t.closest('[data-share]'))) {
@@ -1872,6 +1978,7 @@ window.GRAN_ASSETS = {"assets/img/bg-about.jpg": "data:image/jpeg;base64,/9j/4AA
       } else if (t.closest('[data-open-filters]')) $('#filters').classList.add('open');
       else if (t.closest('[data-close-filters]')) $('#filters').classList.remove('open');
     });
+    relayout = function () { render(); };
     render();
   }
 
@@ -2136,7 +2243,7 @@ window.GRAN_ASSETS = {"assets/img/bg-about.jpg": "data:image/jpeg;base64,/9j/4AA
   function initOnce() { renderMega(); initSuggest(); cityLabel(); }
   function initPage(listing) {
     $$('main input[type=tel]').forEach(phoneMask);
-    initHome(); initSideFly(); initListing(listing); initProduct(); initRails(); initViewed(); initCart(); initFav(); initCompare(); initAccount(); initSearchPage();
+    upgradeCards(); initHome(); initSideFly(); initListing(listing); initProduct(); initRails(); initViewed(); initCart(); initFav(); initCompare(); initAccount(); initSearchPage();
     counters(); markButtons();
   }
   if (SPA) {
@@ -2349,14 +2456,71 @@ window.GRAN_ASSETS = {"assets/img/bg-about.jpg": "data:image/jpeg;base64,/9j/4AA
     return { title: v.name + ' — купить в интернет-магазине ' + CFG.name, html: '<div class="wrap">' + crumbs(cr) + banner + subh + listingShell(n, lead) + '</div>', listing: listingData(items) };
   }
 
+  // ------------------------------------------------------------ другие бренды и разделы бренда (как в сборщике)
+  function words(s) { var o = {}; (s.toLowerCase().replace(/ё/g, 'е').match(/[a-zа-яё0-9]+(?:[.,]\d+)?/g) || []).forEach(function (w) { o[w] = 1; }); return o; }
+  function typeWord(name) { var m = /^\s*([A-Za-zА-Яа-яЁё-]+)/.exec(name); return m ? m[1].toLowerCase() : ''; }
+  function otherBrands(p) {
+    if (!p.brand) return null;
+    var tw = typeWord(p.name), bw = words(p.brand), pw = words(p.name), cand = [], pool = -1;
+    Object.keys(bw).forEach(function (w) { delete pw[w]; });
+    [p.cat, CATS[p.cat].parent].some(function (pc) {
+      if (pc < 0) return false;
+      cand = SUB[pc].filter(function (x) { return x.brand && x.brand !== p.brand && typeWord(x.name) === tw; });
+      if (cand.length) { pool = pc; return true; }
+      return false;
+    });
+    if (!cand.length) return null;
+    function score(x) { var w = words(x.name), xb = words(x.brand), n = 0; Object.keys(w).forEach(function (k) { if (pw[k] && !xb[k]) n++; }); return n; }
+    cand = cand.map(function (x) { return { x: x, k: [x.stock ? 0 : 1, -score(x), x.price || 1e12, x.id] }; }).sort(function (a, b) { return cmpAny(a.k, b.k); }).map(function (o) { return o.x; });
+    var by = {}, order = [], seenf = {};
+    cand.forEach(function (x) {
+      if (x.famId) { if (seenf[x.famId]) return; seenf[x.famId] = 1; }
+      if (!by[x.brand]) { by[x.brand] = []; order.push(x.brand); }
+      by[x.brand].push(x);
+    });
+    order.sort(function (a, b) { return (by[b].length - by[a].length) || cmp(a, b); });
+    return { pool: pool, groups: order.slice(0, 6).map(function (b) { return [b, by[b]]; }) };
+  }
+  function otherBrandsHtml(ob) {
+    var tabs = '', panes = '';
+    ob.groups.forEach(function (g, i) {
+      var b = g[0], xs = g[1], pr = xs.filter(function (x) { return x.stock && x.price; }).map(function (x) { return x.price; });
+      var mark = BLOGO[b] ? '<span class="ob-l"><img src="' + BLOGO[b] + '" alt="' + e(b) + '" loading="lazy"></span>' : '<span class="ob-l ob-t">' + e(b) + '</span>';
+      tabs += '<button type="button" class="ob-tab' + (i ? '' : ' on') + '" data-ob-tab="' + i + '" aria-label="' + e(b) + '">' + mark + '<span>' + goods(xs.length) + (pr.length ? ' · от ' + fmt(Math.min.apply(null, pr)) + ' ₽' : '') + '</span></button>';
+      panes += '<div class="ob-pane" data-ob-pane="' + i + '"' + (i ? ' hidden' : '') + '><div class="rail" data-rail="' + xs.slice(0, 8).map(function (x) { return x.id; }).join(',') + '"></div>' +
+        '<a class="ob-all" href="#/' + CATS[ob.pool].url + '?b=' + encodeURIComponent(b) + '">Все товары ' + e(b) + ' в разделе «' + e(CATS[ob.pool].name) + '» →</a></div>';
+    });
+    return '<section class="sec ob" data-ob><div class="sec-head"><h2 class="h2">Такие же товары других брендов</h2><span class="ob-sub">Сравните цены — ' + ob.groups.map(function (g) { return e(g[0]); }).join(', ') + '</span></div><div class="ob-tabs" role="tablist">' + tabs + '</div>' + panes + '</section>';
+  }
+  function brandGroups(items) {
+    var grp = {}, keys = [];
+    items.forEach(function (p) { var path = catPath(p.cat), g = path.length > 1 ? path[1] : path[0]; if (!grp[g]) { grp[g] = []; keys.push(g); } grp[g].push(p); });
+    return keys.sort(function (a, b) { return (grp[b].length - grp[a].length) || cmp(CATS[a].name, CATS[b].name); }).map(function (g) { return [g, grp[g]]; });
+  }
+
   function pageBrand(b) {
     var items = P.filter(function (p) { return p.brand === b.name; }).sort(function (x, y) {
       return ((x.stock ? 0 : 1) - (y.stock ? 0 : 1)) || cmp(CATS[x.cat].name, CATS[y.cat].name) || cmp(x.name, y.name);
     });
-    var instock = items.filter(function (p) { return p.stock; }).length;
+    var n = items.length, instock = items.filter(function (p) { return p.stock; }).length, groups = brandGroups(items), qb = encodeURIComponent(b.name);
     var logo = BLOGO[b.name] ? '<span class="cb-logo"><img src="' + BLOGO[b.name] + '" alt="' + e(b.name) + '"></span>' : '';
-    var top = '<div class="cat-banner" style="background-image:url(' + bgk('brand') + ')">' + logo + '<p class="eyebrow">Бренд</p><h1>' + e(b.name) + '</h1><p>' + goods(items.length) + ' · ' + instock + ' в наличии</p></div>';
-    return { title: b.name + ' — инструмент и техника ' + b.name + ' в ' + CFG.name, html: '<div class="wrap">' + crumbs([['Бренды', 'brands.html'], [b.name, null]]) + top + listingShell(items.length) + '</div>', listing: listingData(items) };
+    var top = '<div class="cat-banner" style="background-image:url(' + bgk('brand') + ')">' + logo + '<p class="eyebrow">Бренд</p><h1>' + e(b.name) + '</h1><p>' + goods(n) + ' · ' + instock + ' в наличии · ' + groups.length + ' ' + plural(groups.length, 'раздел', 'раздела', 'разделов') + '</p></div>';
+    var tiles = groups.map(function (g) { var r = rep(g[1]); return '<a class="subcat" href="#/' + CATS[g[0]].url + '?b=' + qb + '"><span class="ph">' + img(r ? r.img : '', '') + '</span><b>' + e(CATS[g[0]].name) + '</b><span>' + goods(g[1].length) + '</span></a>'; }).join('');
+    var secs = '<section class="brand-secs"><div class="sec-head"><h2 class="h2">Разделы ' + e(b.name) + '</h2><span class="ob-sub">Выберите раздел — покажем только товары ' + e(b.name) + '</span></div><div class="subcats' + (groups.length > 14 ? ' collapsed' : '') + '">' + tiles + '</div>' +
+      (groups.length > 14 ? '<p style="margin:-8px 0 20px;text-align:center"><button type="button" class="btn btn-ghost" data-expand>Показать все разделы (' + groups.length + ')</button></p>' : '') + '</section>';
+    // описание бренда для покупателей и поисковиков — из данных каталога
+    var bc = mostCommon([].concat.apply([], items.map(function (p) { return p.params.filter(function (q) { return q[0] === 'Страна бренда'; }).map(function (q) { return q[1]; }); })));
+    var made = mostCommon(items.filter(function (p) { return p.country; }).map(function (p) { return p.country; })).slice(0, 3).map(function (x) { return x[0]; });
+    var war = mostCommon(items.filter(function (p) { return p.warranty; }).map(function (p) { return p.warranty; }));
+    var pr = items.filter(function (p) { return p.stock && p.price; }).map(function (p) { return p.price; });
+    var roots = mostCommon(items.map(function (p) { return CATS[catPath(p.cat)[0]].name; })).slice(0, 4);
+    var links = groups.slice(0, 8).map(function (g) { return '<a href="#/' + CATS[g[0]].url + '?b=' + qb + '">' + e(CATS[g[0]].name.toLowerCase()) + '</a> (' + g[1].length + ')'; }).join(', ');
+    var seo = '<div class="box pad seo-text" style="margin-top:24px"><h2>' + e(b.name) + ' — купить в магазине ' + e(CFG.name) + '</h2>' +
+      '<p>' + e(b.name) + ' — бренд инструмента и оборудования' + (bc.length ? ', страна бренда — ' + e(bc[0][0]) : '') + '. В каталоге ' + e(CFG.name) + ' ' + goods(n) + ' ' + e(b.name) + ', из них ' + instock + ' в наличии' + (pr.length ? ', цены от ' + fmt(Math.min.apply(null, pr)) + ' до ' + fmt(Math.max.apply(null, pr)) + ' ₽' : '') + '.</p>' +
+      '<p>Направления: ' + roots.map(function (r) { return e(r[0].toLowerCase()); }).join(', ') + '. Больше всего товаров в разделах: ' + links + '.</p>' +
+      '<p>' + (made.length ? 'Производство: ' + made.map(e).join(', ') + '.' : '') + (war.length ? ' Гарантия производителя — ' + e(war[0][0]) + '.' : '') + ' На товары есть сертификаты и паспорта.</p>' +
+      '<p>Купить ' + e(b.name) + ' можно на сайте, по телефону ' + e(CFG.phone) + ' или в мессенджере: доставка по Москве на следующий день, по России — транспортными компаниями, самовывоз из шоурума в день заказа. Для компаний — счёт с НДС и оптовые цены.</p></div>';
+    return { title: b.name + ' — купить инструмент ' + b.name + ' в ' + CFG.name, html: '<div class="wrap">' + crumbs([['Бренды', 'brands.html'], [b.name, null]]) + top + secs + listingShell(n, seo) + '</div>', listing: listingData(items) };
   }
 
   function seasonItems(season) {
@@ -2517,7 +2681,8 @@ window.GRAN_ASSETS = {"assets/img/bg-about.jpg": "data:image/jpeg;base64,/9j/4AA
     });
     var acc = [], par = cat.parent;
     if (par >= 0) CATS[par].kids.forEach(function (s) { if (s !== p.cat && acc.length < 8) { var r = rep(SUB[s]); if (r) acc.push(r); } });
-    var rel = '';
+    var ob = otherBrands(p);
+    var rel = ob ? otherBrandsHtml(ob) : '';
     if (sim.length) rel += '<section class="sec"><div class="sec-head"><h2 class="h2">Похожие товары</h2><a href="#/' + cat.url + '">Весь раздел →</a></div><div class="rail" data-rail="' + sim.map(function (x) { return x.id; }).join(',') + '"></div></section>';
     rel += '<section class="sec">' + G.strip('order') + '</section>';
     if (acc.length) rel += '<section class="sec"><div class="sec-head"><h2 class="h2">С этим покупают</h2></div><div class="rail" data-rail="' + acc.map(function (x) { return x.id; }).join(',') + '"></div></section>';
