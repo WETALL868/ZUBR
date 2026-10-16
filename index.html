@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru" data-root="#/" data-hdr="band" data-ft="seasons" data-w="wide">
+<html lang="ru" data-root="#/" data-hdr="band" data-ft="seasons" data-w="wide" data-menu="glass">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -178,23 +178,6 @@ form.sent .form-body{display:none}
 .mega-groups.flat .mega-group .gh{padding:10px;border-radius:14px;background:var(--tile)}
 .mega-groups.flat .mega-group .gh:hover{background:var(--soft)}
 .mega-groups.flat .pic{background:#fff}
-.mega-aside{flex:0 0 300px;display:flex;flex-direction:column;gap:12px;padding:16px;background:#F4F6FA;border-left:1px solid var(--line);overflow:auto}
-.ma-banner{position:relative;flex:0 0 auto;min-height:150px;display:flex;flex-direction:column;justify-content:flex-end;padding:14px 16px;border-radius:14px;overflow:hidden;color:#fff;background:var(--navy) center/cover no-repeat}
-.ma-banner::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,22,44,0) 20%,rgba(8,22,44,.85) 100%)}
-.ma-banner>*{position:relative}
-.ma-banner .eyebrow{color:#C9DBF7;font-size:11px}
-.ma-banner .tag{margin:4px 0 0;font-size:20px;font-weight:800;line-height:1.15}
-.mega-promo{display:flex;flex-direction:column;gap:8px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;text-decoration:none;color:var(--ink)}
-.mega-promo:hover{box-shadow:var(--shadow);color:var(--ink)}
-.mega-promo .ph{position:relative;display:flex;align-items:center;justify-content:center;height:130px;background:var(--tile);border-radius:10px}
-.mega-promo .ph img{width:86%;height:116px;object-fit:contain;mix-blend-mode:multiply}
-.mega-promo .ph .badge{position:absolute;top:8px;left:8px}
-.mega-promo b{font-size:13.5px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.mega-promo .row{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.mega-promo .price{font-size:19px}
-.mega-help{display:flex;flex-direction:column;gap:2px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:13px;color:var(--muted)}
-.mega-help b{color:var(--ink);font-size:14px}
-.mega-help a{margin-top:4px;font-size:17px;font-weight:800;color:var(--accent);text-decoration:none}
 
 /* мобильное меню */
 .drawer{position:fixed;inset:0;z-index:200;display:none}
@@ -677,7 +660,6 @@ html:has(.drawer.open),html:has(.drawer.open) body{overflow:hidden}
 
 /* адаптив */
 @media (max-width:1600px){
-  .mega-aside{display:none}
 }
 @media (max-width:1400px){
   .cat-tiles,.grid.cols6{grid-template-columns:repeat(4,minmax(0,1fr))}
@@ -944,17 +926,8 @@ html[data-w=wide] .wrap{max-width:1960px}
 
 /* главная: раскрывающееся меню разделов */
 .home-top{position:relative}
-.sc-fly{position:absolute;right:0;z-index:30;padding:0 0 22px;background:#fff;border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 30px 70px rgba(14,35,64,.24);animation:scfly .16s ease-out}
+.sc-fly{position:absolute;right:0;z-index:30;display:flex;background:#fff;border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 30px 70px rgba(14,35,64,.24);animation:scfly .16s ease-out}
 @keyframes scfly{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}
-.sf-head{position:relative;display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:104px;padding:20px 26px;color:#fff;background:var(--navy) center/cover no-repeat}
-.sf-head::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,22,44,.94),rgba(8,22,44,.45))}
-.sf-head>*{position:relative}
-.sf-head>span{display:flex;align-items:center;gap:14px}
-.sf-head .cic{flex-basis:46px;width:46px;height:46px;border-radius:13px}
-.sf-head b{display:block;font-size:24px;font-weight:800}
-.sf-head small{color:#C7D4E4;font-size:14px}
-.sf-head .sf-all{background:#fff;color:var(--ink);border:0}
-.sc-fly .mega-groups{padding:20px 26px 0}
 .side-cats a.on{background:var(--tile);color:var(--accent)}
 .side-cats a.on .chev{color:var(--accent)}
 
@@ -1064,6 +1037,41 @@ html[data-w=wide] .wrap{max-width:1960px}
   .strip{padding:18px}
 }
 
+/* ------------------------------------------------------------ меню каталога: без правой колонки, фото раздела на всю область, внизу — товар дня и «не нашли» */
+.mega-main{position:relative;display:flex;flex-direction:column}
+.mega-head .eyebrow{margin:0 0 4px}
+.mega-foot{display:flex;align-items:center;flex-wrap:wrap;gap:12px 18px;margin-top:auto;padding:12px 16px;border-radius:16px;background:#F4F6FA}
+.mega-groups{margin-bottom:22px}
+.mf-promo{display:flex;align-items:center;gap:12px;min-width:0;flex:1 1 380px;text-decoration:none;color:var(--ink)}
+.mf-promo .ph{flex:0 0 56px;height:56px;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.mf-promo .ph img{width:48px;height:48px;object-fit:contain;mix-blend-mode:multiply}
+.mf-promo .tx{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0}
+.mf-promo .tx b{font-size:14px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.mf-promo .price{margin-left:auto;font-size:18px;white-space:nowrap}
+.mf-promo:hover b{color:var(--accent)}
+.mf-help{display:flex;flex-direction:column;min-width:0;margin-left:auto}
+.mf-help b{font-size:14px}
+.mf-help span{font-size:13px;color:var(--muted)}
+.mf-tel{font-size:18px;font-weight:800;color:var(--accent);text-decoration:none;white-space:nowrap}
+.sc-fly .mega-main{flex:1;padding:22px 26px 22px;border-radius:inherit}
+/* вариант «фото на всю область»: группы — на полупрозрачных карточках поверх фото раздела */
+html[data-menu=glass] .mega-main{background:linear-gradient(rgba(236,241,247,.12),rgba(236,241,247,.12)),var(--mbg) center/cover no-repeat;background-color:#E9EEF4}
+html[data-menu=glass] .mega-head,html[data-menu=glass] .mega-foot{border:0;border-radius:16px;padding:14px 18px;background:rgba(255,255,255,.8);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 10px 30px rgba(14,35,64,.14)}
+html[data-menu=glass] .mega-groups{gap:14px;margin-top:16px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+html[data-menu=glass] .mega-group:hover{background:rgba(255,255,255,.94)}
+html[data-menu=glass] .mega-group{padding:14px 16px;border-radius:16px;background:rgba(255,255,255,.74);-webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2);box-shadow:0 10px 30px rgba(14,35,64,.14);transition:transform .18s,box-shadow .18s}
+html[data-menu=glass] .mega-group:hover{transform:translateY(-2px);box-shadow:0 16px 36px rgba(14,35,64,.2)}
+html[data-menu=glass] .mega-groups.flat .mega-group{padding:0;background:none;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+html[data-menu=glass] .mega-groups.flat .mega-group .gh{background:rgba(255,255,255,.88);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 10px 30px rgba(14,35,64,.14)}
+html[data-menu=glass] .mega-group .gl{border-left-color:rgba(19,35,58,.12)}
+/* вариант «фото-шапка»: широкое фото раздела сверху во всю ширину меню */
+html[data-menu=head] .mega-head{position:relative;overflow:hidden;min-height:168px;margin:-22px -28px 0;padding:24px 28px;align-items:flex-end;border:0;color:#fff;background:linear-gradient(90deg,rgba(8,22,44,.9) 0%,rgba(8,22,44,.55) 50%,rgba(8,22,44,.15) 100%),var(--mbg) center/cover no-repeat;background-color:var(--navy)}
+html[data-menu=head] .sc-fly .mega-head{margin:-22px -26px 0;border-radius:20px 20px 0 0}
+html[data-menu=head] .mega-head h2{color:#fff;font-size:28px}
+html[data-menu=head] .mega-head h2 small{color:#C7D4E4}
+html[data-menu=head] .mega-head .eyebrow{color:#9FC0F5}
+html[data-menu=head] .mega-head .btn{background:#fff;border-color:#fff}
+
 .mega.shut .mega-drop{visibility:hidden!important;opacity:0!important}
 .boot{min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;color:var(--muted);font-weight:600}
 .boot i{width:44px;height:44px;border-radius:50%;border:4px solid #D9E3F2;border-top-color:#1E63D6;animation:bootspin .8s linear infinite}
@@ -1090,6 +1098,7 @@ window.GRAN_ASSETS = {"assets/img/bg-about.jpg": "data:image/jpeg;base64,/9j/4AA
 <div class="look-sw" id="look-sw"><button type="button" class="ls-btn" aria-expanded="false" aria-label="Варианты оформления">🎨<span> Варианты оформления</span></button><div class="ls-panel" hidden>
 <b>Шапка</b><div data-k="hdr"><button type="button" data-v="light">Светлая</button><button type="button" data-v="band">Фото-полоса</button><button type="button" data-v="photo">Вся на фото</button></div>
 <b>Подвал</b><div data-k="ft"><button type="button" data-v="seasons">Панорама сезонов</button><button type="button" data-v="workshop">Мастерская</button><button type="button" data-v="lineart">Как было</button></div>
+<b>Меню каталога</b><div data-k="menu"><button type="button" data-v="glass">Фото на всю область</button><button type="button" data-v="head">Фото-шапка</button></div>
 <b>Ширина сайта</b><div data-k="w"><button type="button" data-v="normal">Обычная</button><button type="button" data-v="wide">Широкая</button></div></div></div>
 <style>
 .look-sw{position:fixed;left:16px;bottom:16px;z-index:300;font:600 14px/1.3 var(--font)}
@@ -1276,6 +1285,16 @@ window.GRAN_ASSETS = {"assets/img/bg-about.jpg": "data:image/jpeg;base64,/9j/4AA
         (g.links.length ? '<div class="gl">' + g.links.slice(0, 4).map(function (l) { return '<a href="' + R + l[1] + '">' + esc(l[0]) + '</a>'; }).join('') + '</div>' : '') + '</div>';
     }).join('') + '</div>';
   }
+  // содержимое меню раздела: фото раздела на всю область (CSS: html[data-menu]), группы, внизу — товар дня и «не нашли нужное»
+  function megaFill(box, r) {
+    var bg = ((window.MENU || {}).bg || {})[r.bg], p = r.promo, tel = String(window.SITE_PHONE || '').replace(/[^\d+]/g, '');
+    box.style.setProperty('--mbg', bg ? 'url(' + asset(bg) + ')' : 'none');
+    box.innerHTML = '<div class="mega-head"><div>' + (r.tag ? '<p class="eyebrow">' + esc(r.tag) + '</p>' : '') + '<h2>' + esc(r.n) + '<small>' + esc(r.c) + '</small></h2></div><a class="btn btn-line btn-sm" href="' + R + r.u + '">Весь раздел →</a></div>' +
+      groupsHtml(r) +
+      '<div class="mega-foot">' + (p ? '<a class="mf-promo" href="' + R + p.u + '"><span class="ph">' + imgTag(p.img, p.n) + '</span><span class="tx"><span class="badge badge-red">Товар дня</span><b>' + esc(p.n) + '</b></span><span class="price">' + fmt(p.p) + ' ₽</span></a>' : '') +
+      '<div class="mf-help"><b>Не нашли нужное?</b><span>Найдите по артикулу или по фото — или закажите по телефону</span></div>' +
+      (tel ? '<a class="mf-tel" href="tel:' + esc(tel) + '">' + esc(window.SITE_PHONE) + '</a>' : '') + '</div>';
+  }
   function renderMega() {
     var panel = $('#mega-panel'); if (!panel || !menuRoots().length) return;
     var roots = menuRoots(), cur = 0, timer;
@@ -1283,18 +1302,12 @@ window.GRAN_ASSETS = {"assets/img/bg-about.jpg": "data:image/jpeg;base64,/9j/4AA
     panel.innerHTML = '<nav class="mega-roots" aria-label="Разделы каталога">' + roots.map(function (r, i) {
       var sep = i > 0 && roots[i - 1].season && !r.season ? '<span class="mega-sep" aria-hidden="true"></span>' : '';
       return sep + '<a href="' + R + r.u + '" data-i="' + i + '" class="' + (i === 0 ? 'on' : '') + (r.season ? ' sea' : '') + '">' + (r.ic || '<img src="' + thumb(r.img) + '" alt="" loading="lazy">') + '<span class="t"><b>' + esc(r.n) + '</b><small>' + esc(r.c) + '</small></span>' + chev + '</a>';
-    }).join('') + '</nav><div class="mega-main"></div><aside class="mega-aside"></aside>';
-    var main = $('.mega-main', panel), aside = $('.mega-aside', panel);
+    }).join('') + '</nav><div class="mega-main"></div>';
+    var main = $('.mega-main', panel);
     function show(i) {
       cur = i; var r = roots[i];
       $$('.mega-roots a', panel).forEach(function (a, k) { a.classList.toggle('on', k === i); });
-      main.innerHTML = '<div class="mega-head"><h2>' + esc(r.n) + '<small>' + esc(r.c) + '</small></h2><a class="btn btn-line btn-sm" href="' + R + r.u + '">Весь раздел →</a></div>' +
-        groupsHtml(r);
-      var bg = (window.MENU.bg || {})[r.bg] || '';
-      var p = r.promo;
-      aside.innerHTML = '<div class="ma-banner"' + (bg ? ' style="background-image:url(' + asset(bg) + ')"' : '') + '><p class="eyebrow">' + esc(r.n) + '</p><p class="tag">' + esc(r.tag || '') + '</p></div>' +
-        (p ? '<a class="mega-promo" href="' + R + p.u + '"><span class="ph">' + imgTag(p.img, p.n) + '<span class="badge badge-red">Товар дня</span></span><b>' + esc(p.n) + '</b><span class="row"><span class="price">' + fmt(p.p) + ' ₽</span><span class="btn btn-buy btn-sm">Смотреть</span></span></a>' : '') +
-        '<div class="mega-help"><b>Не нашли нужное?</b><span>Подберём по артикулу, фото или описанию задачи</span><a href="tel:' + esc(String(window.SITE_PHONE || '').replace(/[^\d+]/g, '')) + '">' + esc(window.SITE_PHONE || '') + '</a></div>';
+      megaFill(main, r);
     }
     show(0);
     $('.mega-roots', panel).addEventListener('mouseover', function (e) {
@@ -1587,8 +1600,7 @@ window.GRAN_ASSETS = {"assets/img/bg-about.jpg": "data:image/jpeg;base64,/9j/4AA
       var r = rootFor(a); if (!r) { hide(); return; }
       $$('a', side).forEach(function (x) { x.classList.toggle('on', x === a); });
       if (cur === r && !fly.hidden) return; cur = r;
-      var bg = ((window.MENU || {}).bg || {})[r.bg];
-      fly.innerHTML = '<div class="sf-head"' + (bg ? ' style="background-image:url(' + asset(bg) + ')"' : '') + '><span>' + (r.ic || '') + '<span><b>' + esc(r.n) + '</b><small>' + esc((r.tag ? r.tag + ' · ' : '') + r.c) + '</small></span></span><a class="btn btn-sm sf-all" href="' + R + r.u + '">Весь раздел →</a></div>' + groupsHtml(r);
+      fly.innerHTML = '<div class="mega-main"></div>'; megaFill(fly.firstChild, r);
       var tr = top.getBoundingClientRect(), sr = side.getBoundingClientRect();
       fly.style.left = Math.round(sr.right - tr.left + 12) + 'px'; fly.style.top = Math.round(sr.top - tr.top) + 'px'; fly.style.minHeight = Math.round(sr.height) + 'px';
       fly.hidden = false;
