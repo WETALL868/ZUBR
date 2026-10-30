@@ -1,0 +1,288 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=1440"><title>B / Товар</title><style>
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:400;font-display:block;src:url(../../assets/fonts/ibm-plex-sans-cyrillic-400-normal.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:400;font-display:block;src:url(../../assets/fonts/ibm-plex-sans-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD,U+20BD}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:500;font-display:block;src:url(../../assets/fonts/ibm-plex-sans-cyrillic-500-normal.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:500;font-display:block;src:url(../../assets/fonts/ibm-plex-sans-latin-500-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD,U+20BD}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:600;font-display:block;src:url(../../assets/fonts/ibm-plex-sans-cyrillic-600-normal.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:600;font-display:block;src:url(../../assets/fonts/ibm-plex-sans-latin-600-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD,U+20BD}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:400;font-display:block;src:url(../../assets/fonts/ibm-plex-mono-cyrillic-400-normal.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:400;font-display:block;src:url(../../assets/fonts/ibm-plex-mono-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD,U+20BD}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:500;font-display:block;src:url(../../assets/fonts/ibm-plex-mono-cyrillic-500-normal.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:500;font-display:block;src:url(../../assets/fonts/ibm-plex-mono-latin-500-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD,U+20BD}
+*{box-sizing:border-box}html,body{margin:0;padding:0}body{background:#e9e7e4;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+img{display:block;max-width:100%}a{color:inherit;text-decoration:none}button{font:inherit;color:inherit}
+.screen{position:relative;overflow:hidden;margin:0 auto}
+
+.B{--bg:#F4F5F6;--ink:#121417;--ink2:#3D434B;--muted:#6A727C;--line:#DCE0E4;--line2:#EBEEF0;--red:#C5302D;--redd:#A82623;--reds:#FCEEED;--ok:#1F7A45;--warn:#8F5F00;
+  background:#fff;color:var(--ink);font:400 14px/20px 'IBM Plex Sans',sans-serif}
+.B .mono{font-family:'IBM Plex Mono',monospace}
+.B .wrap{width:1376px;margin:0 auto}
+.B .rl{height:3px;background:var(--red)}
+.B .hdr .wrap{display:flex;align-items:center;gap:28px;height:68px}
+.B .logo{display:flex;flex-direction:column;flex:none;gap:2px}
+.B .logo b{font:500 17px/20px 'IBM Plex Mono',monospace;letter-spacing:.06em;display:flex;align-items:center;gap:8px}
+.B .logo b i{width:10px;height:10px;background:var(--red);display:inline-block}
+.B .logo small{font-size:11.5px;line-height:14px;color:var(--muted);letter-spacing:.01em}
+.B .search{flex:1;height:42px;border:1px solid #C9CED4;border-radius:4px;display:flex;align-items:stretch;overflow:hidden}
+.B .search .scope{display:flex;align-items:center;gap:6px;padding:0 12px;background:var(--bg);border-right:1px solid var(--line);font-size:13px;color:var(--ink2)}
+.B .search .q{flex:1;display:flex;align-items:center;gap:8px;padding:0 12px;color:var(--muted);white-space:nowrap;overflow:hidden}
+.B .search .go{display:flex;align-items:center;padding:0 18px;background:var(--ink);color:#fff;font-weight:500;font-size:13.5px}
+.B .ph{font-size:13px;line-height:17px;text-align:right}.B .ph b{display:block;font-weight:600;font-size:14.5px}.B .ph small{color:var(--muted)}
+.B .acts{display:flex;gap:2px}
+.B .act{display:flex;align-items:center;gap:7px;height:40px;padding:0 10px;border-radius:4px;font-size:13px;color:var(--ink2)}
+.B .act .n{font-family:'IBM Plex Mono',monospace;font-size:12px;background:var(--bg);border-radius:3px;padding:1px 5px;color:var(--ink)}
+.B .act .n.r{background:var(--red);color:#fff}
+.B .bar2{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:#fff}
+.B .bar2 .wrap{display:flex;align-items:center;height:42px;gap:0}
+.B .bar2 a{height:42px;display:flex;align-items:center;padding:0 14px;font-size:13.5px;color:var(--ink2);border-right:1px solid var(--line2)}
+.B .bar2 a:first-child{padding-left:0}
+.B .bar2 a em{font-style:normal;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted);margin-left:6px}
+.B .bar2 .r{margin-left:auto;border-right:0;color:var(--red);font-weight:500;gap:6px}
+.B .bar2 .r2{border-right:0;padding-right:0}
+.B .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:40px;padding:0 16px;border-radius:4px;background:var(--red);color:#fff;font-weight:500;font-size:14px;border:0;white-space:nowrap}
+.B .btn.s{height:34px;padding:0 12px;font-size:13px}
+.B .btn.k{background:var(--ink)}
+.B .btn.o{background:#fff;color:var(--ink);border:1px solid #C9CED4}
+.B .lnk{color:var(--red);font-weight:500;display:inline-flex;align-items:center;gap:4px}
+.B .lbl{font:500 11.5px/14px 'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.B h1{font-weight:600;font-size:26px;line-height:32px;letter-spacing:-.01em;margin:0}
+.B h2{font-weight:600;font-size:18px;line-height:24px;margin:0}
+.B .top3{display:grid;grid-template-columns:288px 1fr 336px;gap:24px;margin-top:24px}
+.B .tree{border:1px solid var(--line);border-radius:4px}
+.B .tree .h{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.B .tree a{display:flex;align-items:center;justify-content:space-between;height:40px;padding:0 16px;font-size:14px;border-top:1px solid var(--line2)}
+.B .tree a:nth-child(2){border-top:0}
+.B .tree a span{display:flex;align-items:center;gap:10px}
+.B .tree a em{font-style:normal;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted)}
+.B .tree a.on{background:var(--bg);font-weight:500}
+.B .tree a.sub{padding-left:42px;font-size:13.5px;color:var(--ink2);height:34px}
+.B .ci{width:20px;height:20px;color:var(--ink2)}
+.B .lead{border:1px solid var(--line);border-radius:4px;padding:24px 28px 26px;background:linear-gradient(180deg,#fff, #fff 60%, var(--bg))}
+.B .lead h1{font-size:30px;line-height:36px;margin:10px 0 8px;max-width:640px}
+.B .lead p{margin:0 0 20px;color:var(--ink2);font-size:15px;line-height:22px;max-width:620px}
+.B .sel3{display:grid;grid-template-columns:1fr 1.3fr 1fr auto;gap:8px}
+.B .f{height:44px;border:1px solid #C9CED4;border-radius:4px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;background:#fff}
+.B .f .v{display:flex;flex-direction:column}.B .f label{font-size:11px;line-height:13px;color:var(--muted)}.B .f .t{font-size:14px;line-height:18px}.B .f .t.p{color:var(--muted)}
+.B .sel3 .btn{height:44px}
+.B .hint{margin-top:12px;font-size:12.5px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap}
+.B .hint b{font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--ink2);border-bottom:1px dotted #9AA2AB}
+.B .kpi{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);margin-top:24px;padding-top:16px;gap:20px}
+.B .kpi div{font-size:13px;line-height:18px;color:var(--muted)}.B .kpi b{display:block;color:var(--ink);font-size:14px;font-weight:600;margin-bottom:2px}
+.B .info{border:1px solid var(--line);border-radius:4px}
+.B .info .row{display:grid;grid-template-columns:22px 1fr;gap:12px;padding:14px 16px;border-top:1px solid var(--line2);font-size:13px;line-height:18px;color:var(--muted)}
+.B .info .row:first-child{border-top:0}
+.B .info .row b{display:block;color:var(--ink);font-weight:600;font-size:13.5px;margin-bottom:2px}
+.B .info .ico{color:var(--red)}
+.B .brandidx{margin-top:24px;border:1px solid var(--line);border-radius:4px;display:grid;grid-template-columns:200px 1fr;align-items:center}
+.B .brandidx .h{padding:14px 16px;border-right:1px solid var(--line)}
+.B .brandidx .l{display:flex;flex-wrap:wrap;gap:0;padding:6px 8px}
+.B .brandidx .l a{height:34px;display:flex;align-items:center;padding:0 10px;font-size:14px;font-weight:500;color:var(--ink2);gap:6px}
+.B .brandidx .l a em{font-style:normal;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted);font-weight:400}
+.B .shead{display:flex;align-items:center;justify-content:space-between;margin:32px 0 12px}
+.B .shead .l{display:flex;align-items:baseline;gap:14px}
+.B .seg{display:flex;border:1px solid #C9CED4;border-radius:4px;overflow:hidden}
+.B .seg span{height:32px;padding:0 12px;display:flex;align-items:center;font-size:13px;color:var(--ink2);border-left:1px solid var(--line)}
+.B .seg span:first-child{border-left:0}.B .seg span.on{background:var(--ink);color:#fff}
+.B table{width:100%;border-collapse:collapse}
+.B .tbl{border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.B th{height:36px;background:var(--bg);text-align:left;font:500 11.5px/14px 'IBM Plex Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:0 12px;border-bottom:1px solid var(--line)}
+.B td{height:64px;padding:8px 12px;border-top:1px solid var(--line2);vertical-align:middle;font-size:13.5px}
+.B tr:nth-child(2) td{border-top:0}
+.B td.im{width:76px;padding:6px 6px 6px 12px}.B td.im img{width:60px;height:44px;object-fit:contain}
+.B td .nm{font-weight:500;font-size:14px;line-height:19px;color:var(--ink)}
+.B td .ft{font-size:12.5px;line-height:17px;color:var(--muted);margin-top:2px}
+.B td.c{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink2);white-space:nowrap}
+.B td.n{font-family:'IBM Plex Mono',monospace;text-align:right;white-space:nowrap}
+.B td.pr{font-weight:600;font-size:15px;text-align:right;white-space:nowrap}
+.B .stk{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;white-space:nowrap;color:var(--ok)}
+.B .stk i{width:7px;height:7px;border-radius:1px;background:currentColor}
+.B .stk.order{color:var(--warn)}.B .stk.out{color:var(--muted)}
+.B .clr{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}.B .clr i{width:10px;height:10px;border-radius:2px}
+.B .q{display:inline-flex;align-items:center;height:34px;border:1px solid #C9CED4;border-radius:4px}
+.B .q span{width:28px;height:32px;display:flex;align-items:center;justify-content:center;color:var(--ink2)}
+.B .q i{font-style:normal;width:28px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:13px}
+.B td.act{white-space:nowrap;width:200px}
+.B td.act .w{display:flex;justify-content:flex-end;align-items:center;gap:6px}
+.B .cats6{display:grid;grid-template-columns:repeat(6,1fr);border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.B .cats6 a{padding:16px;border-left:1px solid var(--line);display:flex;flex-direction:column;gap:10px;min-height:118px}
+.B .cats6 a:first-child{border-left:0}
+.B .cats6 b{font-weight:600;font-size:14px;line-height:19px}
+.B .cats6 small{font-size:12.5px;line-height:17px;color:var(--muted)}
+.B .cats6 em{font-style:normal;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);margin-top:auto}
+.B .cats6 .ci{width:28px;height:28px;color:var(--red)}
+.B .help{margin:32px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.B .help>div{border:1px solid var(--line);border-radius:4px;padding:20px 24px}
+.B .help p{margin:6px 0 14px;color:var(--ink2)}
+.B .help ol{margin:0;padding:0;list-style:none;display:grid;gap:8px;counter-reset:s}
+.B .help li{display:grid;grid-template-columns:28px 1fr;font-size:13.5px;color:var(--ink2)}
+.B .help li:before{counter-increment:s;content:counter(s,decimal-leading-zero);font-family:'IBM Plex Mono',monospace;color:var(--red);font-size:12.5px}
+.B .ftr{margin-top:40px;border-top:1px solid var(--line);background:var(--bg)}
+.B .fg{display:grid;grid-template-columns:300px repeat(4,1fr);gap:24px;padding:32px 0 28px}
+.B .fg h4{margin:0 0 10px}
+.B .fg a{display:block;font-size:13.5px;line-height:26px;color:var(--ink2)}
+.B .fg p{margin:10px 0 0;font-size:13px;line-height:19px;color:var(--muted)}
+.B .fb{border-top:1px solid var(--line);height:48px;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--muted)}
+.B .crumbs{display:flex;gap:6px;align-items:center;font-size:12.5px;color:var(--muted);margin:16px 0 10px}
+/* каталог */
+.B .cl{display:grid;grid-template-columns:272px 1fr;gap:24px;margin-top:16px}
+.B .facet{border:1px solid var(--line);border-radius:4px}
+.B .facet .g{padding:12px 14px 14px;border-top:1px solid var(--line)}
+.B .facet .g:first-child{border-top:0}
+.B .facet h5{margin:0 0 8px;display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600}
+.B .ck{display:flex;align-items:center;gap:9px;height:28px;font-size:13.5px;color:var(--ink2)}
+.B .ck i{width:16px;height:16px;border:1.5px solid #AEB5BD;border-radius:3px;display:flex;align-items:center;justify-content:center;color:#fff;flex:none}
+.B .ck.on i{background:var(--ink);border-color:var(--ink)}
+.B .ck em{margin-left:auto;font-style:normal;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted)}
+.B .ck.dis{color:#A9B0B8}
+.B .rg{display:flex;gap:6px}.B .rg span{flex:1;height:34px;border:1px solid #C9CED4;border-radius:4px;display:flex;align-items:center;padding:0 10px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink2)}
+.B .tbar{display:flex;align-items:center;justify-content:space-between;height:44px;border:1px solid var(--line);border-radius:4px;padding:0 6px 0 14px;margin-bottom:12px}
+.B .tbar .l{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--muted)}
+.B .tag{height:26px;padding:0 6px 0 9px;border-radius:3px;background:var(--bg);display:inline-flex;align-items:center;gap:4px;font-size:12.5px;color:var(--ink)}
+.B .tbar .r{display:flex;gap:10px;align-items:center;font-size:13px;color:var(--ink2)}
+.B .dd{height:32px;border:1px solid #C9CED4;border-radius:4px;padding:0 10px;display:flex;align-items:center;gap:6px}
+.B .pgn{display:flex;justify-content:space-between;align-items:center;margin-top:14px;font-size:13px;color:var(--muted)}
+.B .pgn .p{display:flex;gap:4px}.B .pgn .p span{min-width:32px;height:32px;border:1px solid var(--line);border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink2)}.B .pgn .p span.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.B tr.dim td{color:var(--muted)}.B tr.dim td.im img{opacity:.55}
+/* товар */
+.B .ph1{display:flex;justify-content:space-between;align-items:flex-start;gap:24px}
+.B .ph1 .codes{margin-top:8px;display:flex;gap:20px;font-size:12.5px;color:var(--muted)}
+.B .ph1 .codes b{font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--ink2)}
+.B .tools{display:flex;gap:6px}
+.B .tb{height:36px;padding:0 10px;border:1px solid #C9CED4;border-radius:4px;display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink2)}
+.B .p3{display:grid;grid-template-columns:400px 1fr 352px;gap:24px;margin-top:20px;align-items:start}
+.B .gal .m{height:320px;border:1px solid var(--line);border-radius:4px;display:flex;align-items:center;justify-content:center;padding:24px}
+.B .gal .m img{max-height:220px;object-fit:contain}
+.B .gal .th{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}
+.B .gal .th span{height:64px;border:1px solid var(--line);border-radius:4px;display:flex;align-items:center;justify-content:center;padding:4px;overflow:hidden;font-size:11.5px;color:var(--muted);text-align:center}
+.B .gal .th span.on{border-color:var(--ink);border-width:1.5px}.B .gal .th img{max-height:54px;object-fit:contain}
+.B .gal .src{font-size:11.5px;color:var(--muted);margin-top:8px}
+.B .kv{border:1px solid var(--line);border-radius:4px}
+.B .kv .r{display:grid;grid-template-columns:200px 1fr;min-height:38px;align-items:center;padding:0 14px;border-top:1px solid var(--line2);font-size:13.5px}
+.B .kv .r:first-child{border-top:0}
+.B .kv .r span{color:var(--muted)}
+.B .kv .r .mono{font-size:12.5px}
+.B .fitbox{margin-top:12px;border:1px solid var(--line);border-radius:4px;padding:12px 14px;font-size:13px;line-height:19px;color:var(--ink2)}
+.B .fitbox .h{display:flex;justify-content:space-between;margin-bottom:6px}
+.B .buy{border:1px solid #C9CED4;border-radius:4px;overflow:hidden}
+.B .buy .p{padding:16px 18px 14px;border-bottom:1px solid var(--line)}
+.B .buy .p b{font-size:30px;line-height:36px;font-weight:600;letter-spacing:-.01em}
+.B .buy .p small{display:block;font-size:12px;color:var(--muted)}
+.B .whs{padding:4px 18px 10px;border-bottom:1px solid var(--line)}
+.B .whs .r{display:flex;justify-content:space-between;align-items:center;height:32px;font-size:13px;border-top:1px dashed var(--line)}
+.B .whs .r:first-of-type{border-top:0}
+.B .whs .lbl{display:block;padding:10px 0 4px}
+.B .bq{padding:14px 18px 16px}
+.B .bq .row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.B .bq .q{height:44px}.B .bq .q span{width:40px;height:42px}.B .bq .q i{width:36px;font-size:15px}
+.B .bq .tot{text-align:right;font-size:12px;color:var(--muted);line-height:15px}.B .bq .tot b{display:block;font-size:19px;line-height:24px;color:var(--ink);font-weight:600}
+.B .bq .btn{width:100%;height:46px;font-size:15px}
+.B .bq .btn+.btn{margin-top:8px;height:42px}
+.B .bq .ln{display:flex;justify-content:space-between;margin-top:12px;font-size:12.5px;color:var(--ink2)}
+.B .dlv{border-top:1px solid var(--line);padding:12px 18px;font-size:12.5px;line-height:18px;color:var(--ink2);display:grid;gap:6px}
+.B .dlv div{display:flex;gap:8px}.B .dlv .ico{color:var(--muted);flex:none}
+.B .anch{margin-top:32px;border-bottom:1px solid var(--line);display:flex;gap:0;position:relative}
+.B .anch span{height:42px;display:flex;align-items:center;padding:0 16px;font-size:13.5px;color:var(--ink2);border-bottom:2px solid transparent}
+.B .anch span:first-child{padding-left:0}
+.B .anch span.on{color:var(--ink);font-weight:600;border-color:var(--red)}
+.B .anch em{font-style:normal;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted);margin-left:5px}
+.B .sec{display:grid;grid-template-columns:240px 1fr;gap:24px;padding:22px 0;border-bottom:1px solid var(--line2)}
+.B .sec .h2{font-weight:600;font-size:15px}
+.B .sec .h2 small{display:block;font-weight:400;color:var(--muted);font-size:12.5px;margin-top:4px}
+.B .ctab td{height:40px;font-size:13.5px}
+.B .ctab td:first-child{width:180px;color:var(--muted)}
+.B .ctab .mods{display:flex;flex-wrap:wrap;gap:4px 14px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink)}
+.B .twocol{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.B .twocol div{font-size:13px;line-height:19px;color:var(--ink2)}
+.B .twocol b{display:block;color:var(--ink);font-size:13.5px;margin-bottom:4px}
+.B .note{font-size:12px;color:var(--muted);margin-top:8px}
+/* мобильная */
+.B.m{font-size:14px;line-height:20px}
+.B .mh{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 4px 0 16px}
+.B .mh .logo b{font-size:15px}
+.B .mh .r{display:flex}
+.B .i44{width:44px;height:44px;display:flex;align-items:center;justify-content:center;position:relative}
+.B .i44 .n{position:absolute;top:6px;right:4px;font:500 10.5px/16px 'IBM Plex Mono',monospace;background:var(--red);color:#fff;border-radius:3px;padding:0 4px}
+.B .ms{margin:0 16px;height:44px;border:1px solid #C9CED4;border-radius:4px;display:flex;align-items:center;gap:8px;padding:0 12px;color:var(--muted)}
+.B .mfind{margin:12px 16px 0;border:1px solid var(--line);border-radius:4px;padding:14px}
+.B .mfind .g{display:grid;gap:8px;margin-top:10px}
+.B .mfind .btn{height:44px}
+.B .mlist{margin:16px 0 0;border-top:1px solid var(--line)}
+.B .mlist .h{padding:14px 16px 8px}
+.B .mlist a{display:flex;align-items:center;justify-content:space-between;height:52px;padding:0 12px 0 16px;border-bottom:1px solid var(--line2);font-size:14.5px}
+.B .mlist a span{display:flex;align-items:center;gap:12px}
+.B .mlist a em{font-style:normal;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.B .mbr{padding:14px 16px 4px}
+.B .mbr .l{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.B .mbr .l span{height:36px;padding:0 12px;border:1px solid var(--line);border-radius:4px;display:flex;align-items:center;font-size:13.5px;font-weight:500}
+.B .mrows{margin-top:8px;border-top:1px solid var(--line)}
+.B .mrow{display:grid;grid-template-columns:64px 1fr;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line2)}
+.B .mrow img{width:64px;height:48px;object-fit:contain}
+.B .mrow .nm{font-weight:500;font-size:14px;line-height:19px}
+.B .mrow .ft{font-size:12px;line-height:16px;color:var(--muted);margin-top:2px}
+.B .mrow .b{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.B .mrow .b b{font-size:15.5px}
+.B .mrow .btn{height:40px;padding:0 14px}
+.B .mfoot{padding:20px 16px 90px;background:var(--bg);margin-top:20px;font-size:12.5px;color:var(--muted);line-height:19px}
+.B .mfoot b{display:block;font-size:16px;color:var(--ink)}
+.B .mtab{position:absolute;left:0;right:0;bottom:0;height:60px;border-top:1px solid var(--line);background:#fff;display:grid;grid-template-columns:repeat(5,1fr)}
+.B .mtab span{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:10.5px;color:var(--muted);position:relative}
+.B .mtab span.on{color:var(--ink)}
+.B .mtab span.on:before{content:"";position:absolute;top:0;left:30%;right:30%;height:2px;background:var(--red)}
+.B .mtop{height:48px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding:0 4px}
+.B .mtop .t{font-size:13px;color:var(--muted)}
+.B .mp{padding:12px 16px 0}
+.B .mp h1{font-size:19px;line-height:25px;margin:0 0 6px}
+.B .mp .codes{font-size:12px;line-height:17px;color:var(--muted)}.B .mp .codes b{font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--ink2)}
+.B .mgal{display:grid;grid-template-columns:1fr 64px;gap:8px;margin:12px 16px 0}
+.B .mgal .m{height:180px;border:1px solid var(--line);border-radius:4px;display:flex;align-items:center;justify-content:center}
+.B .mgal .m img{max-height:130px;max-width:250px;object-fit:contain}
+.B .mgal .th{display:grid;gap:8px}.B .mgal .th span{height:54px;border:1px solid var(--line);border-radius:4px;display:flex;align-items:center;justify-content:center;overflow:hidden}.B .mgal .th span.on{border-color:var(--ink)}.B .mgal .th img{max-height:44px;object-fit:contain}
+.B .mkv{margin:12px 16px 0;border:1px solid var(--line);border-radius:4px}
+.B .mkv .r{display:grid;grid-template-columns:120px 1fr;min-height:34px;align-items:center;padding:0 12px;border-top:1px solid var(--line2);font-size:13px}
+.B .mkv .r:first-child{border-top:0}.B .mkv .r span{color:var(--muted)}
+.B .mbuy{margin:12px 16px 0;border:1px solid #C9CED4;border-radius:4px;padding:12px}
+.B .mbuy .p{display:flex;justify-content:space-between;align-items:baseline}
+.B .mbuy .p b{font-size:26px;line-height:32px}
+.B .mbuy .w{font-size:12.5px;line-height:18px;margin:8px 0 10px;color:var(--ink2)}
+.B .mbuy .w div{display:flex;justify-content:space-between}
+.B .mbuy .row{display:flex;gap:8px}
+.B .mbuy .q{height:46px}.B .mbuy .q span{width:38px;height:44px}.B .mbuy .q i{width:28px}
+.B .mbuy .row .btn{flex:1;height:46px}
+.B .mbuy .one{width:100%;height:44px;margin-top:8px}
+.B .msect{border-top:1px solid var(--line)}
+.B .msect .hh{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-weight:600;font-size:15px}
+.B .msect .hh em{font-style:normal;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);font-weight:400;margin-left:6px}
+.B .msect .bd{padding:0 16px 16px}
+.B .sbar{position:absolute;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #C9CED4;padding:8px 12px 12px;display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center}
+.B .sbar .p{font-size:11.5px;line-height:14px;color:var(--muted)}.B .sbar .p b{display:block;font-size:17px;line-height:21px;color:var(--ink)}
+.B .sbar .q{height:44px}.B .sbar .q span{width:34px;height:42px}.B .sbar .q i{width:24px}
+.B .sbar .btn{height:44px}
+
+</style></head><body><div class="screen B" data-name="B / 03 Товар CE285A / Desktop 1440" style="width:1440px"><div class="rl"></div><header class="hdr"><div class="wrap"><a class="logo" href="B-home.html"><b><i></i>SAKURA RUSSIA</b><small>Картриджи · бумага · экраны</small></a>
+<div class="search"><span class="scope">Везде <svg class="ico " width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"/></svg></span><span class="q"><svg class="ico " width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>Артикул, номер оригинала или модель</span><span class="go">Найти</span></div>
+<div class="ph"><b>+7 (495) 477-56-25</b><small>Пн–пт, 9:00–18:00</small></div>
+<div class="acts"><a class="act"><svg class="ico " width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 5.6a4.8 4.8 0 0 0-6.8 0L12 6.3l-.7-.7a4.8 4.8 0 1 0-6.8 6.8l7.5 7.4 7.5-7.4a4.8 4.8 0 0 0 0-6.8Z"/></svg>Избранное <span class="n">3</span></a><a class="act"><svg class="ico " width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 19V10M12 19V5M18 19v-6"/></svg>Сравнение <span class="n">2</span></a><a class="act"><svg class="ico " width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2.2l2 11h10.6l1.9-8H6.4"/><circle cx="9" cy="19.5" r="1.3"/><circle cx="17" cy="19.5" r="1.3"/></svg>Корзина <span class="n r">2</span></a><a class="act"><svg class="ico " width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg>Вход</a></div></div></header>
+<div class="bar2"><div class="wrap"><a><svg class="ico " width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>&nbsp; Каталог</a><a href="B-catalog.html">Лазерные картриджи</a><a >Струйные картриджи</a><a >Проекционные экраны</a><a >Фотобумага</a><a >Широкоформатная бумага</a><a >Крепления</a><a class="r"><svg class="ico " width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9V3.5h10V9"/><rect x="3.5" y="9" width="17" height="8" rx="1.5"/><path d="M7 14h10v6.5H7z"/></svg>Подбор по принтеру</a><a class="r2">Доставка</a><a class="r2">Контакты</a></div></div><main class="wrap">
+<div class="crumbs">Главная <svg class="ico " width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9.5 6.5 5.5 5.5-5.5 5.5"/></svg> Лазерные картриджи <svg class="ico " width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9.5 6.5 5.5 5.5-5.5 5.5"/></svg> HP <svg class="ico " width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9.5 6.5 5.5 5.5-5.5 5.5"/></svg> <span style="color:var(--ink)">CE285A</span></div>
+<div class="ph1"><div><h1>Картридж SAKURA CE285A / CB435A / 436A / 725</h1><div class="codes"><span>Артикул <b>SA-SACE285A/CB435A/436A/725</b></span><span>Код производителя <b>SACE285A/CB435A/436A/725</b></span><span>Аналог <b>HP 85A, HP 35A, HP 36A, Canon 725</b></span></div></div>
+<div class="tools"><span class="tb"><svg class="ico " width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 5.6a4.8 4.8 0 0 0-6.8 0L12 6.3l-.7-.7a4.8 4.8 0 1 0-6.8 6.8l7.5 7.4 7.5-7.4a4.8 4.8 0 0 0 0-6.8Z"/></svg>В избранное</span><span class="tb"><svg class="ico " width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 19V10M12 19V5M18 19v-6"/></svg>Сравнить</span><span class="tb"><svg class="ico " width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="17.5" cy="6" r="2.2"/><circle cx="6.5" cy="12" r="2.2"/><circle cx="17.5" cy="18" r="2.2"/><path d="m8.5 11 7-4M8.5 13l7 4"/></svg></span></div></div>
+<section class="p3"><div class="gal"><div class="m"><img src="../../assets/products/ce285a.jpg" alt=""></div><div class="th"><span class="on"><img src="../../assets/products/ce285a.jpg" alt=""></span><span><img src="../../assets/products/ce285a-label.jpg" alt=""></span><span><img src="../../assets/products/ce285a-end.jpg" alt=""></span><span>Схема установки<br>PDF</span></div><div class="src">Фото упаковки: sakurarussia.ru</div></div>
+<div><div class="kv"><div class="r"><span>Тип</span>Лазерный картридж</div><div class="r"><span>Цвет печати</span><span class="clr"><i style="background:#1d1d1f"></i>Чёрный</span></div><div class="r"><span>Ресурс</span>2 000 стр. при 5% заполнении</div><div class="r"><span>Модель оригинала</span>HP 85A, HP 35A, HP 36A, Canon 725</div><div class="r"><span>Совместимость</span>17 моделей HP и Canon</div></div>
+<div class="fitbox"><div class="h"><b>Подходит для</b><a class="lnk">Таблица совместимости <svg class="ico " width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"/></svg></a></div><span class="mono" style="font-size:12.5px">HP LaserJet P1005 · P1006 · P1102 · P1102W · P1505 · M1120 · M1522N … Canon LBP6000 · MF3010</span></div></div>
+<aside class="buy"><div class="p"><b>425 ₽</b><small>Цена за 1 шт., включая НДС · демо</small></div>
+<div class="whs"><span class="lbl">Наличие по складам</span><div class="r"><span>Москва, Ясеневая ул., 50</span><span class="stk"><i></i>В наличии</span></div><div class="r"><span>Склад поставщика</span><span class="stk order"><i></i>Под заказ</span></div></div>
+<div class="bq"><div class="row"><span class="q"><span><svg class="ico " width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12h12"/></svg></span><i>2</i><span><svg class="ico " width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6v12M6 12h12"/></svg></span></span><div class="tot">2 × 425 ₽<b>850 ₽</b></div></div><a class="btn"><svg class="ico " width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2.2l2 11h10.6l1.9-8H6.4"/><circle cx="9" cy="19.5" r="1.3"/><circle cx="17" cy="19.5" r="1.3"/></svg>В корзину</a><a class="btn o">Купить в 1 клик</a><div class="ln"><span><svg class="ico " width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.5M12 7.8v.2"/></svg> Сверьте модель принтера</span><a class="lnk">Таблица <svg class="ico " width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13.5 6.5 19 12l-5.5 5.5"/></svg></a></div></div>
+<div class="dlv"><div><svg class="ico " width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6h11v10h-11zM13.5 9.5h4l3 3.5V16h-7"/><circle cx="7" cy="17.5" r="1.7"/><circle cx="17" cy="17.5" r="1.7"/></svg>Доставка СДЭК: стоимость и срок при оформлении</div><div><svg class="ico " width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 10c0 5.2-7 11-7 11s-7-5.8-7-11a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>Самовывоз: Ясеневая ул., 50, пн–пт, 9:00–18:00</div><div><svg class="ico " width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/></svg>Оплата картой или через СБП</div></div></aside></section>
+<nav class="anch"><span class="on">Совместимость <em>17</em></span><span>Характеристики</span><span>Описание</span><span>Доставка и оплата</span><span>Гарантия и возврат</span><span>Документы <em>1</em></span><span>Аналоги <em>3</em></span></nav>
+<section class="sec"><div class="h2">Совместимость<small>По названию товара в текущем магазине, требует проверки</small></div><div><div class="tbl"><table class="ctab"><tr><th>Серия</th><th>Модели</th></tr><tr><td>HP LaserJet</td><td><div class="mods"><span>P1005</span><span>P1006</span><span>P1102</span><span>P1102W</span><span>P1500</span><span>P1505</span><span>P1505N</span><span>M1120</span><span>M1120N</span><span>M1522N</span><span>M1522F</span><span>1522</span></div></td></tr><tr><td>Canon i-SENSYS</td><td><div class="mods"><span>LBP6000</span><span>LBP6018</span><span>LBP6020</span><span>LBP6030</span><span>MF3010</span></div></td></tr></table></div></div></section>
+<section class="sec"><div class="h2">Характеристики</div><div class="kv"><div class="r"><span>Тип</span>Картридж для лазерного принтера</div><div class="r"><span>Цвет печати</span>Чёрный</div><div class="r"><span>Ресурс</span>2 000 страниц при 5% заполнении</div><div class="r"><span>Модель оригинала</span>HP 85A, HP 35A, HP 36A, Canon 725</div><div class="r"><span>Артикул производителя</span><span class="mono" style="color:var(--ink)">SACE285A/CB435A/436A/725</span></div><div class="r"><span>Производитель картриджа</span>SAKURA</div><div class="r"><span>Вес</span>0,806 кг</div><div class="r"><span>Объём упаковки</span>0,0038 м³</div></div></section>
+<section class="sec"><div class="h2">Описание</div><div style="color:var(--ink2);max-width:820px">Совместимый картридж SAKURA для лазерных принтеров HP и Canon. Чёрная печать, ресурс до 2&nbsp;000 страниц при 5% заполнении. Перед заказом проверьте модель принтера в таблице совместимости.</div></section>
+<section class="sec"><div class="h2">Доставка, оплата, гарантия</div><div class="twocol"><div><b>Доставка</b>СДЭК до двери или пункта выдачи. Самовывоз в Москве. Стоимость рассчитывается при оформлении.</div><div><b>Оплата</b>Банковская карта или СБП онлайн. Электронный чек после оплаты.</div><div><b>Гарантия и возврат</b>Порядок описан на странице «Гарантия и возврат». Срок гарантии подтверждает продавец.</div></div></section>
+<div class="shead"><div class="l"><h2>Аналоги и похожие позиции</h2></div></div>
+<div class="tbl"><table><tr><th></th><th>Наименование и совместимость</th><th>Код</th><th style="text-align:right">Ресурс, стр.</th><th>Цвет</th><th>Наличие</th><th style="text-align:right">Цена</th><th></th></tr><tr class=""><td class="im"><img src="../../assets/products/cb435a.jpg" alt=""></td><td><a class="nm" href="B-product.html">Картридж SAKURA CB435A</a><div class="ft">HP LaserJet P1005, P1006</div></td><td class="c">CB435A</td><td class="n">2 000</td><td><span class="clr"><i style="background:#1d1d1f"></i>Чёрный</span></td><td><span class="stk in"><i></i>В наличии</span></td><td class="pr">413 ₽</td><td class="act"><div class="w"><span class="q"><span><svg class="ico " width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12h12"/></svg></span><i>1</i><span><svg class="ico " width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6v12M6 12h12"/></svg></span></span><a class="btn s"><svg class="ico " width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2.2l2 11h10.6l1.9-8H6.4"/><circle cx="9" cy="19.5" r="1.3"/><circle cx="17" cy="19.5" r="1.3"/></svg>В корзину</a></div></td></tr><tr class=""><td class="im"><img src="../../assets/products/cb436a.jpg" alt=""></td><td><a class="nm" href="B-product.html">Картридж SAKURA CB436A</a><div class="ft">HP LaserJet P1505, M1120, M1522</div></td><td class="c">CB436A</td><td class="n">2 000</td><td><span class="clr"><i style="background:#1d1d1f"></i>Чёрный</span></td><td><span class="stk in"><i></i>В наличии</span></td><td class="pr">425 ₽</td><td class="act"><div class="w"><span class="q"><span><svg class="ico " width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12h12"/></svg></span><i>1</i><span><svg class="ico " width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6v12M6 12h12"/></svg></span></span><a class="btn s"><svg class="ico " width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2.2l2 11h10.6l1.9-8H6.4"/><circle cx="9" cy="19.5" r="1.3"/><circle cx="17" cy="19.5" r="1.3"/></svg>В корзину</a></div></td></tr><tr class=""><td class="im"><img src="../../assets/products/c7115a.jpg" alt=""></td><td><a class="nm" href="B-product.html">Картридж SAKURA C7115A / Q2613A / 2624A</a><div class="ft">HP LaserJet 1000, 1200, 1300, 3300</div></td><td class="c">C7115A / Q2613A / 2624A</td><td class="n">2 500</td><td><span class="clr"><i style="background:#1d1d1f"></i>Чёрный</span></td><td><span class="stk in"><i></i>В наличии</span></td><td class="pr">652 ₽</td><td class="act"><div class="w"><span class="q"><span><svg class="ico " width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12h12"/></svg></span><i>1</i><span><svg class="ico " width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6v12M6 12h12"/></svg></span></span><a class="btn s"><svg class="ico " width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2.2l2 11h10.6l1.9-8H6.4"/><circle cx="9" cy="19.5" r="1.3"/><circle cx="17" cy="19.5" r="1.3"/></svg>В корзину</a></div></td></tr></table></div>
+</main><footer class="ftr"><div class="wrap"><div class="fg"><div><a class="logo"><b><i></i>SAKURA RUSSIA</b><small>Картриджи · бумага · экраны</small></a><p>Розничный интернет-магазин расходных материалов для печати и проекционного оборудования.</p></div>
+<div><h4 class="lbl">Каталог</h4><a>Лазерные картриджи</a><a>Струйные картриджи</a><a>Проекционные экраны</a><a>Фотобумага</a><a>Широкоформатная бумага</a><a>Крепления</a></div>
+<div><h4 class="lbl">Покупателям</h4><a>Подбор картриджа</a><a>Доставка и оплата</a><a>Гарантия и возврат</a><a>Помощь и FAQ</a><a>Личный кабинет</a></div>
+<div><h4 class="lbl">Компания</h4><a>О компании</a><a>Контакты</a><a>Реквизиты</a><a>Политика конфиденциальности</a><a>Пользовательское соглашение</a></div>
+<div><h4 class="lbl">Контакты</h4><a><b>+7 (495) 477-56-25</b></a><a>info@tdofficetorg.ru</a><p>Москва, Ясеневая ул., 50, офис 114<br>Пн–пт, 9:00–18:00</p></div></div>
+<div class="fb"><span>© 2026 Sakura Russia · Реквизиты продавца указываются после согласования</span><span class="mono">Демо-данные: цены, остатки и сроки условные</span></div></div></footer></div></body></html>

@@ -1,0 +1,52 @@
+[
+  {
+    "brand": "HP",
+    "file": "brands/hp.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:HP_logo_2025.svg",
+    "purpose": "Переход к совместимым картриджам для принтеров указанного производителя",
+    "derived_png": "brands/png/hp.png"
+  },
+  {
+    "brand": "Canon",
+    "file": "brands/canon.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Canon_logo.svg",
+    "purpose": "Переход к совместимым картриджам для принтеров указанного производителя",
+    "derived_png": "brands/png/canon.png"
+  },
+  {
+    "brand": "Brother",
+    "file": "brands/brother.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Brother_logo.svg",
+    "purpose": "Переход к совместимым картриджам для принтеров указанного производителя",
+    "derived_png": "brands/png/brother.png"
+  },
+  {
+    "brand": "Kyocera",
+    "file": "brands/kyocera.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Kyocera_logo.svg",
+    "purpose": "Переход к совместимым картриджам для принтеров указанного производителя",
+    "derived_png": "brands/png/kyocera.png"
+  },
+  {
+    "brand": "Samsung",
+    "file": "brands/samsung.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Samsung_logo_wordmark.svg",
+    "purpose": "Переход к совместимым картриджам для принтеров указанного производителя",
+    "derived_png": "brands/png/samsung.png",
+    "color_fix": "brands/samsung-blue.svg: охранное поле прозрачное, надпись #1428A0 вместо белой на чёрном"
+  },
+  {
+    "brand": "Xerox",
+    "file": "brands/xerox.svg",
+    "source": "https://commons.wikimedia.org/wiki/File:Xerox_logo.svg",
+    "purpose": "Переход к совместимым картриджам для принтеров указанного производителя",
+    "derived_png": "brands/png/xerox.png"
+  },
+  {
+    "brand": "Pantum",
+    "file": "brands/pantum.png",
+    "source": "https://global.pantum.com/",
+    "purpose": "Переход к совместимым картриджам для принтеров указанного производителя",
+    "derived_png": "brands/png/pantum.png"
+  }
+]

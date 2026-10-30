@@ -1,0 +1,50 @@
+{
+ "page": {
+  "name": "SAKURA / Claude / Варианты 2026-10-30",
+  "id": "42:242"
+ },
+ "overview": "85:2",
+ "sources_section": "66:242",
+ "sections": {
+  "A": "42:243",
+  "B": "42:244",
+  "C": "42:245"
+ },
+ "frames": {
+  "A": {
+   "home": "67:2",
+   "catalog": "68:2",
+   "product": "69:2",
+   "m-home": "70:2",
+   "m-product": "71:2",
+   "m-product-scroll": "72:2"
+  },
+  "B": {
+   "home": "73:2",
+   "catalog": "74:2",
+   "product": "75:2",
+   "m-home": "76:2",
+   "m-product": "77:2",
+   "m-product-scroll": "78:2"
+  },
+  "C": {
+   "home": "79:2",
+   "catalog": "80:2",
+   "product": "81:2",
+   "m-home": "82:2",
+   "m-product": "83:2",
+   "m-product-scroll": "84:2"
+  }
+ },
+ "generated_images": {
+  "hero-a": "45:242",
+  "cat-laser": "45:243",
+  "cat-ink": "45:244",
+  "cat-screens": "45:245",
+  "cat-photo": "45:246",
+  "cat-roll": "45:247",
+  "cat-mounts": "45:248"
+ },
+ "file": "https://www.figma.com/design/6aMHGbcuXzqn4Ppb0gl1i0",
+ "existing_page_untouched": "0:1 SAKURA / Светлый концепт v5 / Фирменные акценты"
+}
